@@ -1,0 +1,549 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!74 &7400000
+AnimationClip:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Shoot
+  m_AnimationType: 1
+  m_Compressed: 0
+  m_UseHighQualityCurve: 1
+  m_RotationCurves:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: -0.4446566, y: 0, z: 0, w: -0.003954768}
+        outSlope: {x: -0.4446566, y: 0, z: 0, w: -0.003954768}
+        tangentMode: 0
+      - time: 0.04
+        value: {x: -0.017786264, y: 0, z: -0, w: 0.9998418}
+        inSlope: {x: -0.19920827, y: 0, z: 0, w: -0.0015869737}
+        outSlope: {x: -0.19920827, y: 0, z: 0, w: -0.0015869737}
+        tangentMode: 0
+      - time: 0.16
+        value: {x: -0.006261055, y: 0, z: -0, w: 0.9999804}
+        inSlope: {x: 0.12094979, y: 0, z: 0, w: 0.0008091331}
+        outSlope: {x: 0.12094979, y: 0, z: 0, w: 0.0008091331}
+        tangentMode: 0
+      - time: 0.39999998
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0.11017987, y: -0.010010836, z: 0.018051464, w: -0.00050216884}
+        outSlope: {x: 0.11017987, y: -0.010010836, z: 0.018051464, w: -0.00050216884}
+        tangentMode: 0
+      - time: 0.59999996
+        value: {x: 0.14954226, y: -0.010025389, z: 0.026214447, w: 0.98835695}
+        inSlope: {x: 1.031502, y: -0.04261631, z: 0.19202937, w: -0.1604617}
+        outSlope: {x: 1.031502, y: -0.04261631, z: 0.19202937, w: -0.1604617}
+        tangentMode: 0
+      - time: 0.79999995
+        value: {x: 0.24785061, y: -0.012259638, z: 0.045139473, w: 0.9676685}
+        inSlope: {x: -0.32549608, y: 0.002045859, z: -0.06428365, w: 0.08416025}
+        outSlope: {x: -0.32549608, y: 0.002045859, z: -0.06428365, w: 0.08416025}
+        tangentMode: 0
+      - time: 1
+        value: {x: 0.09044943, y: -0.006983135, z: 0.015442826, w: 0.99575686}
+        inSlope: {x: -0.9103554, y: 0.055783343, z: -0.16217873, w: 0.08708686}
+        outSlope: {x: -0.9103554, y: 0.055783343, z: -0.16217873, w: 0.08708686}
+        tangentMode: 0
+      - time: 1.16
+        value: {x: 5.3712456E-15, y: -4.9582206E-16, z: 8.7577383E-16, w: 1}
+        inSlope: {x: -0.08995803, y: 0.00819749, z: -0.014725442, w: 0.0003345314}
+        outSlope: {x: -0.08995803, y: 0.00819749, z: -0.014725442, w: 0.0003345314}
+        tangentMode: 0
+      - time: 1.28
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladArrowHolder
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0, y: -1.0904847, z: 0, w: -0.023794174}
+        outSlope: {x: 0, y: -1.0904847, z: 0, w: -0.023794174}
+        tangentMode: 0
+      - time: 0.04
+        value: {x: 0, y: -0.043619387, z: -0, w: 0.99904823}
+        inSlope: {x: 0, y: -0.56703734, z: 0, w: -0.012867898}
+        outSlope: {x: 0, y: -0.56703734, z: 0, w: -0.012867898}
+        tangentMode: 0
+      - time: 0.12
+        value: {x: 0, y: -0.043619387, z: -0, w: 0.99904823}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.44
+        value: {x: 0, y: -0.043619387, z: -0, w: 0.99904823}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.56
+        value: {x: 0, y: -0.021814886, z: -0, w: 0.99976206}
+        inSlope: {x: 0, y: 0.37486988, z: 0, w: 0.008179247}
+        outSlope: {x: 0, y: 0.37486988, z: 0, w: 0.008179247}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 0, y: -1.0473164E-15, z: -0, w: 1}
+        inSlope: {x: 0, y: 0.17044117, z: 0, w: 0.000581145}
+        outSlope: {x: 0, y: 0.17044117, z: 0, w: 0.000581145}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladRightBow
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0, y: 6.1326847, z: 0, w: -0.7638663}
+        outSlope: {x: 0, y: 6.1326847, z: 0, w: -0.7638663}
+        tangentMode: 0
+      - time: 0.04
+        value: {x: 0, y: 0.24530739, z: -0, w: 0.96944535}
+        inSlope: {x: 0, y: 3.0028505, z: 0, w: -0.36604404}
+        outSlope: {x: 0, y: 3.0028505, z: 0, w: -0.36604404}
+        tangentMode: 0
+      - time: 0.08
+        value: {x: 0, y: 0.24022804, z: -0, w: 0.9707165}
+        inSlope: {x: 0, y: -0.14827532, z: 0, w: 0.03655702}
+        outSlope: {x: 0, y: -0.14827532, z: 0, w: 0.03655702}
+        tangentMode: 0
+      - time: 0.12
+        value: {x: 0, y: 0.23344536, z: -0, w: 0.9723699}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.16
+        value: {x: 0, y: 0.24022804, z: -0, w: 0.9707165}
+        inSlope: {x: 0, y: -1.4901161E-08, z: 0, w: 3.7252903E-09}
+        outSlope: {x: 0, y: -1.4901161E-08, z: 0, w: 3.7252903E-09}
+        tangentMode: 0
+      - time: 0.19999999
+        value: {x: 0, y: 0.23344536, z: -0, w: 0.9723699}
+        inSlope: {x: 0, y: -0.02118221, z: 0, w: 0.0052228635}
+        outSlope: {x: 0, y: -0.02118221, z: 0, w: 0.0052228635}
+        tangentMode: 0
+      - time: 0.32
+        value: {x: 0, y: 0.23853347, z: -0, w: 0.9711343}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.44
+        value: {x: 0, y: 0.23853347, z: -0, w: 0.9711343}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.52
+        value: {x: 0, y: 0.20182589, z: -0, w: 0.97942144}
+        inSlope: {x: 0, y: -1.4799573, z: 0, w: 0.27028838}
+        outSlope: {x: 0, y: -1.4799573, z: 0, w: 0.27028838}
+        tangentMode: 0
+      - time: 0.56
+        value: {x: 0, y: 0.12013685, z: -0, w: 0.9927574}
+        inSlope: {x: 0, y: -2.0525136, z: 0, w: 0.24838148}
+        outSlope: {x: 0, y: -2.0525136, z: 0, w: 0.24838148}
+        tangentMode: 0
+      - time: 0.59999996
+        value: {x: 0, y: 0.037624843, z: -0, w: 0.99929196}
+        inSlope: {x: 0, y: -1.5017114, z: 0, w: 0.09053282}
+        outSlope: {x: 0, y: -1.5017114, z: 0, w: 0.09053282}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 0, y: 5.7811866E-15, z: -0, w: 1}
+        inSlope: {x: 0, y: -0.9406206, z: 0, w: 0.01770108}
+        outSlope: {x: 0, y: -0.9406206, z: 0, w: 0.01770108}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladRightBow/VladRightString
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0, y: 1.0904847, z: 0, w: -0.023794174}
+        outSlope: {x: 0, y: 1.0904847, z: 0, w: -0.023794174}
+        tangentMode: 0
+      - time: 0.04
+        value: {x: 0, y: 0.043619387, z: -0, w: 0.99904823}
+        inSlope: {x: 0, y: 0.56703734, z: 0, w: -0.012867898}
+        outSlope: {x: 0, y: 0.56703734, z: 0, w: -0.012867898}
+        tangentMode: 0
+      - time: 0.12
+        value: {x: 0, y: 0.043619387, z: -0, w: 0.99904823}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.44
+        value: {x: 0, y: 0.043619387, z: -0, w: 0.99904823}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.56
+        value: {x: 0, y: 0.021814886, z: -0, w: 0.99976206}
+        inSlope: {x: 0, y: -0.37486988, z: 0, w: 0.008179247}
+        outSlope: {x: 0, y: -0.37486988, z: 0, w: 0.008179247}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 0, y: 1.0473164E-15, z: -0, w: 1}
+        inSlope: {x: 0, y: -0.17044117, z: 0, w: 0.000581145}
+        outSlope: {x: 0, y: -0.17044117, z: 0, w: 0.000581145}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladLeftBow
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0, y: -0, z: -0, w: 1}
+        inSlope: {x: 0, y: -6.1326847, z: 0, w: -0.7638663}
+        outSlope: {x: 0, y: -6.1326847, z: 0, w: -0.7638663}
+        tangentMode: 0
+      - time: 0.04
+        value: {x: 0, y: -0.24530739, z: -0, w: 0.96944535}
+        inSlope: {x: 0, y: -3.0028505, z: 0, w: -0.36604404}
+        outSlope: {x: 0, y: -3.0028505, z: 0, w: -0.36604404}
+        tangentMode: 0
+      - time: 0.08
+        value: {x: 0, y: -0.24022804, z: -0, w: 0.9707165}
+        inSlope: {x: 0, y: 0.14827532, z: 0, w: 0.03655702}
+        outSlope: {x: 0, y: 0.14827532, z: 0, w: 0.03655702}
+        tangentMode: 0
+      - time: 0.12
+        value: {x: 0, y: -0.23344536, z: -0, w: 0.9723699}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.16
+        value: {x: 0, y: -0.24022804, z: -0, w: 0.9707165}
+        inSlope: {x: 0, y: 1.4901161E-08, z: 0, w: 3.7252903E-09}
+        outSlope: {x: 0, y: 1.4901161E-08, z: 0, w: 3.7252903E-09}
+        tangentMode: 0
+      - time: 0.19999999
+        value: {x: 0, y: -0.23344536, z: -0, w: 0.9723699}
+        inSlope: {x: 0, y: 0.02118221, z: 0, w: 0.0052228635}
+        outSlope: {x: 0, y: 0.02118221, z: 0, w: 0.0052228635}
+        tangentMode: 0
+      - time: 0.32
+        value: {x: 0, y: -0.23853347, z: -0, w: 0.9711343}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.44
+        value: {x: 0, y: -0.23853347, z: -0, w: 0.9711343}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+      - time: 0.52
+        value: {x: 0, y: -0.20182589, z: -0, w: 0.97942144}
+        inSlope: {x: 0, y: 1.4799573, z: 0, w: 0.27028838}
+        outSlope: {x: 0, y: 1.4799573, z: 0, w: 0.27028838}
+        tangentMode: 0
+      - time: 0.56
+        value: {x: 0, y: -0.12013685, z: -0, w: 0.9927574}
+        inSlope: {x: 0, y: 2.0525136, z: 0, w: 0.24838148}
+        outSlope: {x: 0, y: 2.0525136, z: 0, w: 0.24838148}
+        tangentMode: 0
+      - time: 0.59999996
+        value: {x: 0, y: -0.037624843, z: -0, w: 0.99929196}
+        inSlope: {x: 0, y: 1.5017114, z: 0, w: 0.09053282}
+        outSlope: {x: 0, y: 1.5017114, z: 0, w: 0.09053282}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 0, y: -5.7811866E-15, z: -0, w: 1}
+        inSlope: {x: 0, y: 0.9406206, z: 0, w: 0.01770108}
+        outSlope: {x: 0, y: 0.9406206, z: 0, w: 0.01770108}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladLeftBow/VladLeftString
+  m_CompressedRotationCurves: []
+  m_PositionCurves:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: -0, y: 0, z: 0}
+        inSlope: {x: -0, y: -0, z: -3.7111712}
+        outSlope: {x: -0, y: -0, z: -3.7111712}
+        tangentMode: 0
+      - time: 0.04
+        value: {x: -0, y: 0, z: -0.14844684}
+        inSlope: {x: -0, y: -0, z: 0.027557652}
+        outSlope: {x: -0, y: -0, z: 0.027559893}
+        tangentMode: 0
+      - time: 0.24
+        value: {x: -0, y: 0, z: 0.0066139684}
+        inSlope: {x: -0, y: -0, z: 8.495423E-07}
+        outSlope: {x: -0, y: -0, z: 9.824295E-09}
+        tangentMode: 0
+      - time: 0.4
+        value: {x: -0, y: 0, z: 0}
+        inSlope: {x: -0, y: -0, z: -0.025448745}
+        outSlope: {x: -0, y: 1.0008417E-07, z: -0.025448924}
+        tangentMode: 0
+      - time: 0.76
+        value: {x: -0, y: -0.24381104, z: -0.004177263}
+        inSlope: {x: -0, y: 0.025883574, z: -4.643963E-08}
+        outSlope: {x: -0, y: 0.025881596, z: -1.8648658E-08}
+        tangentMode: 0
+      - time: 1.16
+        value: {x: -0, y: 0.019671174, z: 0}
+        inSlope: {x: -0, y: -7.094994E-07, z: -1.2814893E-08}
+        outSlope: {x: -0, y: 8.8551985E-07, z: -0}
+        tangentMode: 0
+      - time: 1.28
+        value: {x: -0, y: 0, z: 0}
+        inSlope: {x: -0, y: 5.855423E-07, z: -0}
+        outSlope: {x: -0, y: 5.855423E-07, z: -0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: -0, y: 0.15562582, z: 0.21219316}
+        inSlope: {x: -0, y: 1.445603E-15, z: 4.0980186}
+        outSlope: {x: -0, y: 1.445603E-15, z: 4.0980186}
+        tangentMode: 0
+      - time: 0.04
+        value: {x: -0, y: 0.15562582, z: 0.3761139}
+        inSlope: {x: -0, y: 6.1954414E-16, z: 5.2467425E-07}
+        outSlope: {x: -0, y: 1.445603E-15, z: -3.5263995E-06}
+        tangentMode: 0
+      - time: 0.08
+        value: {x: -0, y: 0.15562582, z: 0.3713053}
+        inSlope: {x: -0, y: 6.1954414E-16, z: -3.5263995E-06}
+        outSlope: {x: -0, y: 1.445603E-15, z: 1.3518371E-06}
+        tangentMode: 0
+      - time: 0.48
+        value: {x: -0, y: 0.15562582, z: 0.37049177}
+        inSlope: {x: -0, y: 6.1954425E-16, z: -0}
+        outSlope: {x: -0, y: 1.4456032E-15, z: -3.1157076E-06}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: -0, y: 0.15562582, z: 0.21219316}
+        inSlope: {x: -0, y: 6.195438E-16, z: -3.718847E-06}
+        outSlope: {x: -0, y: 6.195438E-16, z: -3.718847E-06}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladArrowHolder
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0.23175186, y: 0.1918881, z: 0.64685965}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 0.23175186, y: 0.1918881, z: 0.64685965}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladRightBow
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 0.1460793, y: -0.046270847, z: -0.2936108}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 0.1460793, y: -0.046270847, z: -0.2936108}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladRightBow/VladRightString
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: -0.23175186, y: 0.1918881, z: 0.64685965}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: -0.23175186, y: 0.1918881, z: 0.64685965}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladLeftBow
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: -0.1460793, y: -0.046270847, z: -0.2936108}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: -0.1460793, y: -0.046270847, z: -0.2936108}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladLeftBow/VladLeftString
+  m_ScaleCurves:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 1.28
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladArrowHolder
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladRightBow
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladRightBow/VladRightString
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladLeftBow
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      - time: 0.64
+        value: {x: 1, y: 1, z: 1}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    path: VladLeftBow/VladLeftString
+  m_FloatCurves: []
+  m_PPtrCurves: []
+  m_SampleRate: 25
+  m_WrapMode: 1
+  m_Bounds:
+    m_Center: {x: 0.015011489, y: 0.115466505, z: 0.1617223}
+    m_Extent: {x: 0.5212712, y: 0.68959045, z: 0.72888005}
+  m_ClipBindingConstant:
+    genericBindings: []
+    pptrCurveMapping: []
+  m_AnimationClipSettings:
+    serializedVersion: 2
+    m_StartTime: 0
+    m_StopTime: 1
+    m_OrientationOffsetY: 0
+    m_Level: 0
+    m_CycleOffset: 0
+    m_LoopTime: 0
+    m_LoopBlend: 0
+    m_LoopBlendOrientation: 0
+    m_LoopBlendPositionY: 0
+    m_LoopBlendPositionXZ: 0
+    m_KeepOriginalOrientation: 0
+    m_KeepOriginalPositionY: 1
+    m_KeepOriginalPositionXZ: 0
+    m_HeightFromFeet: 0
+    m_Mirror: 0
+  m_EditorCurves: []
+  m_EulerEditorCurves: []
+  m_Events: []

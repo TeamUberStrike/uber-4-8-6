@@ -1,0 +1,544 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1709254077376921
+GameObject:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_Component:
+  - 4: {fileID: 4730242686860875}
+  - 114: {fileID: 114724804207875695}
+  m_Layer: 0
+  m_Name: AtlasHUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4730242686860875
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1709254077376921}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!114 &114724804207875695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1709254077376921}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f7db9a480b403690a4a83220213122, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  material: {fileID: 2100000, guid: 76b748500f7c13646af7b3d85c75fdbd, type: 2}
+  sprites:
+  - name: White
+    outer:
+      serializedVersion: 2
+      x: 271
+      y: 393
+      width: 4
+      height: 4
+    inner:
+      serializedVersion: 2
+      x: 272
+      y: 394
+      width: 2
+      height: 2
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: AmmoIcon
+    outer:
+      serializedVersion: 2
+      x: 258
+      y: 448
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 258
+      y: 448
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: HealthIcon
+    outer:
+      serializedVersion: 2
+      x: 323
+      y: 448
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 323
+      y: 448
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: ArmorIcon
+    outer:
+      serializedVersion: 2
+      x: 388
+      y: 448
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 388
+      y: 448
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: rounded-white
+    outer:
+      serializedVersion: 2
+      x: 258
+      y: 385
+      width: 12
+      height: 12
+    inner:
+      serializedVersion: 2
+      x: 262
+      y: 389
+      width: 4
+      height: 4
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: MobileTouchMenuPause
+    outer:
+      serializedVersion: 2
+      x: 258
+      y: 415
+      width: 32
+      height: 32
+    inner:
+      serializedVersion: 2
+      x: 258
+      y: 415
+      width: 32
+      height: 32
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: MobileTouchMenuChat
+    outer:
+      serializedVersion: 2
+      x: 323
+      y: 415
+      width: 32
+      height: 32
+    inner:
+      serializedVersion: 2
+      x: 323
+      y: 415
+      width: 32
+      height: 32
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: MobileTouchMenuScreenshot
+    outer:
+      serializedVersion: 2
+      x: 453
+      y: 480
+      width: 32
+      height: 32
+    inner:
+      serializedVersion: 2
+      x: 453
+      y: 480
+      width: 32
+      height: 32
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: Circle-64
+    outer:
+      serializedVersion: 2
+      x: 0
+      y: 319
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 0
+      y: 319
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: Jump-64
+    outer:
+      serializedVersion: 2
+      x: 0
+      y: 254
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 0
+      y: 254
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: CompetetiveArrow
+    outer:
+      serializedVersion: 2
+      x: 388
+      y: 415
+      width: 32
+      height: 32
+    inner:
+      serializedVersion: 2
+      x: 388
+      y: 415
+      width: 32
+      height: 32
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: MobileTouchMenuBgr
+    outer:
+      serializedVersion: 2
+      x: 0
+      y: 189
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 0
+      y: 189
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: primary-fire
+    outer:
+      serializedVersion: 2
+      x: 0
+      y: 124
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 0
+      y: 124
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: secondary-fire
+    outer:
+      serializedVersion: 2
+      x: 0
+      y: 384
+      width: 128
+      height: 128
+    inner:
+      serializedVersion: 2
+      x: 0
+      y: 384
+      width: 128
+      height: 128
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: casual-arrow
+    outer:
+      serializedVersion: 2
+      x: 421
+      y: 415
+      width: 32
+      height: 32
+    inner:
+      serializedVersion: 2
+      x: 421
+      y: 415
+      width: 32
+      height: 32
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: Arrow-body
+    outer:
+      serializedVersion: 2
+      x: 454
+      y: 415
+      width: 32
+      height: 32
+    inner:
+      serializedVersion: 2
+      x: 454
+      y: 415
+      width: 32
+      height: 32
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: Arrow-head
+    outer:
+      serializedVersion: 2
+      x: 0
+      y: 26
+      width: 32
+      height: 32
+    inner:
+      serializedVersion: 2
+      x: 0
+      y: 26
+      width: 32
+      height: 32
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: Circle-128
+    outer:
+      serializedVersion: 2
+      x: 129
+      y: 384
+      width: 128
+      height: 128
+    inner:
+      serializedVersion: 2
+      x: 129
+      y: 384
+      width: 128
+      height: 128
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: QuickItemCircle
+    outer:
+      serializedVersion: 2
+      x: 0
+      y: 59
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 0
+      y: 59
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: QuickItemOffensiveGrenade
+    outer:
+      serializedVersion: 2
+      x: 65
+      y: 319
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 65
+      y: 319
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: QuickItemHealth
+    outer:
+      serializedVersion: 2
+      x: 65
+      y: 254
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 65
+      y: 254
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: QuickItemArmor
+    outer:
+      serializedVersion: 2
+      x: 65
+      y: 189
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 65
+      y: 189
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: QuickItemSpringGrenade
+    outer:
+      serializedVersion: 2
+      x: 65
+      y: 124
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 65
+      y: 124
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: QuickItemAmmo
+    outer:
+      serializedVersion: 2
+      x: 65
+      y: 59
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 65
+      y: 59
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: ButtonSpectate
+    outer:
+      serializedVersion: 2
+      x: 130
+      y: 319
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 130
+      y: 319
+      width: 64
+      height: 64
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: ScoreBox
+    outer:
+      serializedVersion: 2
+      x: 195
+      y: 319
+      width: 64
+      height: 64
+    inner:
+      serializedVersion: 2
+      x: 210
+      y: 334
+      width: 34
+      height: 34
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: ScoreboardSelectionTriangle
+    outer:
+      serializedVersion: 2
+      x: 258
+      y: 398
+      width: 32
+      height: 16
+    inner:
+      serializedVersion: 2
+      x: 258
+      y: 398
+      width: 32
+      height: 16
+    rotated: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  mCoordinates: 0
+  mPixelSize: 1
+  mReplacement: {fileID: 0}
+--- !u!1001 &100100000
+Prefab:
+  serializedVersion: 2
+  m_ObjectHideFlags: 1
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1709254077376921}
+  m_IsPrefabParent: 1
+  m_IsExploded: 0
