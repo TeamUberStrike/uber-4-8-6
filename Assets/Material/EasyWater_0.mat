@@ -1,0 +1,153 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: EasyWater
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties:
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap1:
+        m_Texture: {fileID: 2800000, guid: 188ec3c94056c5446b0d1b39db2edc1d, type: 3}
+        m_Scale: {x: 8, y: 8}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap2:
+        m_Texture: {fileID: 2800000, guid: f5b972cbdfa747544903b52a1a298538, type: 3}
+        m_Scale: {x: 16, y: 16}
+        m_Offset: {x: 0.5, y: 0.3}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DistortionMap:
+        m_Texture: {fileID: 2800000, guid: e1a7adb4391043d45ad5c9bb039e4013, type: 3}
+        m_Scale: {x: 10, y: 10}
+        m_Offset: {x: 0.3, y: 0.3}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Reflection:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture1:
+        m_Texture: {fileID: 2800000, guid: 52a26b0069f8b174cbbcbc3b41a73128, type: 3}
+        m_Scale: {x: 16, y: 16}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2:
+        m_Texture: {fileID: 2800000, guid: 52a26b0069f8b174cbbcbc3b41a73128, type: 3}
+        m_Scale: {x: 16, y: 16}
+        m_Offset: {x: 0.5, y: 0.3}
+    m_Ints: []
+    m_Floats:
+    - _Add: 4.8076925
+    - _Angulo: 3.4230769
+    - _Bump1Speed: 0.2
+    - _Bump2Speed: -0.2
+    - _BumpForce: 0.3653846
+    - _BumpScale: 1
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DistortPower: 0.003076923
+    - _DistortSpeed: 0.017307693
+    - _DistortionPower: 0.02
+    - _DistortionSpeed: 0.05
+    - _DstBlend: 0
+    - _EdgeAlpha: 0
+    - _FrezFalloff: 4
+    - _FrezPow: 0.25
+    - _Gloss: 0.5
+    - _GlossMapScale: 1
+    - _Glossiness: 1.5
+    - _GlossyReflections: 1
+    - _MainTexSpeed: 0.2
+    - _Metalics: 0.5
+    - _Metallic: 0
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _Opacidade: 0.4134615
+    - _Opacity: 0.8
+    - _OverallOpacity: 0.28846154
+    - _Parallax: 0.02
+    - _Range: 5
+    - _RangeX: 0.5
+    - _RangeZ: 10
+    - _Rangew: 1
+    - _ReflFresnel: 0.115384616
+    - _ReflUV: 1.2692307
+    - _ReflUVadd: 0
+    - _ReflectPower: 0.8
+    - _SmoothnessTextureChannel: 0
+    - _Specular: 1.2
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _Teste2: 0
+    - _Teste3: 0
+    - _Texture2Speed: -0.2
+    - _UVSec: 0
+    - _ZWrite: 1
+    - _teste: 0
+    - _testeRefl: 0.1923077
+    - _testeW: -0.076923065
+    - _testeX: 0.036923077
+    - _testeY: 0.018461538
+    - _testeZ: 0.1923077
+    - _testeadd: 5
+    m_Colors:
+    - _Add: {r: 1, g: 1, b: 0, a: 0}
+    - _Animations: {r: 0.1, g: -0.01, b: 0.01, a: -0.005}
+    - _Color: {r: 0.25373137, g: 0.22753486, b: 0.21775453, a: 1}
+    - _Mult: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Speeds: {r: 0, g: 0, b: 0, a: 0}
+    - _Sub: {r: 1, g: 90, b: 1, a: 1}
+    - _Teste: {r: 1.07, g: 1.1, b: -0.52, a: -0.15}
+    - _TextureSpeed: {r: 0.05, g: -0.01, b: 0.01, a: -0.003}
+    - _teste: {r: -1, g: -1, b: -1, a: -5}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
