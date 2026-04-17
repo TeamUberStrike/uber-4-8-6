@@ -37,6 +37,9 @@ public class HUDAmmoBar : MonoBehaviour
 
 	private void OnEnable()
 	{
+		StopAllCoroutines();
+		oldValue = -1f;
+		panel.alpha = 1f;
 		GameState.Current.PlayerData.ActiveWeapon.Fire();
 	}
 

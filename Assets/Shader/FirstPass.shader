@@ -1,3 +1,7 @@
+// UberStrike/Terrain Splatmap — 4-layer terrain blend using a control map.
+// The control texture's R/G/B channels drive layers 0-2. Layer 3 fills the
+// remainder (1 - R - G - B) so it doesn't require a valid alpha channel.
+// This matches Unity 4.6's Terrain/Diffuse built-in behavior.
 Shader "UberStrike/Terrain Splatmap" {
 Properties {
     _Control ("Control (RGBA)", 2D) = "red" {}
@@ -28,12 +32,19 @@ SubShader {
 
     void surf(Input IN, inout SurfaceOutput o) {
         fixed4 ctrl = tex2D(_Control, IN.uv_Control);
-        fixed4 s0 = tex2D(_Splat0, IN.uv_Control * _Splat0_ST.xy + _Splat0_ST.zw);
-        fixed4 s1 = tex2D(_Splat1, IN.uv_Control * _Splat1_ST.xy + _Splat1_ST.zw);
-        fixed4 s2 = tex2D(_Splat2, IN.uv_Control * _Splat2_ST.xy + _Splat2_ST.zw);
-        fixed4 s3 = tex2D(_Splat3, IN.uv_Control * _Splat3_ST.xy + _Splat3_ST.zw);
 
-        o.Albedo = s0.rgb * ctrl.r + s1.rgb * ctrl.g + s2.rgb * ctrl.b + s3.rgb * ctrl.a;
+        // Compute layer 3 weight as the remainder so we don't depend on the
+        // control texture's alpha channel (PNG may not have one → defaults to 1
+        // which would plaster layer 3 over the entire terrain).
+        float w3 = saturate(1.0 - ctrl.r - ctrl.g - ctrl.b);
+
+        float2 uv = IN.uv_Control;
+        fixed3 s0 = tex2D(_Splat0, uv * _Splat0_ST.xy + _Splat0_ST.zw).rgb;
+        fixed3 s1 = tex2D(_Splat1, uv * _Splat1_ST.xy + _Splat1_ST.zw).rgb;
+        fixed3 s2 = tex2D(_Splat2, uv * _Splat2_ST.xy + _Splat2_ST.zw).rgb;
+        fixed3 s3 = tex2D(_Splat3, uv * _Splat3_ST.xy + _Splat3_ST.zw).rgb;
+
+        o.Albedo = s0 * ctrl.r + s1 * ctrl.g + s2 * ctrl.b + s3 * w3;
         o.Alpha = 1.0;
     }
     ENDCG

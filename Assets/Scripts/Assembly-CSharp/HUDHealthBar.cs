@@ -55,6 +55,9 @@ public class HUDHealthBar : MonoBehaviour
 
 	private void OnEnable()
 	{
+		StopAllCoroutines();
+		oldValue = -1f;
+		panel.alpha = 1f;
 		GameState.Current.PlayerData.Health.Fire();
 	}
 

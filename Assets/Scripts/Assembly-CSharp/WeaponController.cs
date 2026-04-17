@@ -145,6 +145,10 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		{
 			_holsterTime = Mathf.Max(_holsterTime - Time.deltaTime, 0f);
 		}
+		if (_currentSlot != _weapons[_currentSlotID.Current] && TrainingPageGUI.QuickSwitchEnabled)
+		{
+			_holsterTime = 0f;
+		}
 		if (_currentSlot != _weapons[_currentSlotID.Current] && _holsterTime == 0f)
 		{
 			_currentSlot = _weapons[_currentSlotID.Current];

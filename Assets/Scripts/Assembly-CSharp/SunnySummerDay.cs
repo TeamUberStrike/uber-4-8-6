@@ -4,99 +4,112 @@ using UnityEngine.SceneManagement;
 
 public class SunnySummerDay : MonoBehaviour
 {
-	// Scenes that ship their own baked RenderSettings — ambient, fog, skybox,
-	// directional lights — that ForgeRipper migrated from the Steam client.
-	// SunnySummerDay must NOT run on these, or it stomps every map's atmosphere.
-	// All other scenes (Menu/lobby, GlobalScene bootstrap, any non-listed name)
-	// get the procedural sunny-day setup.
-	private static readonly HashSet<string> GameplayMapScenes = new HashSet<string>
+	// Every scene that ships its own baked skybox/RenderSettings.
+	// Menu has SkyBox_Cloudy_A (blue sky with clouds) baked in.
+	// Gameplay maps have their own space/day/halloween skyboxes.
+	// DesktopHUD is loaded additively after gameplay maps.
+	// Only unlisted scenes (GlobalScene bootstrap, auth screens) get the
+	// procedural sunny-day fallback.
+	private static readonly HashSet<string> BlockedScenes = new HashSet<string>
 	{
 		"ApexTwin", "AqualabResearchHub", "Catalyst", "CuberSpace", "CuberStrike",
-		"CuberStrikeBluebox", "FortWinter", "GhostIsland", "GideonsTower", "LostParadise2",
-		"MonkeyIsland", "SkyGarden", "SpaceCity", "SpacePortAlpha", "SuperPRISMReactor",
-		"TempleOfTheRaven", "TheHangar", "TheWarehouse", "UberZone", "Volley"
+		"CuberStrikeBluebox", "DesktopHUD", "FortWinter", "GhostIsland", "GideonsTower",
+		"LostParadise2", "Menu", "MonkeyIsland", "SkyGarden", "SpaceCity",
+		"SpacePortAlpha", "SuperPRISMReactor", "TempleOfTheRaven", "TheHangar",
+		"TheWarehouse", "UberZone", "Volley"
 	};
+
+	private static SunnySummerDay _instance;
+	private static Material _cachedSkyboxMaterial;
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	private static void AutoBootstrap()
 	{
 		SceneManager.sceneLoaded += OnSceneLoaded;
-		// On the very first fire (bootstrap), use whatever the active scene is.
 		TryApplyForScene(SceneManager.GetActiveScene().name);
 	}
 
 	private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 	{
-		// Use the scene parameter (the scene that JUST loaded), not
-		// SceneManager.GetActiveScene() which may still reference the previous
-		// active scene during the async transition.
 		TryApplyForScene(scene.name);
 	}
 
 	private static void TryApplyForScene(string sceneName)
 	{
-		// Blacklist: if this is a gameplay map, skip + clean up any leaked manager.
-		// Whitelist would have been wrong because we don't know every non-gameplay
-		// scene name (Menu, GlobalScene, Auth, etc.).
-		if (GameplayMapScenes.Contains(sceneName))
+		if (BlockedScenes.Contains(sceneName))
 		{
-			// Defensive cleanup: if a SummerDayManager leaked in from a previous
-			// non-gameplay scene via DontDestroyOnLoad, destroy it so its Update()
-			// loop stops mutating shared materials while a map is active.
-			GameObject leaked = GameObject.Find("SummerDayManager");
-			if (leaked != null)
+			if (_instance != null)
 			{
-				Object.Destroy(leaked);
+				DestroyImmediate(_instance.gameObject);
+				_instance = null;
 			}
 			return;
 		}
-		if (GameObject.Find("SummerDayManager") != null)
+
+		if (_instance != null)
 		{
 			return;
 		}
+
+		// Reuse the procedural skybox material across lobby visits so the look
+		// is identical every time (prevents the sunset-on-return glitch).
+		if (_cachedSkyboxMaterial == null)
+		{
+			Shader proc = Shader.Find("Skybox/Procedural");
+			if (proc == null) return;
+			_cachedSkyboxMaterial = new Material(proc);
+			_cachedSkyboxMaterial.name = "SunnySummerDay_Runtime";
+		}
+
 		GameObject go = new GameObject("SummerDayManager");
-		Object.DontDestroyOnLoad(go);
-		SunnySummerDay sd = go.AddComponent<SunnySummerDay>();
-		Light best = null;
+		DontDestroyOnLoad(go);
+
+		// Use an existing directional light if available (Menu scene has one).
+		// Only create a fallback if no light exists, to avoid double-brightness.
+		Light sun = null;
 		float bestIntensity = -1f;
-		foreach (Light l in Object.FindObjectsOfType<Light>())
+		foreach (Light l in FindObjectsOfType<Light>())
 		{
 			if (l != null && l.type == LightType.Directional && l.intensity > bestIntensity)
 			{
-				best = l;
+				sun = l;
 				bestIntensity = l.intensity;
 			}
 		}
-		sd.sunLight = best;
-		Shader proc = Shader.Find("Skybox/Procedural");
-		if (proc == null)
+		if (sun == null)
 		{
-			return;
+			GameObject sunGo = new GameObject("SummerDaySun");
+			sunGo.transform.SetParent(go.transform);
+			sun = sunGo.AddComponent<Light>();
+			sun.type = LightType.Directional;
 		}
-		Material mat = new Material(proc);
-		mat.name = "SunnySummerDay_Runtime";
-		sd.skyboxMaterial = mat;
-		sd.skyTint = new Color(0.5f, 0.5f, 0.5f);
-		sd.atmosphereThickness = 1.4f;
-		sd.exposure = 1.3f;
-		sd.sunIntensity = 1.3f;
+
+		SunnySummerDay sd = go.AddComponent<SunnySummerDay>();
+		_instance = sd;
+		sd.sunLight = sun;
+		sd.skyboxMaterial = _cachedSkyboxMaterial;
+
+		// Apply immediately — no Start() call needed.
+		sd._skipStart = true;
 		sd.ApplySummerLook();
-		if (best != null)
-		{
-			RenderSettings.sun = best;
-		}
+		RenderSettings.sun = sun;
+	}
+
+	private void OnDestroy()
+	{
+		if (_instance == this) _instance = null;
 	}
 
 	[Header("Sun")]
 	public Light sunLight;
 	public Vector3 sunRotation = new Vector3(45f, -30f, 0f);
 	public Color sunColor = new Color(1f, 0.95f, 0.8f);
-	[Range(0f, 2f)] public float sunIntensity = 1.2f;
+	[Range(0f, 2f)] public float sunIntensity = 1.3f;
 
 	[Header("Sky")]
 	public Material skyboxMaterial;
-	public Color skyTint = new Color(0.4f, 0.65f, 1f);
-	[Range(0f, 2f)] public float atmosphereThickness = 0.8f;
+	public Color skyTint = new Color(0.5f, 0.5f, 0.5f);
+	[Range(0f, 2f)] public float atmosphereThickness = 1.4f;
 	[Range(0f, 2f)] public float exposure = 1.3f;
 
 	[Header("Ambient")]
@@ -114,9 +127,13 @@ public class SunnySummerDay : MonoBehaviour
 	public Vector2 cloudSpeed = new Vector2(0.003f, 0.0015f);
 
 	private Vector2 cloudOffset;
+	private bool _skipStart;
 
 	private void Start()
 	{
+		// TryApplyForScene already called ApplySummerLook(). Skip the redundant
+		// Start() call to avoid re-applying with potentially stale state.
+		if (_skipStart) return;
 		ApplySummerLook();
 	}
 

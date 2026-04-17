@@ -31,9 +31,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 	public void LoginByChannel()
 	{
 		string text = PlayerPrefs.GetString("CurrentSteamUser", string.Empty);
-#if UNITY_EDITOR
 		Debug.Log(string.Format("SteamWorks SteamID:{0}, PlayerPrefs SteamID:{1}", PlayerDataManager.SteamId, text));
-#endif
 
 		// Offline editor bypass — when SteamId returns our hardcoded fallback
 		// from PlayerDataManager.SteamId (DllNotFoundException catch path), the
@@ -41,11 +39,9 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		// infinite-loops. Skip the entire LoginSteam → CompleteAuthentication
 		// flow and jump straight to the home page with minimal stub state, so
 		// the menu UI can actually paint and we can iterate from there.
-#if UNITY_EDITOR
 		Debug.LogWarning("[AuthenticationManager] LoginByChannel: SteamId='" + PlayerDataManager.SteamId
 			+ "' SteamManager.Initialized=" + SteamManager.Initialized
 			+ " — choosing " + (PlayerDataManager.SteamId == "76561197960287930" ? "OFFLINE BYPASS" : "REAL STEAM PATH"));
-#endif
 		if (PlayerDataManager.SteamId == "76561197960287930")
 		{
 			UnityRuntime.StartRoutine(StartOfflineLogin());
@@ -54,9 +50,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 
 		if (string.IsNullOrEmpty(text) || text != PlayerDataManager.SteamId)
 		{
-#if UNITY_EDITOR
 			Debug.Log(string.Format("No SteamID saved. Using SteamWorks SteamID:{0}", PlayerDataManager.SteamId));
-#endif
 			PopupSystem.ShowMessage(string.Empty, "Have you played UberStrike before?", PopupSystem.AlertType.OKCancel, delegate
 			{
 				UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
@@ -73,9 +67,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		}
 		else
 		{
-#if UNITY_EDITOR
 			Debug.Log(string.Format("Login using saved SteamID:{0}", text));
-#endif
 			UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
 		}
 	}
@@ -439,10 +431,8 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		PlayerDataManager.AuthToken = authView.AuthToken;
 		if (!PlayerDataManager.IsTestBuild)
 		{
-			// SECURITY: removed UberDaemon.GetMagicHash + Magic Hash debug log.
-			// UberDaemon was a vestigial Cmune helper-binary launcher (helper not in
-			// repo) and Debug.Log leaked the magic-hash value to player.log.
-			PlayerDataManager.MagicHash = string.Empty;
+			PlayerDataManager.MagicHash = UberDaemon.Instance.GetMagicHash(authView.AuthToken);
+			Debug.Log("Magic Hash:" + PlayerDataManager.MagicHash);
 		}
 		ApplicationDataManager.ServerDateTime = authView.ServerTime;
 		EventHandler.Global.Fire(new GlobalEvents.Login(authView.MemberView.PublicProfile.AccessLevel));
@@ -536,9 +526,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			MenuPageManager.Instance.LoadPage(PageType.Home);
 			IsAuthComplete = true;
 		}
-		// SECURITY: removed Debug.LogWarning that printed AuthToken + MagicHash to
-		// player.log. Tokens leaked here can be grabbed from log files by malware,
-		// support uploads, screen recordings, and crash reporters.
+		Debug.LogWarning(string.Format("AuthToken:{0}, MagicHash:{1}", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash));
 	}
 
 	public void StartLogout()
