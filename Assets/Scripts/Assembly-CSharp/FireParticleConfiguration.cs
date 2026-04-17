@@ -16,5 +16,5 @@ public class FireParticleConfiguration
 
 	public Color ParticleColor;
 
-	public ParticleEmitter ParticleEmitter;
+	public ParticleSystem ParticleEmitter;
 }

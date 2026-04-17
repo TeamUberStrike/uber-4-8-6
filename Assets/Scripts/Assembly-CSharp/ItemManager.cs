@@ -295,5 +295,9 @@ public class ItemManager : Singleton<ItemManager>
 			prefabs.Reverse();
 		});
 		Singleton<InventoryManager>.Instance.UpdateInventoryItems(inventoryView);
+#if UNITY_EDITOR
+		// In Editor: grant all shop items so weapons don't need re-purchasing each session
+		Singleton<InventoryManager>.Instance.EnableAllItems();
+#endif
 	}
 }

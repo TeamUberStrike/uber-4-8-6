@@ -93,20 +93,17 @@ public class AvatarHudInformation : MonoBehaviour
 	public void SetAvatarLabel(string name)
 	{
 		_text = name;
-		_textSize = _nameTextStyle.CalcSize(new GUIContent(name));
-		// Unity 4.6 → 6 migration clipping fallback: BlueStonez.label_interparkbold_13pt
-		// can return an under-measured width when its custom font's glyph metrics
-		// didn't survive the import pipeline, leaving the last characters clipped
-		// off the right edge of the drawn Rect. Take the max of the custom style
-		// measurement and the default skin measurement, then add right-side padding
-		// and enforce a minimum so short-but-broken cases still render cleanly.
-		if (GUI.skin != null && GUI.skin.label != null)
+		// Use a generous width based on character count as the primary measurement.
+		// CalcSize with the custom font is unreliable after migration (glyph metrics
+		// don't survive the import pipeline), causing names to be clipped.
+		_textSize = new Vector2(Mathf.Max(name.Length * 10f, 80f), 20f);
+		if (_nameTextStyle != null)
 		{
-			Vector2 fallback = GUI.skin.label.CalcSize(new GUIContent(name));
-			if (fallback.x > _textSize.x) _textSize.x = fallback.x;
-			if (fallback.y > _textSize.y) _textSize.y = fallback.y;
+			Vector2 styled = _nameTextStyle.CalcSize(new GUIContent(name));
+			if (styled.x > _textSize.x) _textSize.x = styled.x;
+			if (styled.y > _textSize.y) _textSize.y = styled.y;
 		}
-		_textSize.x = Mathf.Max(_textSize.x + 12f, 80f);
+		_textSize.x += 16f;
 	}
 
 	public void SetHealthBarValue(float value)
@@ -127,7 +124,11 @@ public class AvatarHudInformation : MonoBehaviour
 	{
 		if ((bool)Camera.main)
 		{
-			_screenPosition = Vector3.Lerp(_screenPosition, Camera.main.WorldToScreenPoint(_transform.position + _offset), Time.deltaTime * 30f);
+			Vector3 target = Camera.main.WorldToScreenPoint(_transform.position + _offset);
+			_screenPosition = Vector3.Lerp(_screenPosition, target, Time.deltaTime * 30f);
+			// Snap to whole pixels to prevent blurry sub-pixel text rendering
+			_screenPosition.x = Mathf.FloorToInt(_screenPosition.x);
+			_screenPosition.y = Mathf.FloorToInt(_screenPosition.y);
 			Vector3 rhs = _transform.position + _offset - Camera.main.transform.position;
 			Camera.main.ResetWorldToCameraMatrix();
 			return Vector3.Dot(Camera.main.transform.forward, rhs) > 0f && _screenPosition.x >= 0f && _screenPosition.x <= (float)Screen.width && _screenPosition.y >= 0f && _screenPosition.y <= (float)Screen.height;

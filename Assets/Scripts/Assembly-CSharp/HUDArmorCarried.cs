@@ -7,6 +7,7 @@ public class HUDArmorCarried : MonoBehaviour
 
 	private void OnEnable()
 	{
+		StopAllCoroutines();
 		GameState.Current.PlayerData.ArmorCarried.Fire();
 	}
 

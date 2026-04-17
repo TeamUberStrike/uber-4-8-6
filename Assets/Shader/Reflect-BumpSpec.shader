@@ -1,31 +1,51 @@
+// Reflective/Bumped Specular — restored from DummyShaderTextExporter stub.
+// Normal-mapped specular with cubemap reflection. Base texture alpha controls
+// reflection strength and gloss. Used by SplatterGun_ManOWar_Skin and other
+// reflective weapon materials.
 Shader "Reflective/Bumped Specular" {
 Properties {
- _Color ("Main Color", Color) = (1,1,1,1)
- _SpecColor ("Specular Color", Color) = (0.5,0.5,0.5,1)
- _Shininess ("Shininess", Range(0.01,1)) = 0.078125
- _ReflectColor ("Reflection Color", Color) = (1,1,1,0.5)
- _MainTex ("Base (RGB) RefStrGloss (A)", 2D) = "white" {}
- _Cube ("Reflection Cubemap", CUBE) = "" { TexGen CubeReflect }
- _BumpMap ("Normalmap", 2D) = "bump" {}
+    _Color ("Main Color", Color) = (1,1,1,1)
+    _SpecColor ("Specular Color", Color) = (0.5,0.5,0.5,1)
+    _Shininess ("Shininess", Range(0.01,1)) = 0.078125
+    _ReflectColor ("Reflection Color", Color) = (1,1,1,0.5)
+    _MainTex ("Base (RGB) RefStrGloss (A)", 2D) = "white" {}
+    _Cube ("Reflection Cubemap", CUBE) = "" {}
+    _BumpMap ("Normalmap", 2D) = "bump" {}
 }
-	//DummyShaderTextExporter
-	
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
-		CGPROGRAM
-#pragma surface surf Lambert
-#pragma target 3.0
-		sampler2D _MainTex;
-		struct Input
-		{
-			float2 uv_MainTex;
-		};
-		void surf(Input IN, inout SurfaceOutput o)
-		{
-			float4 c = tex2D(_MainTex, IN.uv_MainTex);
-			o.Albedo = c.rgb;
-		}
-		ENDCG
-	}
+SubShader {
+    Tags { "RenderType"="Opaque" }
+    LOD 400
+
+    CGPROGRAM
+    #pragma surface surf BlinnPhong
+    #pragma target 3.0
+
+    sampler2D _MainTex;
+    sampler2D _BumpMap;
+    samplerCUBE _Cube;
+    fixed4 _Color;
+    fixed4 _ReflectColor;
+    half _Shininess;
+
+    struct Input {
+        float2 uv_MainTex;
+        float2 uv_BumpMap;
+        float3 worldRefl;
+        INTERNAL_DATA
+    };
+
+    void surf(Input IN, inout SurfaceOutput o) {
+        fixed4 tex = tex2D(_MainTex, IN.uv_MainTex);
+        o.Albedo = tex.rgb * _Color.rgb;
+        o.Gloss = tex.a;
+        o.Specular = _Shininess;
+        o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
+
+        float3 worldRefl = WorldReflectionVector(IN, o.Normal);
+        fixed4 reflcol = texCUBE(_Cube, worldRefl);
+        o.Emission = reflcol.rgb * _ReflectColor.rgb * tex.a;
+    }
+    ENDCG
+}
+Fallback "Legacy Shaders/Reflective/Bumped Specular"
 }

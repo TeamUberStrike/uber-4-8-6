@@ -32,11 +32,16 @@ public class TempleTeleporter : SecretDoor
 	private void Awake()
 	{
 		_audios = GetComponents<AudioSource>();
-		_particles.emit = false;
-		Renderer[] visuals = _visuals;
-		foreach (Renderer renderer in visuals)
+		if (_particles != null)
 		{
-			renderer.enabled = false;
+			_particles.emit = false;
+		}
+		if (_visuals != null)
+		{
+			foreach (Renderer renderer in _visuals)
+			{
+				if (renderer != null) renderer.enabled = false;
+			}
 		}
 		_doorID = base.transform.position.GetHashCode();
 	}
@@ -55,16 +60,23 @@ public class TempleTeleporter : SecretDoor
 	{
 		if (_timeOut < Time.time)
 		{
-			AudioSource[] audios = _audios;
-			foreach (AudioSource audioSource in audios)
+			if (_audios != null)
 			{
-				audioSource.Stop();
+				foreach (AudioSource audioSource in _audios)
+				{
+					if (audioSource != null) audioSource.Stop();
+				}
 			}
-			_particles.emit = false;
-			Renderer[] visuals = _visuals;
-			foreach (Renderer renderer in visuals)
+			if (_particles != null)
 			{
-				renderer.enabled = false;
+				_particles.emit = false;
+			}
+			if (_visuals != null)
+			{
+				foreach (Renderer renderer in _visuals)
+				{
+					if (renderer != null) renderer.enabled = false;
+				}
 			}
 			base.enabled = false;
 		}
@@ -99,17 +111,24 @@ public class TempleTeleporter : SecretDoor
 	private void OpenDoor()
 	{
 		base.enabled = true;
-		_particles.emit = true;
-		Renderer[] visuals = _visuals;
-		foreach (Renderer renderer in visuals)
+		if (_particles != null)
 		{
-			renderer.enabled = true;
+			_particles.emit = true;
+		}
+		if (_visuals != null)
+		{
+			foreach (Renderer renderer in _visuals)
+			{
+				if (renderer != null) renderer.enabled = true;
+			}
 		}
 		_timeOut = Time.time + _activationTime;
-		AudioSource[] audios = _audios;
-		foreach (AudioSource audioSource in audios)
+		if (_audios != null)
 		{
-			audioSource.Play();
+			foreach (AudioSource audioSource in _audios)
+			{
+				if (audioSource != null) audioSource.Play();
+			}
 		}
 	}
 }

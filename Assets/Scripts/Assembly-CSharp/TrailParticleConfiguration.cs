@@ -14,5 +14,5 @@ public class TrailParticleConfiguration
 
 	public Color ParticleColor;
 
-	public ParticleEmitter ParticleEmitter;
+	public ParticleSystem ParticleEmitter;
 }

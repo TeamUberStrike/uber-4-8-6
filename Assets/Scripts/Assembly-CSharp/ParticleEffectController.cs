@@ -103,8 +103,14 @@ public class ParticleEffectController : MonoBehaviour
 		ShowHitEffect(effectType, surface, direction, hitPoint, hitNormal, muzzlePosition, distance, ref trailRenderer, parent, 0);
 	}
 
+	private static int _hitEffectLogs;
 	public static void ShowHitEffect(ParticleConfigurationType effectType, SurfaceEffectType surface, Vector3 direction, Vector3 hitPoint, Vector3 hitNormal, Vector3 muzzlePosition, float distance, ref MoveTrailrendererObject trailRenderer, Transform parent, int damage)
 	{
+		if (_hitEffectLogs < 5)
+		{
+			_hitEffectLogs++;
+			Debug.Log($"[ShowHitEffect #{_hitEffectLogs}] effect={effectType} surface={surface} hit={hitPoint} dist={distance:F1}");
+		}
 		if (Exists)
 		{
 			ParticleConfigurationPerWeapon particleConfigurationPerWeapon = Instance._allConfigurations[effectType];

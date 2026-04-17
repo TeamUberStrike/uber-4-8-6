@@ -24,5 +24,5 @@ public class ParticleConfiguration
 
 	public Color ParticleColor;
 
-	public ParticleEmitter ParticleEmitter;
+	public ParticleSystem ParticleEmitter;
 }

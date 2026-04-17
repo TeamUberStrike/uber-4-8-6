@@ -33,6 +33,12 @@ public class HUDArmorBar : MonoBehaviour
 
 	private readonly float NORMAL_MAX = 100f;
 
+	private void OnEnable()
+	{
+		StopAllCoroutines();
+		oldValue = -1f;
+	}
+
 	private void Start()
 	{
 		baseWidth = bgr.transform.localScale.x;

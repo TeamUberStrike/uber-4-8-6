@@ -1,25 +1,56 @@
+// Unlit/Transparent — restored from DummyShaderTextExporter stub.
+// Unlit alpha-blended texture. No lighting. Used by MonkeyIsland AcceleratorLight
+// instances and Health pickup materials.
 Shader "Unlit/Transparent" {
 Properties {
- _MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
+    _MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
 }
-	//DummyShaderTextExporter
-	
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
-		CGPROGRAM
-#pragma surface surf Lambert
-#pragma target 3.0
-		sampler2D _MainTex;
-		struct Input
-		{
-			float2 uv_MainTex;
-		};
-		void surf(Input IN, inout SurfaceOutput o)
-		{
-			float4 c = tex2D(_MainTex, IN.uv_MainTex);
-			o.Albedo = c.rgb;
-		}
-		ENDCG
-	}
+SubShader {
+    Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+    Blend SrcAlpha OneMinusSrcAlpha
+    Cull Off
+    Lighting Off
+    ZWrite Off
+
+    Pass {
+        CGPROGRAM
+        #pragma vertex vert
+        #pragma fragment frag
+        #pragma target 2.5
+        #include "UnityCG.cginc"
+
+        sampler2D _MainTex;
+        float4 _MainTex_ST;
+
+        struct appdata {
+            float4 vertex : POSITION;
+            float2 texcoord : TEXCOORD0;
+            fixed4 color : COLOR;
+            UNITY_VERTEX_INPUT_INSTANCE_ID
+        };
+
+        struct v2f {
+            float4 vertex : SV_POSITION;
+            float2 texcoord : TEXCOORD0;
+            fixed4 color : COLOR;
+            UNITY_VERTEX_OUTPUT_STEREO
+        };
+
+        v2f vert(appdata v) {
+            v2f o;
+            UNITY_SETUP_INSTANCE_ID(v);
+            UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+            o.vertex = UnityObjectToClipPos(v.vertex);
+            o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
+            o.color = v.color;
+            return o;
+        }
+
+        fixed4 frag(v2f i) : SV_Target {
+            fixed4 col = tex2D(_MainTex, i.texcoord) * i.color;
+            return col;
+        }
+        ENDCG
+    }
+}
 }

@@ -131,6 +131,10 @@ public class HUDReticleController : MonoBehaviour
 		if (ActiveReticle != null)
 		{
 			ActiveReticle.gameObject.SetActive(isEnabled);
+			if (isEnabled)
+			{
+				ActiveReticle.SetColor(Color.white);
+			}
 		}
 	}
 
