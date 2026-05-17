@@ -40,13 +40,10 @@ public class WaterTile : MonoBehaviour
 
 	public void OnWillRenderObject()
 	{
-		if ((bool)reflection)
-		{
-			reflection.WaterTileBeingRendered(base.transform, Camera.current);
-		}
-		if ((bool)waterBase)
-		{
-			waterBase.WaterTileBeingRendered(base.transform, Camera.current);
-		}
+		// No-op: PlanarReflection + WaterBase helper-camera renders are
+		// Pro-only on Unity 4.6 Free and silent-fail per Scene+Game camera,
+		// generating "Shader wants normals" warnings per renderer per frame.
+		// FX/Water cubemap reflection covers the visual. See
+		// feedback_unity_4_6_free_planar_reflection_spam.md.
 	}
 }
