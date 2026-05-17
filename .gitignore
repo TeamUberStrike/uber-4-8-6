@@ -1,0 +1,40 @@
+# Unity 4.6 — local-only directories
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+
+# AssetRipper / bulk-port backups
+/.bak_*/
+/.monkey_island_rebind_brief.md
+
+# Unity-generated solution/project files (regenerated on import)
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Standalone build output (do NOT commit binaries)
+/windowsstandalone.exe
+/windowsstandalone_Data/
+
+# OS / IDE noise
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Don't ignore .meta — Unity tracks asset import settings here
+!*.meta
