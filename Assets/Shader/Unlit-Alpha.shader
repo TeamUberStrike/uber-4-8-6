@@ -1,25 +1,50 @@
 Shader "Unlit/Transparent" {
 Properties {
- _MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
+	_MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
 }
-	//DummyShaderTextExporter
-	
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
+
+SubShader {
+	Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+	LOD 100
+
+	ZWrite Off
+	Blend SrcAlpha OneMinusSrcAlpha
+	Cull Off
+
+	Pass {
 		CGPROGRAM
-#pragma surface surf Lambert
-#pragma target 3.0
-		sampler2D _MainTex;
-		struct Input
-		{
-			float2 uv_MainTex;
+		#pragma vertex vert
+		#pragma fragment frag
+		#pragma target 2.0
+		#include "UnityCG.cginc"
+
+		struct appdata_t {
+			float4 vertex : POSITION;
+			float2 texcoord : TEXCOORD0;
 		};
-		void surf(Input IN, inout SurfaceOutput o)
+
+		struct v2f {
+			float4 vertex : SV_POSITION;
+			half2 texcoord : TEXCOORD0;
+		};
+
+		sampler2D _MainTex;
+		float4 _MainTex_ST;
+
+		v2f vert (appdata_t v)
 		{
-			float4 c = tex2D(_MainTex, IN.uv_MainTex);
-			o.Albedo = c.rgb;
+			v2f o;
+			o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+			o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
+			return o;
+		}
+
+		fixed4 frag (v2f i) : SV_Target
+		{
+			fixed4 col = tex2D(_MainTex, i.texcoord);
+			return col;
 		}
 		ENDCG
 	}
+}
 }
