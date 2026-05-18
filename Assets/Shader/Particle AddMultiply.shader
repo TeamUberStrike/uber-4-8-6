@@ -70,15 +70,18 @@ Category {
 
             fixed4 frag (v2f i) : SV_Target {
                 fixed4 t = tex2D(_MainTex, i.texcoord);
-                // Shape mask: tex.a * texture luminance. Multiplying both means EITHER
-                // a zero-alpha pixel OR a zero-luminance pixel masks out -- robust to
-                // textures with shape encoded in either channel.
-                //  - cloud2.png style (uniform white RGB, shape in alpha) -> tex.a drives
-                //  - CFX2 style (RGB silhouette on black, alpha uniform) -> lum drives
-                // Critical: do NOT multiply by vertex.a -- legacy ParticleAnimator leaves
-                // it at 0 across all keyframes, which would zero out everything.
+                // Mask combines three sources to defeat the "white square" problem
+                // we hit on legacy ParticleAnimator + textures with weak alpha/RGB fade:
+                //  1. tex.a       -- cloud2.png style (shape in alpha)
+                //  2. luminance   -- CFX2 style (shape in RGB on black)
+                //  3. radial fade -- procedural, kills quad corners even if both
+                //                    texture channels are uniform across the quad
+                // Critical: NOT vertex.a (legacy ParticleAnimator is zero there).
                 fixed lum = max(max(t.r, t.g), t.b);
-                fixed mask = t.a * lum;
+                float2 uvc = i.texcoord - 0.5;
+                float r2 = saturate(dot(uvc, uvc) * 4.0);   // 0 at center, 1 at corner
+                fixed radial = 1.0 - r2 * r2;               // smooth quadratic falloff
+                fixed mask = t.a * lum * radial;
 
                 fixed4 col;
                 col.rgb = i.color.rgb * _TintColor.rgb * t.rgb * 2.0 * mask;
