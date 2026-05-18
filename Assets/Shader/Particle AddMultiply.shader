@@ -1,12 +1,15 @@
 // Particles/~Additive-Multiply -- restored from DummyShaderTextExporter stub.
-// Soft-additive blend (Blend OneMinusDstColor One): brightens dark areas of the
-// scene without overexposing bright areas. Used by GhostSteam.mat on FogInTheShip
-// (Ghost Island ship-interior fog) and other smoke/fog/haze effects.
+// Soft-additive blend (Blend OneMinusDstColor One): brightens dark scene areas
+// without overexposing bright ones.
 //
-// Important: this shader derives its alpha mask from RGB luminance, not from the
-// texture's alpha channel. Many CFX2 (Cartoon FX 2) smoke/fog textures encode the
-// fade as brightness instead of alpha; trusting tex.a alone produces opaque quad
-// outlines when the source PNG has a uniform alpha channel.
+// Critical for legacy ParticleAnimator (component 12) compatibility: the legacy
+// particle system writes per-particle color into vertex color, where alpha is
+// typically 0 across all color-animation keyframes (only RGB varies for fade).
+// So this shader MUST NOT gate visibility by vertex.a -- the blend `OneMinusDstColor One`
+// already ignores src.a, and the shape mask must come from texture luminance only.
+//
+// Used by GhostSteam.mat on FogInTheShip (Ghost Island ship-interior fog) and other
+// legacy-PS smoke/fog/haze effects.
 Shader "Particles/~Additive-Multiply" {
 Properties {
     _TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
@@ -67,24 +70,21 @@ Category {
 
             fixed4 frag (v2f i) : SV_Target {
                 fixed4 t = tex2D(_MainTex, i.texcoord);
-                // Derive mask from RGB luminance only (do NOT trust tex.a).
-                // CFX2 smoke/fog textures encode the silhouette as brightness on
-                // a black background; their alpha channel is typically uniform 1
-                // so trusting it would render the quad as a fully-opaque square.
+                // Shape mask from texture luminance only (NOT vertex.a or tex.a).
+                // Legacy ParticleAnimator keyframes leave alpha at 0; trusting it
+                // would zero out the contribution. CFX2 smoke textures encode the
+                // silhouette in RGB brightness anyway.
                 fixed mask = max(max(t.r, t.g), t.b);
 
-                fixed alpha = i.color.a * _TintColor.a * mask;
+                fixed4 col;
+                col.rgb = i.color.rgb * _TintColor.rgb * t.rgb * 2.0 * mask;
                 #ifdef SOFTPARTICLES_ON
                 float sceneZ = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture, UNITY_PROJ_COORD(i.projPos)));
                 float partZ = i.projPos.z;
                 float fade = saturate(_InvFade * (sceneZ - partZ));
-                alpha *= fade;
+                col.rgb *= fade;
                 #endif
-
-                fixed4 col;
-                col.rgb = i.color.rgb * _TintColor.rgb * t.rgb * 2.0;
-                col.a = alpha;
-                col.rgb *= col.a;
+                col.a = 1.0;  // ignored by Blend OneMinusDstColor One
                 return col;
             }
             ENDCG
