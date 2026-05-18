@@ -70,11 +70,15 @@ Category {
 
             fixed4 frag (v2f i) : SV_Target {
                 fixed4 t = tex2D(_MainTex, i.texcoord);
-                // Shape mask from texture luminance only (NOT vertex.a or tex.a).
-                // Legacy ParticleAnimator keyframes leave alpha at 0; trusting it
-                // would zero out the contribution. CFX2 smoke textures encode the
-                // silhouette in RGB brightness anyway.
-                fixed mask = max(max(t.r, t.g), t.b);
+                // Shape mask: tex.a * texture luminance. Multiplying both means EITHER
+                // a zero-alpha pixel OR a zero-luminance pixel masks out -- robust to
+                // textures with shape encoded in either channel.
+                //  - cloud2.png style (uniform white RGB, shape in alpha) -> tex.a drives
+                //  - CFX2 style (RGB silhouette on black, alpha uniform) -> lum drives
+                // Critical: do NOT multiply by vertex.a -- legacy ParticleAnimator leaves
+                // it at 0 across all keyframes, which would zero out everything.
+                fixed lum = max(max(t.r, t.g), t.b);
+                fixed mask = t.a * lum;
 
                 fixed4 col;
                 col.rgb = i.color.rgb * _TintColor.rgb * t.rgb * 2.0 * mask;
