@@ -85,7 +85,7 @@ public static class ApplicationDataManager
 	static ApplicationDataManager()
 	{
 		WebServiceBaseUrl = "http://127.0.0.1:8888/2.0/";
-		ImagePath = "http://static.uberstrike.com/images/";
+		ImagePath = "http://127.0.0.1:8888/images/";
 		IsDebug = true;
 		applicationDateTime = 0f;
 		serverDateTime = DateTime.Now;
