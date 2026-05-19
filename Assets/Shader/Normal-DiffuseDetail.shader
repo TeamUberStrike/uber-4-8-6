@@ -1,7 +1,7 @@
 // Diffuse Detail — restored from DummyShaderTextExporter stub.
 // Unity legacy Diffuse Detail: base texture multiplied by detail texture at 2x contrast.
-// Used by ApexTwin RockLarges + CocoTreesTrunks, MonkeyIsland bridge/pillars/walls,
-// and other architectural props that need a tiling detail overlay for close-up quality.
+// Used by MonkeyIsland bridge, pillars, stone walls, shipwreck, tunnel, and other
+// architectural props that need a tiling detail overlay for close-up surface quality.
 Shader "Diffuse Detail" {
 Properties {
     _Color ("Main Color", Color) = (1,1,1,1)

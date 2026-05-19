@@ -1,8 +1,6 @@
-// Cross Platform Shaders/Diffuse (Cull Off) -- restored from DummyShaderTextExporter stub.
-// Plain Lambert diffuse with main texture, color tint, and double-sided rendering
-// (Cull Off lets backfaces show too). Used as the fallback shader for materials whose
-// Unity 6 Standard binding doesn't exist in U4.6.5 (SpacePortAlpha + UberZone teleporters,
-// BlueBox cubes, PickupBaseWeapon, etc.).
+// Cross Platform Shaders/Diffuse (Cull Off) — restored from DummyShaderTextExporter stub.
+// Diffuse with no backface culling. Used by SkyGarden YellowHair material and other
+// double-sided geometry like hair planes and foliage.
 Shader "Cross Platform Shaders/Diffuse (Cull Off)" {
 Properties {
     _Color ("Main Color", Color) = (1,1,1,1)
@@ -12,6 +10,7 @@ SubShader {
     Tags { "RenderType"="Opaque" }
     LOD 200
     Cull Off
+
     CGPROGRAM
     #pragma surface surf Lambert
     #pragma target 2.5

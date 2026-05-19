@@ -1,6 +1,6 @@
 // RenderFX/Skybox Cubed — restored from DummyShaderTextExporter stub.
-// Cubemap skybox shader (Unity 4.6 compatible).
-// Used by SkyboxV2.mat (TempleOfTheRaven).
+// Cubemap skybox shader. Samples a single CUBE texture with a tint.
+// Used by TempleOfTheRaven (SkyboxV2 material).
 Shader "RenderFX/Skybox Cubed" {
 Properties {
     _Tint ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
@@ -10,15 +10,17 @@ SubShader {
     Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
     Cull Off
     ZWrite Off
-    Fog { Mode Off }
 
     Pass {
         CGPROGRAM
         #pragma vertex vert
         #pragma fragment frag
+        #pragma target 2.5
+
         #include "UnityCG.cginc"
 
         samplerCUBE _Tex;
+        half4 _Tex_HDR;
         half4 _Tint;
 
         struct appdata {
