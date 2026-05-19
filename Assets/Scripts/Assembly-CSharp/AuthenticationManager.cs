@@ -44,6 +44,10 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			+ " — choosing " + (PlayerDataManager.SteamId == PlayerDataManager.OFFLINE_STEAMID ? "OFFLINE BYPASS" : "REAL STEAM PATH"));
 		if (PlayerDataManager.SteamId == PlayerDataManager.OFFLINE_STEAMID)
 		{
+			// NOTE: StartLoginMemberEmailDirect("aaa@bbb.com", "dev123") works at the auth
+			// step (server returns Ok) but CompleteAuthentication explodes because the
+			// server's MemberView lacks PublicProfile (schema delta between v4.8.6 server
+			// and 4.7.1 client). Real-auth path is parked; offline bypass keeps editor playable.
 			UnityRuntime.StartRoutine(StartOfflineLogin());
 			return;
 		}
@@ -111,6 +115,37 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		{
 			yield return UnityRuntime.StartRoutine(CompleteAuthentication(authenticationView));
 		}
+	}
+
+	// Dev-only: routes around the Steam-link branch in StartLoginMemberEmail by passing
+	// ChannelType.WindowsStandalone directly. ApplicationDataManager.Channel stays Steam
+	// globally (other code paths still gate correctly); only the LoginMemberEmail call
+	// itself uses WindowsStandalone so UBZ treats this as a plain email auth, not a Steam link.
+	public IEnumerator StartLoginMemberEmailDirect(string emailAddress, string password)
+	{
+		if (string.IsNullOrEmpty(emailAddress) || string.IsNullOrEmpty(password))
+		{
+			ShowLoginErrorPopup(LocalizedStrings.Error, "Dev login: empty email/password.");
+			yield break;
+		}
+		_progress.Text = "Authenticating (UBZ email)";
+		_progress.Progress = 0.1f;
+		PopupSystem.Show(_progress);
+		MemberAuthenticationResultView authenticationView = null;
+		yield return AuthenticationWebServiceClient.LoginMemberEmail(emailAddress, password, ChannelType.WindowsStandalone, SystemInfo.deviceUniqueIdentifier, delegate(MemberAuthenticationResultView ev)
+		{
+			authenticationView = ev;
+		}, delegate(Exception ex)
+		{
+			Debug.LogError("[AuthenticationManager] LoginMemberEmail SOAP error: " + (ex != null ? ex.Message : "(null)"));
+		});
+		if (authenticationView == null)
+		{
+			ShowLoginErrorPopup(LocalizedStrings.Error, "UBZ email login failed (no response). Check server + proxy.");
+			yield break;
+		}
+		Debug.Log("[AuthenticationManager] UBZ email login result: " + authenticationView.MemberAuthenticationResult);
+		yield return UnityRuntime.StartRoutine(CompleteAuthentication(authenticationView));
 	}
 
 	public IEnumerator StartOfflineLogin()
@@ -361,7 +396,6 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			{ "LostParadise2",      "Lost Paradise 2" },
 			{ "MonkeyIsland",       "Monkey Island" },
 			{ "SkyGarden",          "Sky Garden" },
-			{ "SpaceCity",          "Space City" },
 			{ "SpacePortAlpha",     "Space Port Alpha" },
 			{ "SuperPRISMReactor",  "Super PRISM Reactor" },
 			{ "TempleOfTheRaven",   "Temple of the Raven" },
