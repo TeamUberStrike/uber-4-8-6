@@ -102,6 +102,12 @@ public class AvatarAnimationController : MonoBehaviour
 	private void Awake()
 	{
 		Animator = GetComponent<Animator>();
+		// Parked T-pose avatar: Mecanim crashes in EvaluateAvatarSM (FKStep) on the U5+ humanoid clips.
+		// Disabling the Animator keeps the avatar in T-pose but prevents Unity's PlayerLoop from FK-stepping.
+		if (Animator != null)
+		{
+			Animator.enabled = false;
+		}
 	}
 
 	private void OnEnable()
@@ -149,6 +155,10 @@ public class AvatarAnimationController : MonoBehaviour
 
 	private void Update()
 	{
+		if (Animator == null || !Animator.enabled || Animator.runtimeAnimatorController == null || Animator.avatar == null)
+		{
+			return;
+		}
 		Animator.SetInteger(ControlFields.GearType, gearTrigger);
 		if (state != null)
 		{
