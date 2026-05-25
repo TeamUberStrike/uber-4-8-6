@@ -782,8 +782,20 @@ public class WeaponFeedbackManager : MonoBehaviour
 	{
 		if (_pickupWeaponState != null && _pickupWeaponState.IsValid)
 		{
+			// Hide the previous weapon's GameObject immediately so it doesn't
+			// render on top of the incoming PickUpState pose. Non-melee weapons
+			// share the same pivot transform, so without this the prev gun
+			// ghosts in roughly the new gun's position for PutDownDuration.
+			// PutDownState still runs (and its Finish() will redundantly
+			// disable on completion), but the GameObject is inactive so the
+			// animated transform has no visual effect.
+			BaseWeaponDecorator prevDecorator = _pickupWeaponState.Decorator;
 			PutDownWeapon(_pickupWeaponState.Weapon, _pickupWeaponState.Decorator, destroy);
 			_pickupWeaponState = null;
+			if ((bool)prevDecorator)
+			{
+				prevDecorator.IsEnabled = false;
+			}
 		}
 	}
 
