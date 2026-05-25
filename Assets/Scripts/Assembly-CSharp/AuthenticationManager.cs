@@ -28,10 +28,26 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		IsAuthComplete = enabled;
 	}
 
+	// DEV: flip to true to bypass the OFFLINE_STEAMID guard in-editor and exercise
+	// the real UBZ email auth path. Requires UBZ server running and a user account
+	// at DEV_REAL_AUTH_EMAIL / DEV_REAL_AUTH_PASS (create one via the in-game
+	// signup flow once if needed). Flip back to false for offline iteration.
+	private const bool DEV_REAL_AUTH_TEST = false;
+	private const string DEV_REAL_AUTH_EMAIL = "aaa@bbb.com";
+	private const string DEV_REAL_AUTH_PASS = "dev123";
+
 	public void LoginByChannel()
 	{
 		string text = PlayerPrefs.GetString("CurrentSteamUser", string.Empty);
 		Debug.Log(string.Format("SteamWorks SteamID:{0}, PlayerPrefs SteamID:{1}", PlayerDataManager.SteamId, text));
+
+		if (DEV_REAL_AUTH_TEST)
+		{
+			Debug.LogWarning("[AuthenticationManager] DEV_REAL_AUTH_TEST=true — routing to UBZ email auth ("
+				+ DEV_REAL_AUTH_EMAIL + ").");
+			UnityRuntime.StartRoutine(StartLoginMemberEmailDirect(DEV_REAL_AUTH_EMAIL, DEV_REAL_AUTH_PASS));
+			return;
+		}
 
 		// Offline editor bypass — when SteamId returns the hardcoded sentinel
 		// from PlayerDataManager.SteamId (uninit SteamManager / DllNotFoundException
@@ -44,10 +60,14 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			+ " — choosing " + (PlayerDataManager.SteamId == PlayerDataManager.OFFLINE_STEAMID ? "OFFLINE BYPASS" : "REAL STEAM PATH"));
 		if (PlayerDataManager.SteamId == PlayerDataManager.OFFLINE_STEAMID)
 		{
-			// NOTE: StartLoginMemberEmailDirect("aaa@bbb.com", "dev123") works at the auth
-			// step (server returns Ok) but CompleteAuthentication explodes because the
-			// server's MemberView lacks PublicProfile (schema delta between v4.8.6 server
-			// and 4.7.1 client). Real-auth path is parked; offline bypass keeps editor playable.
+			// Real auth scope (re-investigated 2026-05-25): UBZ AspNetCore server uses
+			// Rijndael-encrypted request bodies (CryptoHelper.DecryptRequest) for auth
+			// methods, plus a custom AuthProxy43 response format that differs from the
+			// shared MemberAuthenticationResultViewProxy in field order, mask bits, and
+			// nested proxies (MemberWalletView/PublicProfileView/PlayerStatisticsView).
+			// 4.7.1 client lacks the crypto layer AND has stock proxies — so real auth
+			// requires porting RijndaelCipher.cs + 4 proxy rewrites. Multi-hour port,
+			// deferred. Offline bypass remains the editor path.
 			UnityRuntime.StartRoutine(StartOfflineLogin());
 			return;
 		}
