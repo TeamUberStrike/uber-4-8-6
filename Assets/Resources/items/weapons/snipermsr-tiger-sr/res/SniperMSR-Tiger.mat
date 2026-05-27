@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: SniperMSR-Tiger
+  m_Shader: {fileID: 4800000, guid: 1662e2babbb51fd489c29975c65a2e81, type: 3}
+  m_ShaderKeywords: []
+  m_CustomRenderQueue: -1
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+      data:
+        first:
+          name: _BumpMap
+        second:
+          m_Texture: {fileID: 2800000, guid: cbcb61df20af2fa4b8de9755456a1f53, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _MainTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 27e3c6fa04f61a042bd46809a4e10c4b, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+    m_Floats:
+      data:
+        first:
+          name: _Shininess
+        second: 0.078125
+    m_Colors:
+      data:
+        first:
+          name: _Color
+        second: {r: 0.80597013, g: 0.80597013, b: 0.80597013, a: 1}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: 0.25373137, g: 0.25373137, b: 0.25373137, a: 1}
