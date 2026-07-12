@@ -338,20 +338,19 @@ namespace UberStrike.Editor.Bots
                             if (floorY < refYLowerBand) { rejectedBelow++; continue; }
                             if (floorY > refYUpperBand) { rejectedAbove++; continue; }
 
-                            bool blocked = TorsoBlocked(cx, floorY, cz);
-
-                            if (chosenY <= NoGround)
-                            {
-                                chosenY = floorY;
-                                chosenWalkable = !blocked;
-                                if (!blocked) break;
-                            }
-                            else if (!blocked)
-                            {
-                                chosenY = floorY;
-                                chosenWalkable = true;
-                                break;
-                            }
+                            // 2026-07-13: take the LOWEST valid floor-like hit and
+                            // STOP — don't keep searching upward past it when it's
+                            // torso-blocked. The old behavior treated "blocked" as
+                            // "try the next surface up," which on multi-story maps
+                            // could latch onto a completely disconnected upper
+                            // floor/rooftop (unblocked from directly above) as this
+                            // cell's ground — exactly the "bot spawns on top of a
+                            // collider it's not supposed to reach" bug. A blocked
+                            // lowest floor means real ground-level clutter here;
+                            // the correct read is WALL at that Y, not "look upstairs."
+                            chosenY = floorY;
+                            chosenWalkable = !TorsoBlocked(cx, floorY, cz);
+                            break;
                         }
                     }
 
@@ -367,6 +366,14 @@ namespace UberStrike.Editor.Bots
             else
                 Debug.LogWarning("[BotsGeo]   no spawn points found in " + sceneName +
                     " — Y-band filter disabled; bots may sink into outdoor terrain.");
+
+            // 2026-07-13: validate every authored spawn point actually landed
+            // on usable ground in the exported grid. Before this, a spawn
+            // point whose cell had no ground hit (or was classified as wall)
+            // produced no error anywhere — it just silently showed up later
+            // as a bot floating/frozen in place in-game, with no way to tell
+            // WHICH spawn point was bad short of live-testing every one.
+            int badSpawns = ValidateSpawnCells(sceneName, spawns, minX, minZ, gridW, gridH, groundY, walkable);
 
             // 2) Build the export model.
             string fileBase = FileBaseFor(sceneName);
@@ -416,29 +423,90 @@ namespace UberStrike.Editor.Bots
                 minX, maxX, minZ, maxZ, json.Length / 1024, streamingPath));
 
             _report.AppendLine(string.Format(
-                "{0,-22} OK        grid {1,4}x{2,-5} ground={3,-7} walk={4,-7} wall={5,-7} spawns={6,-4} {7}KB",
+                "{0,-22} OK        grid {1,4}x{2,-5} ground={3,-7} walk={4,-7} wall={5,-7} spawns={6,-4} badSpawns={7,-3} {8}KB",
                 sceneName, gridW, gridH, hitGround, walkN, wallN,
-                spawns.blue.Count + spawns.red.Count + spawns.none.Count, json.Length / 1024));
+                spawns.blue.Count + spawns.red.Count + spawns.none.Count, badSpawns, json.Length / 1024));
             return true;
+        }
+
+        // Checks every authored spawn point against the exported grid and
+        // logs (Debug.LogWarning + report line) any whose cell has no ground
+        // hit or isn't walkable — these are the spawns that will produce a
+        // floating/frozen/stuck-in-wall bot in-game. Returns the bad count.
+        private static int ValidateSpawnCells(string sceneName, SpawnLists spawns,
+            float minX, float minZ, int gridW, int gridH, float[] groundY, byte[] walkable)
+        {
+            int bad = 0;
+            var all = new List<KeyValuePair<string, Vector3>>();
+            foreach (var p in spawns.blue) all.Add(new KeyValuePair<string, Vector3>("BLUE", p));
+            foreach (var p in spawns.red)  all.Add(new KeyValuePair<string, Vector3>("RED", p));
+            foreach (var p in spawns.none) all.Add(new KeyValuePair<string, Vector3>("NONE", p));
+
+            foreach (var kv in all)
+            {
+                var p = kv.Value;
+                int gx = Mathf.FloorToInt((p.x - minX) / CellSize);
+                int gz = Mathf.FloorToInt((p.z - minZ) / CellSize);
+                if (gx < 0 || gx >= gridW || gz < 0 || gz >= gridH)
+                {
+                    bad++;
+                    Debug.LogWarning(string.Format(
+                        "[BotsGeo]   BAD SPAWN ({0}) {1} at ({2:F1},{3:F1},{4:F1}) — outside the exported grid entirely",
+                        sceneName, kv.Key, p.x, p.y, p.z));
+                    continue;
+                }
+                int idx = gz * gridW + gx;
+                bool hasGround = groundY[idx] > NoGround;
+                bool isWalkable = walkable[idx] != 0;
+                if (!hasGround || !isWalkable)
+                {
+                    bad++;
+                    Debug.LogWarning(string.Format(
+                        "[BotsGeo]   BAD SPAWN ({0}) {1} at ({2:F1},{3:F1},{4:F1}) — cell[{5},{6}] hasGround={7} walkable={8} (this is exactly the \"floating/frozen/stuck in geometry\" bug)",
+                        sceneName, kv.Key, p.x, p.y, p.z, gx, gz, hasGround, isWalkable));
+                }
+            }
+            return bad;
         }
 
         // Clearance test: does a collider overlap the bot's torso band above
         // this floor cell? Replaces Unity 2022's Physics.CheckBox — 4.6.5 has
         // no CheckBox, and OverlapSphere lets us drop trigger hits per-call
-        // (CheckCapsule cannot). Two samples (knee + chest) catch low rails
+        // (CheckCapsule cannot). Two heights (knee + chest) catch low rails
         // and chest-height walls without flagging the floor itself.
+        //
+        // 2026-07-13: was a SINGLE sample at the cell's exact center — a wall
+        // or pillar thinner than ~0.8m (2x the old radius) that didn't happen
+        // to cross that one point was structurally invisible to the whole
+        // system on both sides of it, letting bots walk straight through.
+        // Now samples 5 XZ points per cell (center + 4 quarter-offsets) at
+        // both heights; ANY overlap at ANY point marks the cell blocked —
+        // conservative on purpose, since a cell should only be "walkable" if
+        // a bot's full footprint actually clears it, not just its center.
+        private static readonly Vector2[] _cellOffsets =
+        {
+            new Vector2(0f, 0f),
+            new Vector2(0.3f, 0f), new Vector2(-0.3f, 0f),
+            new Vector2(0f, 0.3f), new Vector2(0f, -0.3f),
+        };
+
         private static bool TorsoBlocked(float cx, float floorY, float cz)
         {
-            float radius = CellSize * 0.4f;
+            float radius = CellSize * 0.22f; // 5 overlapping samples cover the cell without excessive double-counting
             float[] sampleHeights = { BotHeightMin + 0.3f, BotHeightMax - 0.3f };
-            foreach (float h in sampleHeights)
+            foreach (var offset in _cellOffsets)
             {
-                var center = new Vector3(cx, floorY + h, cz);
-                var overlaps = Physics.OverlapSphere(center, radius, RaycastMask);
-                foreach (var col in overlaps)
+                float sx = cx + offset.x * CellSize;
+                float sz = cz + offset.y * CellSize;
+                foreach (float h in sampleHeights)
                 {
-                    if (col == null || col.isTrigger) continue; // triggers aren't walls
-                    return true;
+                    var center = new Vector3(sx, floorY + h, sz);
+                    var overlaps = Physics.OverlapSphere(center, radius, RaycastMask);
+                    foreach (var col in overlaps)
+                    {
+                        if (col == null || col.isTrigger) continue; // triggers aren't walls
+                        return true;
+                    }
                 }
             }
             return false;

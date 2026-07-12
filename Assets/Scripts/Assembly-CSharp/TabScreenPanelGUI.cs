@@ -264,6 +264,26 @@ public class TabScreenPanelGUI : MonoBehaviour
 			string text = ((!string.IsNullOrEmpty(player.ClanTag)) ? ("[" + player.ClanTag + "] " + player.PlayerName) : player.PlayerName);
 			GUI.Label(new Rect(num13, 0f, num12, 36f), text, BlueStonez.label_interparkbold_11pt_left_wrap);
 			GUI.color = contentColor;
+			// Unforgeable bot marker (HaZard's requirement) — driven ONLY by
+			// player.Cmid < 0 (server-authoritative, matches
+			// BotManager.SpawnBot's Interlocked.Decrement range; a real
+			// account can never have a negative cmid), never by name text.
+			// A prior attempt embedded a marker glyph directly in PlayerName,
+			// but this game's name-rendering fonts (both this legacy IMGUI
+			// path and the NGUI UILabel path elsewhere) are baked to ASCII
+			// 32-126 only — any non-ASCII glyph is silently dropped, not
+			// shown. Drawing "(Bot)" here as plain ASCII, client-side, tied
+			// to the server-supplied cmid rather than any player-editable
+			// text, avoids that rendering gap entirely and is unforgeable by
+			// construction — a real player has no path to make their own
+			// name trigger this label.
+			if (player.Cmid < 0)
+			{
+				Color color2 = GUI.color;
+				GUI.color = new Color(0.75f, 0.75f, 0.75f, 0.45f);
+				GUI.Label(new Rect(num13, 18f, num12, 16f), "(Bot)", BlueStonez.label_interparkbold_11pt_left);
+				GUI.color = color2;
+			}
 			num13 += num12;
 			GUI.Label(new Rect(num13, 0f, num4, 36f), player.Kills.ToString(), BlueStonez.label_interparkbold_11pt_left);
 			num13 += num4;
