@@ -233,32 +233,26 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		EventHandler.Global.Fire(new GlobalEvents.Login(MemberAccessLevel.Admin));
 		Singleton<PlayerDataManager>.Instance.SetPlayerStatisticsView(new PlayerStatisticsView());
 
-		// Avatar build with Animator-neutralization. The AssetRipper-emitted
-		// DefaultAvatar prefab has a corrupt Animator state machine that crashes
-		// Unity 4.6 mecanim native (StateMachine.cpp:1584 → EvaluateAvatarSM AV).
-		// Strategy: instantiate the prefab, then immediately strip the runtime
-		// Animator controller off every Animator we find on the new avatar so
-		// mecanim never tries to evaluate the broken state machine. Result: avatar
-		// renders in T-pose (static) but the lobby has a visible character.
+		// Was: strip the runtime Animator controller off every Animator on the
+		// avatar (a.runtimeAnimatorController = null; a.avatar = null; a.enabled
+		// = false;) to dodge a crash in Unity 4.6 mecanim native
+		// (StateMachine.cpp:1584 -> EvaluateAvatarSM AV). Root cause found:
+		// AvatarMovement.controller's state machines all serialized with
+		// m_States: [] even though every state they reference by GUID exists as
+		// a real, complete .state asset under Assets/State/ -- the importer
+		// bakes the runtime state graph from m_States, so an empty list left
+		// AnyState/default-state transitions pointing at states the baked graph
+		// never registered. Relinked them (see AvatarMovement.controller diff).
+		// Leaving the Animator enabled now as a live test of that fix -- if
+		// mecanim still crashes here, the state-relink wasn't the whole story
+		// and this strip needs to come back.
 		try
 		{
 			AvatarDecorator dec = AvatarBuilder.CreateLocalAvatar();
 			if (dec != null)
 			{
 				Animator[] anims = dec.GetComponentsInChildren<Animator>(true);
-				int killed = 0;
-				foreach (Animator a in anims)
-				{
-					if (a == null) continue;
-					// Null both — the crash is in EvaluateAvatarSM which walks the
-					// Avatar's state machine; corruption could be in either the
-					// runtime controller asset or the Avatar humanoid mapping.
-					a.runtimeAnimatorController = null;
-					a.avatar = null;
-					a.enabled = false;
-					killed++;
-				}
-				Debug.Log("[Offline] Avatar built; neutralized " + killed + " Animator(s) to dodge mecanim state-machine crash.");
+				Debug.Log("[Offline] Avatar built; leaving " + anims.Length + " Animator(s) enabled (testing AvatarMovement.controller state-relink fix).");
 				GameState.Current.Avatar.SetDecorator(dec);
 				GameState.Current.Avatar.UpdateAllWeapons();
 			}

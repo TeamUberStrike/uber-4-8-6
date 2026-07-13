@@ -164,7 +164,9 @@ StateMachine:
   m_PrefabInternal: {fileID: 0}
   m_Name: Base
   m_DefaultState: {fileID: 110200000, guid: f9bb73e7a0d992a45a65b9525c8772bd, type: 2}
-  m_States: []
+  m_States:
+  - {fileID: 110200000, guid: f9bb73e7a0d992a45a65b9525c8772bd, type: 2}
+  - {fileID: 110200000, guid: ee6d9f76dbecd6c46a293456af19a6b4, type: 2}
   m_ChildStateMachine:
   - {fileID: 1107730242686860875}
   m_ChildStateMachinePosition:
@@ -220,7 +222,12 @@ StateMachine:
   m_PrefabInternal: {fileID: 0}
   m_Name: Weapons
   m_DefaultState: {fileID: 110200000, guid: 82dd6f1e097ad1e43b81eeadf6b0627c, type: 2}
-  m_States: []
+  m_States:
+  - {fileID: 110200000, guid: 82dd6f1e097ad1e43b81eeadf6b0627c, type: 2}
+  - {fileID: 110200000, guid: 8b70d12b9f164b54d9141149363033fd, type: 2}
+  - {fileID: 110200000, guid: d6b1ac997ac542d45a80cfd3802069f9, type: 2}
+  - {fileID: 110200000, guid: cc8f864dc2d9113469b73a96e9cd6433, type: 2}
+  - {fileID: 110200000, guid: 5ec2ab9dddbe0c34dba3a5e084d44281, type: 2}
   m_ChildStateMachine:
   - {fileID: 1107703437598541787}
   - {fileID: 1107884547391421755}
@@ -431,7 +438,8 @@ StateMachine:
   m_PrefabInternal: {fileID: 0}
   m_Name: Shop
   m_DefaultState: {fileID: 110200000, guid: ee23ce6719dbe9a49a8bf8b3a08b860e, type: 2}
-  m_States: []
+  m_States:
+  - {fileID: 110200000, guid: ee23ce6719dbe9a49a8bf8b3a08b860e, type: 2}
   m_ChildStateMachine: []
   m_ChildStateMachinePosition: []
   m_OrderedTransitions: {}
