@@ -413,6 +413,8 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 				GUI.Label(new Rect(170f, 190f, _sliderWidth, 25f), "MaxLevel is too low for you!", BlueStonez.label_interparkbold_11pt);
 				GUI.contentColor = Color.white;
 			}
+			ToggleGameFlag(GameFlags.GAME_FLAGS.LowGravity, 220, LocalizedStrings.LowGravity);
+			ToggleGameFlag(GameFlags.GAME_FLAGS.QuickSwitch, 240, "Quick Switch");
 			GUI.EndGroup();
 		}
 		else
@@ -423,13 +425,14 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 
 	private void ToggleGameFlag(GameFlags.GAME_FLAGS flag, int y, string content)
 	{
-		if (GUI.Toggle(new Rect(6f, y, 160f, 16f), _gameFlags == flag, content, BlueStonez.toggle))
+		bool flag2 = (_gameFlags & flag) == flag;
+		if (GUI.Toggle(new Rect(6f, y, 160f, 16f), flag2, content, BlueStonez.toggle))
 		{
-			_gameFlags = flag;
+			_gameFlags |= flag;
 		}
-		else if (_gameFlags == flag)
+		else
 		{
-			_gameFlags = GameFlags.GAME_FLAGS.None;
+			_gameFlags &= ~flag;
 		}
 	}
 

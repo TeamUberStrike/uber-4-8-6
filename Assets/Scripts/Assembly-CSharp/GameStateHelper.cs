@@ -135,6 +135,17 @@ internal static class GameStateHelper
 
 	public static void PlayerHit(int targetCmid, ushort damage, BodyPart part, Vector3 force)
 	{
+		// This is client-side prediction for self-hits (fired before the server's
+		// authoritative response). The server refuses all damage outside
+		// GameStateId.MatchRunning (CanDamage gated on IsMatchRunning), so it never
+		// sends a correcting GameActorInfoDelta back -- meaning a predicted hit taken
+		// while waiting for players stays wrong forever with nothing to reconcile it.
+		// Mirror the server's own gate here so the two never diverge.
+		if ((GameStateId)GameData.Instance.GameState != GameStateId.MatchRunning)
+		{
+			return;
+		}
+
 		PlayerData playerData = GameState.Current.PlayerData;
 		short healthDamage;
 		byte armorDamage;

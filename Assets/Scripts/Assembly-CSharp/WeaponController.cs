@@ -157,7 +157,12 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		// "equip delay after firing". When the player has the Quick Switch
 		// toggle enabled and a slot change has been requested, zero the
 		// cooldown so the switch executes on the same frame.
-		if (_currentSlot != _weapons[_currentSlotID.Current] && TrainingPageGUI.QuickSwitchEnabled)
+		// TrainingPageGUI.QuickSwitchEnabled only covers Explore Maps' own local
+		// toggle -- a real match never sets it, so also honor the room's actual
+		// GameFlags (set via CreateGamePanelGUI, synced through RoomData), mirroring
+		// how GameState.ConfigureAvatar reads LowGravity the same way.
+		bool quickSwitchActive = TrainingPageGUI.QuickSwitchEnabled || (GameState.Current.RoomData != null && GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, GameState.Current.RoomData.GameFlags));
+		if (_currentSlot != _weapons[_currentSlotID.Current] && quickSwitchActive)
 		{
 			_holsterTime = 0f;
 		}

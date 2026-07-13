@@ -379,7 +379,7 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		if (_updateLoadoutTime == 0f)
 		{
-			_updateLoadoutTime = Time.time + 5f;
+			_updateLoadoutTime = Time.time + 0.5f;
 			while (_updateLoadoutTime > Time.time)
 			{
 				yield return new WaitForEndOfFrame();
@@ -401,7 +401,7 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 		}
 		else
 		{
-			_updateLoadoutTime = Time.time + 5f;
+			_updateLoadoutTime = Time.time + 0.5f;
 		}
 	}
 
