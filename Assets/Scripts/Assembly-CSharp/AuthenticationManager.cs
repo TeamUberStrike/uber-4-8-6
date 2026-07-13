@@ -347,6 +347,21 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		}
 
 		yield return new WaitForEndOfFrame();
+
+		// Offline bypass never fetched the persisted loadout, so every fresh
+		// Play Mode session started back at LoadoutManager's defaults even
+		// though SetLoadout was saving equip changes correctly server-side --
+		// the player had to re-equip everything every single session.
+		IEnumerator loadoutRoutine = null;
+		try { loadoutRoutine = Singleton<PlayerDataManager>.Instance.StartGetLoadout(); }
+		catch (Exception ex) { Debug.LogWarning("[Offline] PlayerDataManager.StartGetLoadout pre-yield exception: " + ex.Message); }
+		if (loadoutRoutine != null)
+		{
+			yield return UnityRuntime.StartRoutine(loadoutRoutine);
+			Debug.Log("[Offline] PlayerDataManager.StartGetLoadout() completed.");
+		}
+
+		yield return new WaitForEndOfFrame();
 		PopupSystem.HideMessage(_progress);
 
 		try { MenuPageManager.Instance.LoadPage(PageType.Home); }
