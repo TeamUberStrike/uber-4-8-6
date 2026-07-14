@@ -360,7 +360,8 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 				m_GetAuthSessionTicketResponse = Callback<GetAuthSessionTicketResponse_t>.Create(OnGetAuthSessionTicketResponse);
 				byte[] ticket = new byte[1024];
 				uint pcbTicket;
-				HAuthTicket authTicket = SteamUser.GetAuthSessionTicket(ticket, 1024, out pcbTicket);
+				SteamNetworkingIdentity identity = default;
+				HAuthTicket authTicket = SteamUser.GetAuthSessionTicket(ticket, 1024, out pcbTicket, ref identity);
 				int num = (int)pcbTicket;
 				authToken = num.ToString();
 			}
@@ -378,7 +379,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			MemberAuthenticationResultView authenticationView = null;
 			_progress.Text = "Authenticating with UberStrike";
 			_progress.Progress = 0.1f;
-			yield return AuthenticationWebServiceClient.LoginSteam(PlayerDataManager.SteamId, authToken, machineId, delegate(MemberAuthenticationResultView result)
+			yield return AuthenticationWebServiceClient.LoginSteam("4.8.6", PlayerDataManager.SteamId, authToken, machineId, delegate(MemberAuthenticationResultView result)
 			{
 				authenticationView = result;
 				PlayerPrefs.SetString("CurrentSteamUser", PlayerDataManager.SteamId);
@@ -399,7 +400,9 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 
 	private void OnGetAuthSessionTicketResponse(GetAuthSessionTicketResponse_t pCallback)
 	{
+#if UNITY_EDITOR
 		Debug.Log(string.Concat("[", 163, " - GetAuthSessionTicketResponse] - ", pCallback.m_hAuthTicket, " -- ", pCallback.m_eResult));
+#endif
 	}
 
 	private IEnumerator CompleteAuthentication(MemberAuthenticationResultView authView, bool isRegistrationLogin = false)
@@ -432,7 +435,6 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		if (!PlayerDataManager.IsTestBuild)
 		{
 			PlayerDataManager.MagicHash = UberDaemon.Instance.GetMagicHash(authView.AuthToken);
-			Debug.Log("Magic Hash:" + PlayerDataManager.MagicHash);
 		}
 		ApplicationDataManager.ServerDateTime = authView.ServerTime;
 		EventHandler.Global.Fire(new GlobalEvents.Login(authView.MemberView.PublicProfile.AccessLevel));
