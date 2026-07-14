@@ -83,13 +83,19 @@ namespace UberStrike.WebService.Unity
 			}
 		}
 
-		public static Coroutine LoginSteam(string steamId, string authToken, string machineId, Action<MemberAuthenticationResultView> callback, Action<Exception> handler)
+		// UBZ AspNetCore server deserializes LoginSteam as 6-arg:
+		// (clientVersion, steamId, authToken, machineId, hwid, isMac)
+		// Serialization order must match exactly or version check returns NewUpdate.
+		public static Coroutine LoginSteam(string clientVersion, string steamId, string authToken, string machineId, Action<MemberAuthenticationResultView> callback, Action<Exception> handler)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
+				StringProxy.Serialize(memoryStream, clientVersion);
 				StringProxy.Serialize(memoryStream, steamId);
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, machineId);
+				StringProxy.Serialize(memoryStream, string.Empty); // hwid — tolerated empty by UberBeatManager
+				BooleanProxy.Serialize(memoryStream, false);       // isMac
 				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "LoginSteam", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)

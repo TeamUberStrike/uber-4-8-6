@@ -16,33 +16,69 @@ using UnityEngine;
 internal class SteamManager : MonoBehaviour
 {
     private static SteamManager m_instance;
-    private bool m_bInitialized;
+    private static bool s_bInitialized;
     private SteamAPIWarningMessageHook_t m_SteamAPIWarningMessageHook;
 
-    public static bool Initialized => m_instance != null && m_instance.m_bInitialized;
+    public static bool Initialized => s_bInitialized;
+
+    // SteamAPI.Init() is called directly here — in BeforeSceneLoad — so the
+    // result is available before any MonoBehaviour.Start() checks SteamId.
+    // In Unity 6, AddComponent Awake() is deferred to the first scene frame,
+    // which is too late; the auth chain runs in GlobalSceneLoader.Start().
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void CreateInstance()
+    {
+        Debug.Log("[SteamManager] CreateInstance() — calling SteamAPI.Init() before scene load.");
+        try
+        {
+            if (!SteamAPI.Init())
+            {
+                Debug.LogWarning("[SteamManager] SteamAPI.Init() returned false — Steam not running or app 291210 not accessible. Offline fallback active.");
+                return;
+            }
+            s_bInitialized = true;
+#if UNITY_EDITOR
+            Debug.Log("[SteamManager] SteamAPI.Init() OK — Steam auth available. SteamId=" + SteamUser.GetSteamID());
+#endif
+        }
+        catch (DllNotFoundException ex)
+        {
+            Debug.LogWarning("[SteamManager] steam_api64.dll not found — offline fallback active. " + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("[SteamManager] SteamAPI.Init() threw — offline fallback active. " + ex.Message);
+        }
+
+        if (!s_bInitialized) return;
+
+        // Spawn the MonoBehaviour only when Steam init succeeded — needed for RunCallbacks + Shutdown.
+        var go = new GameObject("SteamManager");
+        DontDestroyOnLoad(go);
+        go.AddComponent<SteamManager>();
+    }
 
     private static void SteamAPIDebugTextHook(int nSeverity, StringBuilder pchDebugText)
     {
         Debug.LogWarning(pchDebugText);
     }
 
-    private void Awake() { }
+    private void Awake()
+    {
+        if (m_instance != null) { Destroy(gameObject); return; }
+        m_instance = this;
+    }
 
     private void OnDestroy()
     {
-        if (m_instance == this) m_instance = null;
+        if (m_instance == this) { m_instance = null; s_bInitialized = false; }
     }
 
-    private void Start()
-    {
-        Debug.Log("[SteamManager] Start() running — Steamworks init is DISABLED in this build (ABI-incompatible steam_api64.dll). Forcing offline mode.");
-        m_instance = this;
-        m_bInitialized = false;
-    }
+    private void Start() { }
 
     private void OnEnable()
     {
-        if (m_bInitialized && m_SteamAPIWarningMessageHook == null)
+        if (s_bInitialized && m_SteamAPIWarningMessageHook == null)
         {
             try
             {
@@ -58,7 +94,7 @@ internal class SteamManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        if (m_bInitialized)
+        if (s_bInitialized)
         {
             try { SteamAPI.Shutdown(); } catch { }
         }
@@ -66,7 +102,7 @@ internal class SteamManager : MonoBehaviour
 
     private void Update()
     {
-        if (m_bInitialized)
+        if (s_bInitialized)
         {
             try { SteamAPI.RunCallbacks(); } catch { }
         }
