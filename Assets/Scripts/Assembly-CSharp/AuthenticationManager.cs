@@ -39,7 +39,9 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 	public void LoginByChannel()
 	{
 		string text = PlayerPrefs.GetString("CurrentSteamUser", string.Empty);
+#if UNITY_EDITOR
 		Debug.Log(string.Format("SteamWorks SteamID:{0}, PlayerPrefs SteamID:{1}", PlayerDataManager.SteamId, text));
+#endif
 
 		if (DEV_REAL_AUTH_TEST)
 		{
@@ -55,9 +57,11 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		// infinite-loops on the error popup. Skip the LoginSteam → CompleteAuthentication
 		// flow entirely; jump straight to the home page with minimal stub state so
 		// the menu UI can paint and we can iterate from there.
+#if UNITY_EDITOR
 		Debug.LogWarning("[AuthenticationManager] LoginByChannel: SteamId='" + PlayerDataManager.SteamId
 			+ "' SteamManager.Initialized=" + SteamManager.Initialized
 			+ " — choosing " + (PlayerDataManager.SteamId == PlayerDataManager.OFFLINE_STEAMID ? "OFFLINE BYPASS" : "REAL STEAM PATH"));
+#endif
 		if (PlayerDataManager.SteamId == PlayerDataManager.OFFLINE_STEAMID)
 		{
 			// Real auth scope (re-investigated 2026-05-25): UBZ AspNetCore server uses
@@ -74,7 +78,9 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 
 		if (string.IsNullOrEmpty(text) || text != PlayerDataManager.SteamId)
 		{
+#if UNITY_EDITOR
 			Debug.Log(string.Format("No SteamID saved. Using SteamWorks SteamID:{0}", PlayerDataManager.SteamId));
+#endif
 			PopupSystem.ShowMessage(string.Empty, "Have you played UberStrike before?", PopupSystem.AlertType.OKCancel, delegate
 			{
 				UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
@@ -91,7 +97,9 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		}
 		else
 		{
+#if UNITY_EDITOR
 			Debug.Log(string.Format("Login using saved SteamID:{0}", text));
+#endif
 			UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
 		}
 	}
@@ -233,32 +241,26 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		EventHandler.Global.Fire(new GlobalEvents.Login(MemberAccessLevel.Admin));
 		Singleton<PlayerDataManager>.Instance.SetPlayerStatisticsView(new PlayerStatisticsView());
 
-		// Avatar build with Animator-neutralization. The AssetRipper-emitted
-		// DefaultAvatar prefab has a corrupt Animator state machine that crashes
-		// Unity 4.6 mecanim native (StateMachine.cpp:1584 → EvaluateAvatarSM AV).
-		// Strategy: instantiate the prefab, then immediately strip the runtime
-		// Animator controller off every Animator we find on the new avatar so
-		// mecanim never tries to evaluate the broken state machine. Result: avatar
-		// renders in T-pose (static) but the lobby has a visible character.
+		// Was: strip the runtime Animator controller off every Animator on the
+		// avatar (a.runtimeAnimatorController = null; a.avatar = null; a.enabled
+		// = false;) to dodge a crash in Unity 4.6 mecanim native
+		// (StateMachine.cpp:1584 -> EvaluateAvatarSM AV). Root cause found:
+		// AvatarMovement.controller's state machines all serialized with
+		// m_States: [] even though every state they reference by GUID exists as
+		// a real, complete .state asset under Assets/State/ -- the importer
+		// bakes the runtime state graph from m_States, so an empty list left
+		// AnyState/default-state transitions pointing at states the baked graph
+		// never registered. Relinked them (see AvatarMovement.controller diff).
+		// Leaving the Animator enabled now as a live test of that fix -- if
+		// mecanim still crashes here, the state-relink wasn't the whole story
+		// and this strip needs to come back.
 		try
 		{
 			AvatarDecorator dec = AvatarBuilder.CreateLocalAvatar();
 			if (dec != null)
 			{
 				Animator[] anims = dec.GetComponentsInChildren<Animator>(true);
-				int killed = 0;
-				foreach (Animator a in anims)
-				{
-					if (a == null) continue;
-					// Null both — the crash is in EvaluateAvatarSM which walks the
-					// Avatar's state machine; corruption could be in either the
-					// runtime controller asset or the Avatar humanoid mapping.
-					a.runtimeAnimatorController = null;
-					a.avatar = null;
-					a.enabled = false;
-					killed++;
-				}
-				Debug.Log("[Offline] Avatar built; neutralized " + killed + " Animator(s) to dodge mecanim state-machine crash.");
+				Debug.Log("[Offline] Avatar built; leaving " + anims.Length + " Animator(s) enabled (testing AvatarMovement.controller state-relink fix).");
 				GameState.Current.Avatar.SetDecorator(dec);
 				GameState.Current.Avatar.UpdateAllWeapons();
 			}
@@ -344,6 +346,21 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		{
 			yield return UnityRuntime.StartRoutine(invRoutine);
 			Debug.Log("[Offline] ItemManager.StartGetInventory(false) completed.");
+		}
+
+		yield return new WaitForEndOfFrame();
+
+		// Offline bypass never fetched the persisted loadout, so every fresh
+		// Play Mode session started back at LoadoutManager's defaults even
+		// though SetLoadout was saving equip changes correctly server-side --
+		// the player had to re-equip everything every single session.
+		IEnumerator loadoutRoutine = null;
+		try { loadoutRoutine = Singleton<PlayerDataManager>.Instance.StartGetLoadout(); }
+		catch (Exception ex) { Debug.LogWarning("[Offline] PlayerDataManager.StartGetLoadout pre-yield exception: " + ex.Message); }
+		if (loadoutRoutine != null)
+		{
+			yield return UnityRuntime.StartRoutine(loadoutRoutine);
+			Debug.Log("[Offline] PlayerDataManager.StartGetLoadout() completed.");
 		}
 
 		yield return new WaitForEndOfFrame();

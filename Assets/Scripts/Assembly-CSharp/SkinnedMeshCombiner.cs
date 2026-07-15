@@ -84,6 +84,15 @@ public class SkinnedMeshCombiner
 		{
 			dictionary[transform.name] = transform.transform;
 		}
+		// Neither this method nor SuperCombineUpdate ever assigned rootBone on
+		// the combined renderer -- .bones was populated but rootBone stayed
+		// None, which left the combined mesh rendering at bind pose (T-pose)
+		// regardless of what the Animator/Avatar were doing. Capture it from
+		// whichever source renderer has one (the base body's own renderers,
+		// or a gear piece as fallback) before it gets destroyed below, and
+		// resolve it through the same bone-name dictionary the bones list
+		// itself uses, so it points at target's own hierarchy.
+		Transform rootBone = null;
 		SkinnedMeshRenderer[] componentsInChildren2 = sourceGameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true);
 		foreach (SkinnedMeshRenderer skinnedMeshRenderer in componentsInChildren2)
 		{
@@ -96,6 +105,10 @@ public class SkinnedMeshCombiner
 					subMeshIndex = k
 				});
 				list3.AddRange(skinnedMeshRenderer.bones);
+			}
+			if (rootBone == null && skinnedMeshRenderer.rootBone != null && dictionary.ContainsKey(skinnedMeshRenderer.rootBone.name))
+			{
+				rootBone = dictionary[skinnedMeshRenderer.rootBone.name];
 			}
 			UnityEngine.Object.Destroy(skinnedMeshRenderer);
 		}
@@ -128,6 +141,10 @@ public class SkinnedMeshCombiner
 						}
 					}
 				}
+				if (rootBone == null && item2.rootBone != null && dictionary.ContainsKey(item2.rootBone.name))
+				{
+					rootBone = dictionary[item2.rootBone.name];
+				}
 			}
 		}
 		SkinnedMeshRenderer skinnedMeshRenderer2 = sourceGameObject.AddComponent<SkinnedMeshRenderer>();
@@ -139,6 +156,19 @@ public class SkinnedMeshCombiner
 		skinnedMeshRenderer2.sharedMesh.name = "CombinedMesh";
 		skinnedMeshRenderer2.sharedMesh.CombineMeshes(list.ToArray(), false, false);
 		skinnedMeshRenderer2.bones = list3.ToArray();
+		// "Chest" (a source sub-mesh's own LOCAL rootBone, e.g. an upper-body-only
+		// piece that never referenced leg bones) is not an ancestor of every bone
+		// in the combined skeleton -- the Avatar's own skeleton table (T-Pose With
+		// RiggingAvatar.asset's m_TOS) confirms "Hips" is the true whole-body root
+		// (Hips/Spine/Chest/... , Hips/LeftUpLeg/..., Hips/RightUpLeg/...). Prefer
+		// it explicitly over whichever source renderer's rootBone happened to
+		// resolve first.
+		Transform hips;
+		if (dictionary.TryGetValue("Hips", out hips))
+		{
+			rootBone = hips;
+		}
+		skinnedMeshRenderer2.rootBone = rootBone;
 		Material[] materials = skinnedMeshRenderer2.materials;
 		foreach (Material obj in materials)
 		{
