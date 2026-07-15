@@ -156,6 +156,18 @@ public class SkinnedMeshCombiner
 		skinnedMeshRenderer2.sharedMesh.name = "CombinedMesh";
 		skinnedMeshRenderer2.sharedMesh.CombineMeshes(list.ToArray(), false, false);
 		skinnedMeshRenderer2.bones = list3.ToArray();
+		// "Chest" (a source sub-mesh's own LOCAL rootBone, e.g. an upper-body-only
+		// piece that never referenced leg bones) is not an ancestor of every bone
+		// in the combined skeleton -- the Avatar's own skeleton table (T-Pose With
+		// RiggingAvatar.asset's m_TOS) confirms "Hips" is the true whole-body root
+		// (Hips/Spine/Chest/... , Hips/LeftUpLeg/..., Hips/RightUpLeg/...). Prefer
+		// it explicitly over whichever source renderer's rootBone happened to
+		// resolve first.
+		Transform hips;
+		if (dictionary.TryGetValue("Hips", out hips))
+		{
+			rootBone = hips;
+		}
 		skinnedMeshRenderer2.rootBone = rootBone;
 		Material[] materials = skinnedMeshRenderer2.materials;
 		foreach (Material obj in materials)

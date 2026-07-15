@@ -102,11 +102,13 @@ public class AvatarAnimationController : MonoBehaviour
 	private void Awake()
 	{
 		Animator = GetComponent<Animator>();
-		// Parked T-pose avatar: Mecanim crashes in EvaluateAvatarSM (FKStep) on the U5+ humanoid clips.
-		// Disabling the Animator keeps the avatar in T-pose but prevents Unity's PlayerLoop from FK-stepping.
-		// Procedural pose attempts (2026-05-25) failed: (a) eulers caused shoulder skinning collapse,
-		// (b) Steam-extracted quaternions produced a blob because AssetRipper-extracted bind poses
-		// differ from the Steam build's bind poses. Proper fix needs Editor-side rig work.
+		// 2026-07-14: re-tested with AvatarMovement.controller's state machines fully
+		// relinked (see feedback_tpose_mecanim_crash_mitigation.md) -- still crashes,
+		// same signature (mecanim::animation::EvaluateAvatarSM -> Animator::FKStep),
+		// now on the very first FK tick after avatar build. Confirms the 2026-05-18
+		// diagnosis: this is an Avatar-asset/rig format incompatibility (U5+ humanoid
+		// data Unity 4.6.5's native Mecanim can't evaluate), not a state-machine
+		// wiring gap. Restoring the mitigation until the rig itself is re-authored.
 		if (Animator != null)
 		{
 			Animator.enabled = false;
