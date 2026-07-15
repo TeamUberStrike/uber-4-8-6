@@ -277,6 +277,7 @@ public class GamePeer : BaseGamePeer
 
 	public void CreateGame(GameRoomData data, string password)
 	{
+		Debug.Log("[DIAG] CreateGame entry: IsConnected=" + base.IsConnected + " AuthToken='" + PlayerDataManager.AuthToken + "' MagicHash='" + PlayerDataManager.MagicHash + "'");
 		if (base.IsConnected)
 		{
 			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
@@ -284,6 +285,7 @@ public class GamePeer : BaseGamePeer
 		}
 		onConnectAction = delegate
 		{
+			Debug.Log("[DIAG] CreateGame deferred onConnectAction: AuthToken='" + PlayerDataManager.AuthToken + "' MagicHash='" + PlayerDataManager.MagicHash + "'");
 			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
 		};
 		Connect(data.Server.ConnectionString);
