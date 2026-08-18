@@ -1,27 +1,60 @@
+// Ported to Unity 6 (Built-in RP) from the uber471-unity465 branch, where this
+// shader already had a real body while main still carried the ForgeRipper stub.
+// Transparent/Cutout/Soft Edge Unlit — restored from DummyShaderTextExporter stub.
+// Cmune-style unlit alpha-test for foliage / snow / decal cards. The original
+// rendered as flat-black Lambert (stub) which broke the snow effects on
+// FortWinter and the grass/foliage decals on GhostIsland. Unity 4.6.5-native
+// CG: UnityObjectToClipPos, clip(alpha - cutoff), tex tint. No lighting.
 Shader "Transparent/Cutout/Soft Edge Unlit" {
 Properties {
- _Color ("Main Color", Color) = (1,1,1,1)
- _MainTex ("Base (RGB) Alpha (A)", 2D) = "white" {}
- _Cutoff ("Base Alpha cutoff", Range(0,0.9)) = 0.5
+    _Color ("Main Color", Color) = (1,1,1,1)
+    _MainTex ("Base (RGB) Alpha (A)", 2D) = "white" {}
+    _Cutoff ("Base Alpha cutoff", Range(0,0.9)) = 0.5
 }
-	//DummyShaderTextExporter
-	
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
-		CGPROGRAM
-#pragma surface surf Lambert
-#pragma target 3.0
-		sampler2D _MainTex;
-		struct Input
-		{
-			float2 uv_MainTex;
-		};
-		void surf(Input IN, inout SurfaceOutput o)
-		{
-			float4 c = tex2D(_MainTex, IN.uv_MainTex);
-			o.Albedo = c.rgb;
-		}
-		ENDCG
-	}
+
+SubShader {
+    Tags { "Queue"="AlphaTest" "IgnoreProjector"="True" "RenderType"="TransparentCutout" }
+    LOD 100
+    Cull Off
+    Lighting Off
+    ZWrite On
+
+    Pass {
+        CGPROGRAM
+        #pragma vertex vert
+        #pragma fragment frag
+        #include "UnityCG.cginc"
+
+        sampler2D _MainTex;
+        float4 _MainTex_ST;
+        fixed4 _Color;
+        fixed _Cutoff;
+
+        struct appdata {
+            float4 vertex : POSITION;
+            float2 uv : TEXCOORD0;
+        };
+
+        struct v2f {
+            float4 pos : SV_POSITION;
+            float2 uv : TEXCOORD0;
+        };
+
+        v2f vert (appdata v) {
+            v2f o;
+            o.pos = UnityObjectToClipPos(v.vertex);
+            o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+            return o;
+        }
+
+        fixed4 frag (v2f i) : SV_Target {
+            fixed4 c = tex2D(_MainTex, i.uv) * _Color;
+            clip(c.a - _Cutoff);
+            return c;
+        }
+        ENDCG
+    }
+}
+
+Fallback "Transparent/Cutout/VertexLit"
 }
