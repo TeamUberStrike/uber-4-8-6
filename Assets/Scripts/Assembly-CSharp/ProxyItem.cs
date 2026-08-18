@@ -58,6 +58,15 @@ public class ProxyItem : IUnityItem
 		{
 			m_Icon = UnityItemConfiguration.Instance.GetDefaultIcon(view.ItemClass);
 		}
+
+		// Override the shop/inventory icon LAST, after all three branches above have
+		// picked a stock icon. GetIconTexture returns null for every item that is not one
+		// of the skins, and the null check keeps the stock icon in that case.
+		Texture2D skinIcon = WeaponSkinHelper.GetIconTexture(view.ID);
+		if (skinIcon != null)
+		{
+			m_Icon = skinIcon;
+		}
 	}
 
 	public void UpdateProxyItem(BaseUberStrikeItemView view)
