@@ -1,27 +1,78 @@
+// Ported to Unity 6 (Built-in RP) from the uber471-unity465 branch, where this
+// shader already had a real body while main still carried the ForgeRipper stub.
+// Cross Platform Shaders/AlphaRenderTexture Add — restored from DummyShaderTextExporter stub.
+// Plain additive-blended particle (same as Particles/Additive). _MainTex sampled, tinted by
+// _TintColor * vertex color, premultiplied by alpha for soft additive. Used by Eradicator
+// BlueGlow muzzle effect (blue_exlosion_light.mat) and other "render texture additive" effects.
 Shader "Cross Platform Shaders/AlphaRenderTexture Add" {
 Properties {
- _TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
- _MainTex ("Particle Texture", 2D) = "white" {}
- _InvFade ("Soft Particles Factor", Range(0.01,3)) = 1
+	_TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
+	_MainTex ("Particle Texture", 2D) = "white" {}
+	_InvFade ("Soft Particles Factor", Range(0.01,3.0)) = 1.0
 }
-	//DummyShaderTextExporter
-	
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
-		CGPROGRAM
-#pragma surface surf Lambert
-#pragma target 3.0
-		sampler2D _MainTex;
-		struct Input
-		{
-			float2 uv_MainTex;
-		};
-		void surf(Input IN, inout SurfaceOutput o)
-		{
-			float4 c = tex2D(_MainTex, IN.uv_MainTex);
-			o.Albedo = c.rgb;
+
+Category {
+	Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+	Blend SrcAlpha One
+	ColorMask RGB
+	Cull Off Lighting Off ZWrite Off
+
+	SubShader {
+		Pass {
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#pragma multi_compile_particles
+			#pragma target 2.0
+			#include "UnityCG.cginc"
+
+			sampler2D _MainTex;
+			fixed4 _TintColor;
+			float4 _MainTex_ST;
+
+			struct appdata_t {
+				float4 vertex : POSITION;
+				fixed4 color : COLOR;
+				float2 texcoord : TEXCOORD0;
+			};
+
+			struct v2f {
+				float4 vertex : SV_POSITION;
+				fixed4 color : COLOR;
+				float2 texcoord : TEXCOORD0;
+				#ifdef SOFTPARTICLES_ON
+				float4 projPos : TEXCOORD1;
+				#endif
+			};
+
+			v2f vert (appdata_t v)
+			{
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				#ifdef SOFTPARTICLES_ON
+				o.projPos = ComputeScreenPos (o.vertex);
+				COMPUTE_EYEDEPTH(o.projPos.z);
+				#endif
+				o.color = v.color;
+				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
+				return o;
+			}
+
+			sampler2D_float _CameraDepthTexture;
+			float _InvFade;
+
+			fixed4 frag (v2f i) : SV_Target
+			{
+				#ifdef SOFTPARTICLES_ON
+				float sceneZ = LinearEyeDepth (SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture, UNITY_PROJ_COORD(i.projPos)));
+				float partZ = i.projPos.z;
+				float fade = saturate (_InvFade * (sceneZ-partZ));
+				i.color.a *= fade;
+				#endif
+				return 2.0f * i.color * _TintColor * tex2D(_MainTex, i.texcoord);
+			}
+			ENDCG
 		}
-		ENDCG
 	}
+}
 }

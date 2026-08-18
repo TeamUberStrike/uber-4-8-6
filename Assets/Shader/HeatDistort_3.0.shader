@@ -1,27 +1,114 @@
+// Ported to Unity 6 (Built-in RP) from the uber471-unity465 branch, where this
+// shader already had a real body while main still carried the ForgeRipper stub.
+// Per pixel bumped refraction.
+// Uses a normal map to distort the image behind, and
+// an additional texture to tint the color.
+//
+// Copied verbatim from production uber-client-4-3-8-unity_2022_working
+// (UberStrike.Unity/Assets/Scenes/Props/Teleport/FBX/Materials/HeatDistort_3.0.shader)
+// where it is proven to render correctly.
+
 Shader "Cross Platform Shaders/HeatDistort_3.0" {
 Properties {
- _BumpAmt ("Distortion", Range(0,128)) = 10
- _MainTex ("Tint Color (RGB)", 2D) = "white" {}
- _BumpMap ("Normalmap", 2D) = "bump" {}
+	_BumpAmt  ("Distortion", range (0,128)) = 10
+	_MainTex ("Tint Color (RGB)", 2D) = "white" {}
+	_BumpMap ("Normalmap", 2D) = "bump" {}
 }
-	//DummyShaderTextExporter
-	
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
-		CGPROGRAM
-#pragma surface surf Lambert
-#pragma target 3.0
-		sampler2D _MainTex;
-		struct Input
-		{
-			float2 uv_MainTex;
-		};
-		void surf(Input IN, inout SurfaceOutput o)
-		{
-			float4 c = tex2D(_MainTex, IN.uv_MainTex);
-			o.Albedo = c.rgb;
+
+CGINCLUDE
+#pragma fragmentoption ARB_precision_hint_fastest
+#pragma fragmentoption ARB_fog_exp2
+#include "UnityCG.cginc"
+
+sampler2D _GrabTexture : register(s0);
+float4 _GrabTexture_TexelSize;
+sampler2D _BumpMap : register(s1);
+sampler2D _MainTex : register(s2);
+
+struct v2f {
+	float4 vertex : POSITION;
+	float4 uvgrab : TEXCOORD0;
+	float2 uvbump : TEXCOORD1;
+	float2 uvmain : TEXCOORD2;
+};
+
+uniform float _BumpAmt;
+
+
+half4 frag( v2f i ) : COLOR
+{
+	// calculate perturbed coordinates
+	half2 bump = UnpackNormal(tex2D( _BumpMap, i.uvbump )).rg; // we could optimize this by just reading the x & y without reconstructing the Z
+	float2 offset = bump * _BumpAmt * _GrabTexture_TexelSize.xy;
+	i.uvgrab.xy = offset * i.uvgrab.z + i.uvgrab.xy;
+
+	half4 col = tex2Dproj( _GrabTexture, UNITY_PROJ_COORD(i.uvgrab) );
+	half4 tint = tex2D( _MainTex, i.uvmain );
+	return col * tint;
+}
+ENDCG
+
+Category {
+
+	// We must be transparent, so other objects are drawn before this one.
+	Tags { "Queue"="Transparent+100" "RenderType"="Opaque" }
+
+	Fog { Mode Off }
+
+	SubShader {
+
+		// This pass grabs the screen behind the object into a texture.
+		// We can access the result in the next pass as _GrabTexture
+		GrabPass {
+			Name "BASE"
+			Tags { "LightMode" = "Always" }
+ 		}
+
+ 		// Main pass: Take the texture grabbed above and use the bumpmap to perturb it
+ 		// on to the screen
+		Pass {
+			Name "BASE"
+			Tags { "LightMode" = "Always" }
+
+CGPROGRAM
+#pragma vertex vert
+#pragma fragment frag
+
+struct appdata_t {
+	float4 vertex : POSITION;
+	float2 texcoord: TEXCOORD0;
+};
+
+v2f vert (appdata_t v)
+{
+	v2f o;
+	o.vertex = UnityObjectToClipPos(v.vertex);
+	#if UNITY_UV_STARTS_AT_TOP
+	float scale = -1.0;
+	#else
+	float scale = 1.0;
+	#endif
+	o.uvgrab.xy = (float2(o.vertex.x, o.vertex.y*scale) + o.vertex.w) * 0.5;
+	o.uvgrab.zw = o.vertex.zw;
+	o.uvbump = MultiplyUV( UNITY_MATRIX_TEXTURE1, v.texcoord );
+	o.uvmain = MultiplyUV( UNITY_MATRIX_TEXTURE2, v.texcoord );
+	return o;
+}
+ENDCG
 		}
-		ENDCG
 	}
+
+	// ------------------------------------------------------------------
+	// Fallback for older cards and Unity non-Pro
+
+	SubShader {
+		Blend DstColor Zero
+		Pass {
+			Name "BASE"
+			SetTexture [_MainTex] {	combine texture }
+		}
+	}
+
+}
+
 }
