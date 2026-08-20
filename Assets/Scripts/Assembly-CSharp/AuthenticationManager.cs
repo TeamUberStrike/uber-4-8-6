@@ -233,26 +233,26 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		EventHandler.Global.Fire(new GlobalEvents.Login(MemberAccessLevel.Admin));
 		Singleton<PlayerDataManager>.Instance.SetPlayerStatisticsView(new PlayerStatisticsView());
 
-		// Was: strip the runtime Animator controller off every Animator on the
-		// avatar (a.runtimeAnimatorController = null; a.avatar = null; a.enabled
-		// = false;) to dodge a crash in Unity 4.6 mecanim native
-		// (StateMachine.cpp:1584 -> EvaluateAvatarSM AV). Root cause found:
-		// AvatarMovement.controller's state machines all serialized with
-		// m_States: [] even though every state they reference by GUID exists as
-		// a real, complete .state asset under Assets/State/ -- the importer
-		// bakes the runtime state graph from m_States, so an empty list left
-		// AnyState/default-state transitions pointing at states the baked graph
-		// never registered. Relinked them (see AvatarMovement.controller diff).
-		// Leaving the Animator enabled now as a live test of that fix -- if
-		// mecanim still crashes here, the state-relink wasn't the whole story
-		// and this strip needs to come back.
+		// The Animators on this avatar are ALREADY DISABLED by the time we get here:
+		// AvatarAnimationController.Awake() sets Animator.enabled = false
+		// unconditionally. That is the mitigation for the native Unity 4.6.5 crash in
+		// mecanim::animation::EvaluateAvatarSM (avatar.cpp:628), reached from
+		// PlayerLoop -> UpdateAvatars -> Animator::FKStep before any managed Update.
+		// Nothing in this method re-enables them. The count logged below is just how
+		// many Animator components the built avatar has, NOT how many are running.
+		//
+		// (This block used to claim the Animators were "left enabled as a live test"
+		// of a state-machine relink. That was already false once Awake() got the
+		// mitigation back, and the relink itself was tested on 2026-07-14 and did NOT
+		// stop the crash. To actually run the risky path, use MecanimRiskHarness --
+		// scripting define UBERSTRIKE_MECANIM_RISK plus a mecanim_risk.arm token.)
 		try
 		{
 			AvatarDecorator dec = AvatarBuilder.CreateLocalAvatar();
 			if (dec != null)
 			{
 				Animator[] anims = dec.GetComponentsInChildren<Animator>(true);
-				Debug.Log("[Offline] Avatar built; leaving " + anims.Length + " Animator(s) enabled (testing AvatarMovement.controller state-relink fix).");
+				Debug.Log("[Offline] Avatar built; " + anims.Length + " Animator component(s), all DISABLED by AvatarAnimationController.Awake() (mecanim FK crash mitigation).");
 				GameState.Current.Avatar.SetDecorator(dec);
 				GameState.Current.Avatar.UpdateAllWeapons();
 			}
@@ -331,28 +331,47 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 
 		yield return new WaitForEndOfFrame();
 
-		IEnumerator invRoutine = null;
-		try { invRoutine = Singleton<ItemManager>.Instance.StartGetInventory(false); }
-		catch (Exception ex) { Debug.LogWarning("[Offline] ItemManager.StartGetInventory pre-yield exception: " + ex.Message); }
-		if (invRoutine != null)
+		// OFFLINE GRANT -- deliberately NOT StartGetInventory / StartGetLoadout.
+		//
+		// Both round-trip to the server, and the server keys every lookup off
+		// GameSessionManager.m_sessions (GameSessionManager.cs:63) -- an in-process
+		// Dictionary that ONLY CreateSession fills, whose sole caller is
+		// AuthenticationWebService.cs:178 inside OnLoginSteam. The offline bypass
+		// never logs in, so AuthToken stays the literal "OFFLINE_TOKEN", which is
+		// not valid base64 -- Utils.GetUserId (Helper/Utils.cs:77) throws
+		// FormatException and GetInventory / GetLoadout / BuyItem all return 500.
+		// Forging a well-formed token does NOT help: it only turns the 500 into a
+		// silent null, because the session still would not exist in m_sessions.
+		//
+		// So grant locally. EnableAllItems copies every shop item into the
+		// inventory as permanent -- and the shop now carries weapon skins
+		// 9007-9067, so this is what makes them equippable in the Editor.
+		try
 		{
-			yield return UnityRuntime.StartRoutine(invRoutine);
-			Debug.Log("[Offline] ItemManager.StartGetInventory(false) completed.");
+			Singleton<InventoryManager>.Instance.EnableAllItems();
+			Debug.Log("[Offline] granted every shop item locally (inventory + loadout are client-side here).");
+
+			// Four DISTINCT weapon classes on purpose: Loadout.SetSlot only checks
+			// ItemType (Loadout.cs:83), but RemoveDuplicateWeaponClass would evict a
+			// second weapon of the same class, so two AWPs would not both stick.
+			LoadoutView offlineLoadout = new LoadoutView
+			{
+				Cmid        = 1,
+				MeleeWeapon = 9007,   // Plasma Bat        -> TheSplatbat
+				Weapon1     = 9008,   // Inferno MG        -> MachineGun
+				Weapon2     = 9043,   // AWP [Gold]        -> AWP_Roughed
+				Weapon3     = 9042,   // SPAS-12 [Gold]    -> Automatic_Shotgun_Roughed
+				SkinColor   = "FFFFFF"
+			};
+			Singleton<LoadoutManager>.Instance.UpdateLoadout(offlineLoadout);
+			GameState.Current.Avatar.SetLoadout(new Loadout(Singleton<LoadoutManager>.Instance.Loadout));
+			GameState.Current.Avatar.UpdateAllWeapons();
+			Debug.Log("[Offline] equipped 9007/9008/9043/9042 -- WeaponSkinHelper hooks "
+				+ "fire when each weapon is next built.");
 		}
-
-		yield return new WaitForEndOfFrame();
-
-		// Offline bypass never fetched the persisted loadout, so every fresh
-		// Play Mode session started back at LoadoutManager's defaults even
-		// though SetLoadout was saving equip changes correctly server-side --
-		// the player had to re-equip everything every single session.
-		IEnumerator loadoutRoutine = null;
-		try { loadoutRoutine = Singleton<PlayerDataManager>.Instance.StartGetLoadout(); }
-		catch (Exception ex) { Debug.LogWarning("[Offline] PlayerDataManager.StartGetLoadout pre-yield exception: " + ex.Message); }
-		if (loadoutRoutine != null)
+		catch (Exception ex)
 		{
-			yield return UnityRuntime.StartRoutine(loadoutRoutine);
-			Debug.Log("[Offline] PlayerDataManager.StartGetLoadout() completed.");
+			Debug.LogError("[Offline] local grant failed: " + ex.Message + "\n" + ex.StackTrace);
 		}
 
 		yield return new WaitForEndOfFrame();

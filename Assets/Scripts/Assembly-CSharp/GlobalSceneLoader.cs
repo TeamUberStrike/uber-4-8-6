@@ -122,7 +122,7 @@ public class GlobalSceneLoader : MonoBehaviour
 	private IEnumerator BeginAuthenticateApplication()
 	{
 		Debug.Log("BeginAuthenticateApplication " + Configuration.WebserviceBaseUrl);
-		yield return ApplicationWebServiceClient.AuthenticateApplication("4.7.1", ApplicationDataManager.Channel, string.Empty, delegate(AuthenticateApplicationView callback)
+		yield return ApplicationWebServiceClient.AuthenticateApplication("4.8.6", ApplicationDataManager.Channel, string.Empty, delegate(AuthenticateApplicationView callback)
 		{
 			OnAuthenticateApplication(callback);
 		}, delegate(Exception exception)

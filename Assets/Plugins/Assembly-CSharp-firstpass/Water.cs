@@ -40,6 +40,24 @@ public class Water : MonoBehaviour
 
 	private static bool s_InsideWater;
 
+	private void Awake()
+	{
+		// Unity 4.6 Free has no RenderTexture, so the reflection/refraction
+		// helper cameras in OnWillRenderObject are disabled (the bare return
+		// below). Engage the shipped WATER_SIMPLE fallback tier ONCE here so
+		// that a real multi_compile FX/Water shader would resolve to its
+		// RenderTexture-free variant instead of sampling the unassigned
+		// _ReflectionTex/_RefractionTex. This mirrors FindHardwareWaterSupport()
+		// and never touches the disabled reflection camera. On RenderTexture-
+		// capable hardware the guard is false and the shipped default stands.
+		if (!SystemInfo.supportsRenderTextures)
+		{
+			Shader.EnableKeyword("WATER_SIMPLE");
+			Shader.DisableKeyword("WATER_REFLECTIVE");
+			Shader.DisableKeyword("WATER_REFRACTIVE");
+		}
+	}
+
 	public void OnWillRenderObject()
 	{
 		// Unity 4.6 Free: RenderTexture is Pro-only, so the reflection/

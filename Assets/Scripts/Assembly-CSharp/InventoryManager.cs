@@ -447,5 +447,19 @@ public class InventoryManager : Singleton<InventoryManager>
 				ExpirationDate = DateTime.MaxValue
 			});
 		}
+		// UpdateInventoryItems (the server path this replaces) ends with this same
+		// call, and it is the ONLY place OnInventoryUpdated is ever raised. Without
+		// it, every ShopPageGUI whose Awake already ran keeps a stale cache:
+		// ShopPageGUI.Awake builds _inventoryItemGUIList/_shopItemGUIList once and
+		// DrawShop renders only from those lists.
+		//
+		// The lobby shop (Menu.unity &637, on "PageShop", m_IsActive:0) is fine --
+		// Unity defers its Awake until MenuPageManager activates the page, after
+		// login. The in-game "Loadout & Shop" is a SECOND instance (GlobalScene.unity
+		// &353, on Managers/GamePageManager, m_IsActive:1, DontDestroyOnLoad): it
+		// Awakes on frame 0, long before login, and is what training/map-explore
+		// draws via PregameLoadoutState -> GamePageManager.LoadPage(PreGame). This
+		// event is the only thing that can refill it.
+		this.OnInventoryUpdated();
 	}
 }

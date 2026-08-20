@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Menu Water
+  m_Shader: {fileID: 4800000, guid: 915a53080782f3540941d8cda65f38ae, type: 3}
+  m_ShaderKeywords: []
+  m_CustomRenderQueue: -1
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+      data:
+        first:
+          name: _BumpMap
+        second:
+          m_Texture: {fileID: 2800000, guid: 3d82c3a25e1014a40ab6e16de4598db3, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Fresnel
+        second:
+          m_Texture: {fileID: 2800000, guid: 2da6f0bcaafa8a4478dc5ebdc46c2669, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _MainTex
+        second:
+          m_Texture: {fileID: 2800000, guid: e1a37952d43da45468d65e61e8c0604a, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ReflectionTex
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ReflectiveColor
+        second:
+          m_Texture: {fileID: 2800000, guid: a68d40c8cd95ec94e8241e5836f77580, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ReflectiveColorCube
+        second:
+          m_Texture: {fileID: 8900000, guid: d90d88b5e57c34d4db77bbeba8afa6bd, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _RefractionTex
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+    m_Floats:
+      data:
+        first:
+          name: _ReflDistort
+        second: 0.44
+      data:
+        first:
+          name: _RefrDistort
+        second: 0
+      data:
+        first:
+          name: _WaveScale
+        second: 0.063
+    m_Colors:
+      data:
+        first:
+          name: WaveSpeed
+        second: {r: 4, g: 2.25, b: -4.5, a: -3.5}
+      data:
+        first:
+          name: _BumpMap_ST
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _Fresnel_ST
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _HorizonColor
+        second: {r: 0.15, g: 0.50, b: 0.42, a: 1}
+      data:
+        first:
+          name: _MainTex_ST
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _ReflectionTex_ST
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _ReflectiveColorCube_ST
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _ReflectiveColor_ST
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _RefrColor
+        second: {r: 0.94950026, g: 1, b: 0.7294117, a: 1}
+      data:
+        first:
+          name: _RefractionTex_ST
+        second: {r: 1, g: 1, b: 0, a: 0}

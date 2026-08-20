@@ -102,16 +102,47 @@ public class AvatarAnimationController : MonoBehaviour
 	private void Awake()
 	{
 		Animator = GetComponent<Animator>();
-		// 2026-07-14: re-tested with AvatarMovement.controller's state machines fully
-		// relinked (see feedback_tpose_mecanim_crash_mitigation.md) -- still crashes,
-		// same signature (mecanim::animation::EvaluateAvatarSM -> Animator::FKStep),
-		// now on the very first FK tick after avatar build. Confirms the 2026-05-18
-		// diagnosis: this is an Avatar-asset/rig format incompatibility (U5+ humanoid
-		// data Unity 4.6.5's native Mecanim can't evaluate), not a state-machine
-		// wiring gap. Restoring the mitigation until the rig itself is re-authored.
+		// ================= MITIGATION -- DO NOT REMOVE, DO NOT MAKE CONDITIONAL =================
+		// Unity 4.6.5 runs Mecanim FK straight out of PlayerLoop (player.cpp:1963)
+		//   -> AnimatorManager::UpdateFKMove -> UpdateAvatars -> Animator::FKStep
+		//   -> FKStepStatic -> mecanim::animation::EvaluateAvatarSM (avatar.cpp:628).
+		// That is native code running BEFORE any MonoBehaviour Update, so guarding
+		// Update() does nothing and no try/catch can help. The ONLY thing that takes
+		// this Animator out of the FK pipeline is enabled == false. This store is
+		// unconditional and stays first.
+		//
+		// HISTORY -- read before you change anything here:
+		//  2026-07-14  Relinked AvatarMovement.controller's state machines (m_States was
+		//              []) and left the Animator on as a live test. STILL CRASHED, same
+		//              signature, on the first FK tick after avatar build. That negative
+		//              result stands: re-pointing state GUIDs is not the fix.
+		//  2026-08-19  Repaired AssetRipper's hex corruption in 230 assets and re-enabled.
+		//              STILL CRASHED. Repairing the Avatar alone is not the fix either.
+		//
+		// WHAT IS NOW DISPROVEN (do not go back down this road):
+		//   The old note here blamed "U5+ humanoid data 4.6.5's Mecanim can't evaluate"
+		//   and called for re-authoring the rig. That is FALSE. The shipped Steam client
+		//   reports 4.6.5f1 at offset 0x14 of resources.assets -- the same engine -- and
+		//   its player Avatar is HUMANOID (20-node human skeleton, 19 muscle colliders,
+		//   19 of 24 HumanBodyBones mapped). After the hex repair every one of our 144
+		//   distinct avatar hex blobs is BYTE-IDENTICAL to that shipped data. The rig is
+		//   data this exact Mecanim provably evaluates. Do not re-author it.
+		//
+		// LEADING REMAINING SUSPECT (untested): all 49 shipped humanoid clips carry a
+		//   compiled m_MuscleClip blob (2.24 MB total in sharedassets0.assets); not one
+		//   of our 159 .anim files has m_MuscleClip at all -- AssetRipper emitted editor
+		//   float curves instead. EvaluateAvatarSM is the clip-sampling stage, so
+		//   sampling a type-3 clip with no ClipMuscleConstant is a clean null-deref.
+		// =========================================================================================
 		if (Animator != null)
 		{
 			Animator.enabled = false;
+#if UBERSTRIKE_MECANIM_RISK
+			// Opt-in test path, OFF by default. Without the UBERSTRIKE_MECANIM_RISK
+			// scripting define this block emits no IL at all and Awake() is identical
+			// to the mitigation-only version above. See MecanimRiskHarness.cs.
+			MecanimRiskHarness.TryEnable(this, Animator);
+#endif
 		}
 	}
 

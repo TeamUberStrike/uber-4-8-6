@@ -1367,13 +1367,19 @@ public static class WeaponSkinHelper
 		//      surface that is already bright and already moving. Making it visible would mean a
 		//      hot per-skin tint, which is reason 1 again but louder.
 		//
-		// 9026-9029 [Frosted] below deliberately KEEP theirs. Frost over fire is the language
-		// 9018 Frostfire already ships, and 9026 is the skin that GAINS visible flames from the
-		// Renderer fix -- that one is the point of the fix, not a casualty of it.
-		{ 9026, "9017_Frostbound_Flames.png" },
-		{ 9027, "9017_Frostbound_Flames.png" },
-		{ 9028, "9017_Frostbound_Flames.png" },
-		{ 9029, "9017_Frostbound_Flames.png" },
+		// 2026-08-19: the four [Frosted] ids are REMOVED from this table. They used to be here
+		// on the argument that frost-over-fire matches 9018 Frostfire and that 9026 "gains"
+		// flames from the MeshFilter->Renderer fix in ApplyFlames. Rejected in game: the set is
+		// meant to read as frost, and 9026 was the ONLY one that ever actually burned, so the
+		// set was not even self-consistent.
+		//
+		// Why only 9026 burned, which is worth keeping: Surface mode copies source.vertices, and
+		// the other three sit on meshes imported with m_IsReadable: 0 (Sniper, ShotGun,
+		// CannonBody/CannonHead), where that read throws and the sleeve silently degrades to
+		// nothing. MachineGun.asset is readable, so 9026 alone drew a sleeve -- and because
+		// Particles/Additive is Cull Off + ZWrite Off, that sleeve over coincident body geometry
+		// reads as flames burning INSIDE the gun. 9027-9029 looking "correct" was an accident of
+		// mesh import settings, never a decision.
 	};
 
 	// Shop icons. ProxyItem loads the BASE weapon's "<prefabPath>-Icon" from Resources and we
@@ -1933,6 +1939,7 @@ public static class WeaponSkinHelper
 			{
 				Debug.LogError("WeaponSkinHelper: alpha mask size " + maskTex.width + "x" + maskTex.height
 					+ " does not match colour " + colour.width + "x" + colour.height + " for " + stem);
+				UnityEngine.Object.Destroy(maskTex); // colour is returned; the mask is dead weight
 				return colour;
 			}
 
@@ -1953,6 +1960,15 @@ public static class WeaponSkinHelper
 				rgb[i].a = a[i].r; // greyscale mask: any channel carries the value
 			merged.SetPixels(rgb);
 			merged.Apply(false);
+
+			// Free the two decode intermediates. Only `merged` is returned and cached;
+			// `colour` and `maskTex` are unreachable from here on. Without this each
+			// skin load costs 3 textures instead of 1 and nothing ever reclaims the two
+			// extras -- Texture2D is a native UnityEngine.Object, so going out of C#
+			// scope does NOT free it. Browsing the shop crashed the 32-bit Editor with
+			// "Could not allocate memory: System out of memory!" at ~1 GB of ALLOC_GFX.
+			UnityEngine.Object.Destroy(colour);
+			UnityEngine.Object.Destroy(maskTex);
 			return merged;
 		}
 
@@ -2251,6 +2267,167 @@ public static class WeaponSkinHelper
 				r.material.HasProperty("_Color") ? r.material.GetColor("_Color").ToString() : "(absent)",
 				r.material.HasProperty("_ReflectColor") ? r.material.GetColor("_ReflectColor").ToString() : "(absent)"));
 		}
+
+		AddDepthPrime(r, itemId);
+	}
+
+	/// <summary>
+	/// Skins whose transparent shader needs a DEPTH-ONLY PRE-PASS in front of it.
+	///
+	/// WHY, and it is geometry, not art. Glass-Hangar is a surface shader with `alpha`, so its
+	/// pass is Blend SrcAlpha OneMinusSrcAlpha with ZWRITE OFF, and nothing then hides one
+	/// triangle of a mesh behind another triangle of the SAME mesh. Measured by casting each
+	/// triangle's outward normal against the rest of its own mesh:
+	///
+	///     Ninja_Knife  (9017/9019 -- the see-through skins that ship fine)  1.5% of triangles,
+	///                                                                      1.0% of surface AREA
+	///     AWP          (9020/9035/9038)                                    40.8% / 31.8%
+	///     Death_Hammer (9021/9036/9039)                                    41.9% / 50.4%
+	///
+	/// The AWP's buried geometry is the scope's internal lens plugs and the full-length barrel
+	/// inside the handguard; the Death Hammer's is the barrel and magazine tube running the whole
+	/// length of the vented shroud. Half that hammer is inside itself. The katana works because
+	/// there is nothing inside a katana. It is not a duplicated shell -- only 0.4% of triangles
+	/// have a near-coincident neighbour -- it is ordinary interpenetrating-solids modelling that
+	/// nobody expected to see through.
+	///
+	/// Those faces read BLACK and OPAQUE for two independent reasons, both of them the shipped
+	/// program working exactly as designed:
+	///     rgb   = _LightColor0 * _Color  +  tex.RED * (cube * _ReflectColor.rgb)
+	///     alpha = (1 - tex.RED) * _Color.a
+	/// An interior face points into a cavity, so its N.L is ~0 and the first term vanishes; the
+	/// painted sheet's red under those faces averages 0.282 (AWP) / 0.216 (hammer), so the second
+	/// term is scaled to nothing AND alpha comes out 0.72 / 0.78 before _Color.a. Unlit and nearly
+	/// opaque, stacked several deep. That is the "opaque black shape inside the body".
+	///
+	/// NOT FIXABLE BY EXCLUDING A RENDERER, which was the first thing checked -- though the
+	/// renderer census is not as tidy as it first looked, so state it exactly:
+	///   AWP_Roughed.prefab carries TEN renderers -- three MeshRenderer (AWP_Roughed, Handle,
+	///   SplatterTrail) and seven ParticleSystemRenderer (Sfx, AWPBigSmoke, AWPGunSmoke,
+	///   AWPSmokeControl, AWPBulletShell, AWPBulletShellTail, Spark). EIGHT of the ten sit on
+	///   Assets/Shader/Particle Add.shader (guid e121aeb7e9d7e864dbd06fd7d382fcca, declared name
+	///   "Particles/Additive") and are skipped by the name test in ApplyToWeapon. TWO are not:
+	///   AWPBulletShell is on Material/BulletNewAmmoSniperRifle.mat whose m_Shader is the builtin
+	///   {fileID: 7} -- the SAME builtin Specular as Death_Hammer.mat, so the "Particle" name test
+	///   does NOT catch it -- and AWPSmokeControl carries a builtin material {fileID: 10301}
+	///   whose shader name cannot be read from the asset text at all. Both are particle emitters
+	///   that the skinning loop nevertheless reaches; that is a separate, real bug (glass shell
+	///   casings wearing the skin sheet) and is deliberately NOT addressed here.
+	///   DeathHammer.prefab is the tidy case: four MeshRenderers, the body on builtin {fileID: 7}
+	///   and SGMuzzleFlash20 + two StandardBullets on "Particles/Additive".
+	/// The renderers that actually need the primer are the weapon BODIES (AWP_Roughed + Handle,
+	/// and Death Hammer), which is why AddDepthPrime tests for MeshRenderer as well as the id.
+	/// NOT FIXABLE IN THE MESH EITHER: AWP.asset, Handle.asset and Death_Hammer.asset are all
+	/// imported m_IsReadable: 0, so there is no runtime surgery. NOT FIXABLE IN THE ART: only
+	/// tex.RED is sampled.
+	///
+	/// 9038/9039 ARE IN THIS TABLE even though they carry no SkinMaterialBindings row. That they
+	/// look identically wrong is the evidence, not a coincidence: bindings move only _Color and
+	/// _ReflectColor, and _Color.a is 1.0 / 0.86 / 1.0 across 9020 / 9035 / 9038 -- 9038 and 9039
+	/// inherit (1,1,1,1) from AWP_Roughed.mat and Death_Hammer.mat. The six differ only in those
+	/// two Color values and a muzzle-FX tint (MuzzleTints has rows for 9020, 9021 and 9035 but
+	/// not 9036/9038/9039), none of which touches the weapon body's depth or geometry.
+	/// </summary>
+	private static readonly Dictionary<int, bool> SkinDepthPrime = new Dictionary<int, bool>
+	{
+		{ 9020, true }, { 9035, true }, { 9038, true },   // AWP_Roughed
+		{ 9021, true }, { 9036, true }, { 9039, true },   // DeathHammer
+	};
+
+	private static Material _depthPrimeMat;
+	private static bool _depthPrimeResolved;
+
+	/// <summary>
+	/// ONE shared depth-only material for every primed renderer, created once.
+	///
+	/// "Unlit/Depth" is the GAME'S OWN shader and it is already in the shipped client -- the
+	/// Shader object named "Unlit - Depth" sits in UberStrike_Data/resources.assets at
+	/// 0x124ED408, and because it lives under Resources it cannot be stripped from a build. Its
+	/// entire body is
+	///
+	///     SubShader { LOD 100 Tags { "QUEUE"="Geometry+1" "RenderType"="Opaque" }
+	///                 Pass { Tags { ... } ColorMask 0 } }
+	///
+	/// -- no properties, no colour output, and a Pass with no ZWrite statement, which means
+	/// ZWrite On. A depth primer and nothing else. That is why ONE SHARED instance is correct:
+	/// there is no per-skin state to diverge, and a new Material per renderer per respawn would be
+	/// the texture leak of 2026-08-19 again in another currency. Shader.Find is known to reach
+	/// this family at runtime -- UIDrawCall.cs:226 already does Shader.Find("Unlit/Depth Cutout")
+	/// and sets hideFlags = HideFlags.DontSave on the result, which is copied here.
+	///
+	/// renderQueue IS FORCED TO 2999 AND THAT LINE IS LOAD-BEARING. At the shader's own
+	/// Geometry+1 (2001) the primer would write weapon depth in the middle of the OPAQUE phase and
+	/// every alpha-tested object behind the gun (queue 2450 -- grates, foliage) would be
+	/// depth-rejected: a third-person player's glass sniper would punch a hole through the level.
+	/// 2999 is after all opaque and all cutout and before all transparent, so it can only ever
+	/// affect the weapon it was made for.
+	/// </summary>
+	private static Material DepthPrimeMaterial()
+	{
+		if (_depthPrimeResolved)
+			return _depthPrimeMat;
+		_depthPrimeResolved = true;
+
+		Shader s = Shader.Find("Unlit/Depth");
+		if (s == null)
+			s = Resources.Load("shaders/Unlit - Depth", typeof(Shader)) as Shader;
+		if (s == null)
+		{
+			// LogError and carry on: without the primer these skins look exactly as wrong as
+			// they do today, which is survivable. Refusing to skin would be worse.
+			Debug.LogError("WeaponSkinHelper: 'Unlit/Depth' is not in this build, so the "
+				+ "see-through skins keep their interior geometry. Skinning continues.");
+			return null;
+		}
+
+		_depthPrimeMat = new Material(s);
+		_depthPrimeMat.name = "SkinDepthPrime";
+		_depthPrimeMat.hideFlags = HideFlags.DontSave; // same as UIDrawCall's mDepthMat
+		_depthPrimeMat.renderQueue = 2999; // see above -- deliberately NOT the shader's 2001
+		return _depthPrimeMat;
+	}
+
+	/// <summary>
+	/// Give this renderer a depth-only draw in front of its transparent one, so only the frontmost
+	/// surface of the weapon survives the glass pass.
+	///
+	/// MeshRenderer ONLY, and that test is not defensive tidiness. The AWP's shell-casing emitter
+	/// is a ParticleSystemRenderer whose material is the builtin Specular
+	/// (Material/BulletNewAmmoSniperRifle.mat, m_Shader {fileID: 7}), so the "Particle" name test
+	/// in ApplyToWeapon does NOT skip it and it arrives here with a single material. A second
+	/// material slot on a particle renderer is not a second pass over a submesh -- it is state we
+	/// do not want to invent, and if it were drawn the casings would write depth and punch holes
+	/// in the transparent effects around them.
+	///
+	/// Unity submits a MeshRenderer once per entry in its material array -- one submesh and two
+	/// materials means the mesh is drawn twice -- and orders those draws by RENDER QUEUE, not by
+	/// array index. So the primer goes at INDEX 1 and still draws first (2999 before 3000).
+	/// Index 1 is deliberate and is the trap in this method: `r.material` and `r.sharedMaterial`
+	/// are both slot 0, and ApplyToWeapon runs again on every respawn and every re-equip. With the
+	/// primer at slot 0 the second pass would assign the skin texture and the Glass-Hangar shader
+	/// ONTO THE PRIMER and silently undo all of this.
+	///
+	/// sharedMaterials for the length test, NEVER materials: the `materials` GETTER instantiates
+	/// every slot, which on the second equip would clone the shared primer and leak one per
+	/// respawn. Length != 1 doubles as the idempotency guard -- an already-primed renderer reads
+	/// back 2 and is left alone.
+	/// </summary>
+	private static void AddDepthPrime(Renderer r, int itemId)
+	{
+		if (r == null || !SkinDepthPrime.ContainsKey(itemId))
+			return;
+		if (!(r is MeshRenderer))
+			return;
+
+		Material[] cur = r.sharedMaterials;
+		if (cur == null || cur.Length != 1 || cur[0] == null)
+			return; // already primed, or a multi-material renderer we must not reorder
+
+		Material prime = DepthPrimeMaterial();
+		if (prime == null)
+			return;
+
+		r.materials = new Material[] { cur[0], prime };
 	}
 
 	/// <summary>Did this skin's bindings table assign <paramref name="property"/> itself?</summary>
