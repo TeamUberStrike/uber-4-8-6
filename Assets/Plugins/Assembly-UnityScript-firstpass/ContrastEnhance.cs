@@ -32,6 +32,14 @@ public class ContrastEnhance : PostEffectsBase
 		CheckSupport(false);
 		contrastCompositeMaterial = CheckShaderAndCreateMaterial(contrastCompositeShader, contrastCompositeMaterial);
 		separableBlurMaterial = CheckShaderAndCreateMaterial(separableBlurShader, separableBlurMaterial);
+		// AssetRipper rebuild: ContrastComposite.shader + SeparableBlur.shader are //DummyShaderTextExporter
+		// stubs (lit Lambert surface shaders). As a fullscreen Blit they over-brighten / fail to blur ->
+		// white blowout + soft white circles (GideonsTower) once image effects are enabled by the
+		// RenderTexture unlock. CheckShaderAndCreateMaterial accepts the stub (valid shader), so it does
+		// NOT auto-disable. Force off until the real composites are ported (OnRenderImage then passes
+		// through). Re-enable by deleting these two lines once those shaders are real.
+		isSupported = false;
+		enabled = false;
 		if (!isSupported)
 		{
 			ReportAutoDisable();

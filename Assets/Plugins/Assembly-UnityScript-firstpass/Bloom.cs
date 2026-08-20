@@ -135,6 +135,18 @@ public class Bloom : PostEffectsBase
 		lensFlareMaterial = CheckShaderAndCreateMaterial(lensFlareShader, lensFlareMaterial);
 		blurAndFlaresMaterial = CheckShaderAndCreateMaterial(blurAndFlaresShader, blurAndFlaresMaterial);
 		brightPassFilterMaterial = CheckShaderAndCreateMaterial(brightPassFilterShader, brightPassFilterMaterial);
+		// AssetRipper rebuild: the ported bloom shaders are stubs/incomplete. The blit paths use
+		// screenBlend pass 10 and blurAndFlares pass 4, so a shader with fewer passes throws
+		// "Invalid pass number for Graphics.Blit" every frame (~3x/frame) once image effects are
+		// enabled (post RenderTexture unlock) -> ~700 errors/sec, a hard FPS killer. Disable Bloom
+		// gracefully until the real bloom shaders are ported: OnRenderImage then falls back to a
+		// passthrough Blit. This re-enables itself automatically when the shaders gain their passes.
+		if (isSupported && (screenBlend == null || screenBlend.passCount <= 10
+			|| blurAndFlaresMaterial == null || blurAndFlaresMaterial.passCount <= 4))
+		{
+			isSupported = false;
+			enabled = false;
+		}
 		if (!isSupported)
 		{
 			ReportAutoDisable();

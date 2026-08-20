@@ -34,10 +34,13 @@ public class ReflectionFx : MonoBehaviour
 		{
 			initialReflectionTextures[i] = reflectiveMaterials[i].GetTexture(reflectionSampler);
 		}
-		if (!SystemInfo.supportsRenderTextures)
-		{
-			base.enabled = false;
-		}
+		// AssetRipper rebuild: this per-frame half-res reflection camera + RenderTexture was gated OFF by
+		// Unity Free's lack of RenderTexture. The Unity.exe RT unlock re-enabled it, but the bound material
+		// (CenterRoomReflection / Normal-Bumped stub) never samples _ReflectionTex and replacementShader is
+		// null -> 100% wasted per-frame cost, zero visual payoff, and it revives the PlanarReflection-style
+		// "Shader wants normals" spam risk. Force off (like the neutered PlanarReflection/Water) until a real
+		// reflective water shader is bound; then restore the `!SystemInfo.supportsRenderTextures` gate.
+		base.enabled = false;
 	}
 
 	private void OnDisable()

@@ -37,5 +37,5 @@ SubShader {
     }
     ENDCG
 }
-Fallback "Legacy Shaders/Bumped Specular"
+Fallback "Bumped Specular"
 }
