@@ -129,25 +129,34 @@ Properties {
 			v2f vert (appdata v)
 			{
 				v2f o;
-				float4 worldVtx = mul(_Object2World, v.vertex);
-				float2 xzVtx = worldVtx.xz;
+				// Byte-for-byte with the shipped Water4 vertex (sharedassets3.assets @25064604):
+				// wave PHASE input = world.xz * unity_Scale.w (object scale; the tiles are 0.5 -> uScale.w=2),
+				// displacement added in OBJECT space then full MVP (so the object scale scales the world wave
+				// amplitude), normal evaluated at the DISPLACED xz, view from the UN-displaced world position.
+				float4 worldVtx = mul(_Object2World, v.vertex);   // undisplaced world (tmpvar_4)
+				float2 xzVtx = worldVtx.xz * unity_Scale.w;       // tmpvar_5.xz -- scaled phase input
 
 				float3 offsets = GerstnerOffset4(xzVtx, _GSteepness, _GAmplitude, _GFrequency, _GSpeed, _GDirectionAB, _GDirectionCD);
-				float3 nrml    = GerstnerNormal4(xzVtx, _GAmplitude, _GFrequency, _GSpeed, _GDirectionAB, _GDirectionCD);
-				worldVtx.xyz += offsets;
+				float3 nrml    = GerstnerNormal4(xzVtx + offsets.xz, _GAmplitude, _GFrequency, _GSpeed, _GDirectionAB, _GDirectionCD);
 
-				o.pos = mul(UNITY_MATRIX_VP, worldVtx);
-				o.normalInterp = float4(nrml, 1.0);
-				o.viewInterp.xyz = worldVtx.xyz - _WorldSpaceCameraPos;
+				o.viewInterp.xyz = worldVtx.xyz - _WorldSpaceCameraPos;   // tmpvar_3.xyz -- undisplaced world
 				o.viewInterp.w   = clamp(offsets.y, 0.0, 1.0);
+				o.normalInterp   = float4(nrml, 1.0);
 
-				o.bumpCoords = (worldVtx.xzxz + _Time.x * _BumpDirection) * _BumpTiling;
+				// Displace in OBJECT space (gl_Vertex + offsets), then MVP (tmpvar_1 -> gl_MVP * tmpvar_1).
+				float4 dispObjVtx = v.vertex;
+				dispObjVtx.xyz += offsets;
+				o.pos = mul(UNITY_MATRIX_MVP, dispObjVtx);
+
+				// bump uv from the DISPLACED world position (shipped: (_Object2World * tmpvar_1).xzxz).
+				float4 dispWorld = mul(_Object2World, dispObjVtx);
+				o.bumpCoords = (dispWorld.xzxz + _Time.x * _BumpDirection) * _BumpTiling;
 
 				float4 clip = o.pos;
-				// DEPTH / edge-blend tap coord (screen space, NOT y-flipped). This is the
-				// orientation _CameraDepthTexture is stored in, which is why the shore/opacity
-				// read correctly -- leave it exactly as-is.
-				o.grabPos.xy = (clip.xy + clip.w) * 0.5;
+				// grabPos (TEXCOORD3 = depth + reflection) = ComputeScreenPos (shipped o_26): _ProjectionParams.x
+				// on y (=1 to screen). reflUV (TEXCOORD4 = refraction/GrabPass) = ComputeGrabScreenPos: the D3D
+				// y-flip the GLES dump doesn't show (its grabPassPos_25 is the un-flipped GLES form).
+				o.grabPos.xy = (float2(clip.x, clip.y * _ProjectionParams.x) + clip.w) * 0.5;
 				o.grabPos.zw = clip.zw;
 				// REFRACTION grab coord. ComputeGrabScreenPos applies the platform y-flip
 				// (scale=-1 under UNITY_UV_STARTS_AT_TOP on D3D). The previous hand-rolled coord
