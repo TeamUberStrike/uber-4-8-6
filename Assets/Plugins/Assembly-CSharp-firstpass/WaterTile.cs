@@ -40,10 +40,16 @@ public class WaterTile : MonoBehaviour
 
 	public void OnWillRenderObject()
 	{
-		// No-op: PlanarReflection + WaterBase helper-camera renders are
-		// Pro-only on Unity 4.6 Free and silent-fail per Scene+Game camera,
-		// generating "Shader wants normals" warnings per renderer per frame.
-		// FX/Water cubemap reflection covers the visual. See
-		// feedback_unity_4_6_free_planar_reflection_spam.md.
+		// RESTORED (1:1 with the shipped Water4): drive the planar-reflection helper camera and
+		// the depth-texture setup for whichever camera is about to render this tile. The reflection
+		// camera excludes the Water layer, so no recursion; PlanarReflection guards to one render/frame.
+		if ((bool)reflection)
+		{
+			reflection.WaterTileBeingRendered(base.transform, Camera.current);
+		}
+		if ((bool)waterBase)
+		{
+			waterBase.WaterTileBeingRendered(base.transform, Camera.current);
+		}
 	}
 }

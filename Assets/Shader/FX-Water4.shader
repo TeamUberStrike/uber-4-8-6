@@ -179,10 +179,13 @@ Properties {
 				float distZ = LinearEyeDepth(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.grabPos + distort)).r);
 				if (distZ < i.grabPos.z) refr = refrUndist;   // i.grabPos.z == clip.z (verbatim shipped)
 
-				// Reflection: PlanarReflection RT intentionally OFF -> flat _ReflectionColor (RT-off
-				// compromise; NOT the see-through cause -- that's the depth-driven alpha below). Shipped-with-RT
-				// would be lerp(tex2Dproj(_ReflectionTex, i.reflUV+distort).rgb, _ReflectionColor.rgb, _ReflectionColor.a).
-				half3 reflCol = _ReflectionColor.rgb;
+				// Planar reflection (1:1 shipped Water4): sample the PlanarReflection camera RT
+				// (_ReflectionTex) blended toward _ReflectionColor by its alpha. Uses grabPos
+				// (ComputeScreenPos, main camera) -- NOT reflUV: a camera RenderTexture and a GrabPass
+				// have OPPOSITE y-orientation on D3D, so the reflection keeps grabPos while the GrabPass
+				// refraction above keeps reflUV. If the reflection reads upside-down, flip grabPos here.
+				half3 reflCol = lerp(tex2Dproj(_ReflectionTex, UNITY_PROJ_COORD(i.grabPos + distort)).rgb,
+				                     _ReflectionColor.rgb, _ReflectionColor.a);
 
 				// Depth edge-blend from _CameraDepthTexture (grabPos = safe non-y-flipped screen tap;
 				// .w == clip.w). edgeBlend.x -> ALPHA (opaque in deep water, transparent at shore);
