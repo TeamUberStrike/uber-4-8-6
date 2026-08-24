@@ -93,9 +93,11 @@ public class RenderSettingsController : MonoBehaviour
 		// IsUnderWater enable path below) they full-screen blit through Lambert stubs -> black/distorted
 		// underwater + broken vignette/chromatic-aberration. Skip CREATING them until the real CMune
 		// shaders are ported (every use of these fields null-checks, so leaving them null is safe).
-		// Re-enable by setting this flag true once those shaders are real.
-		bool cmuneUnderwaterShadersReady = false;
-		if (cmuneUnderwaterShadersReady && null == underWaterEffect)
+		// UnderWaterEffect.shader is now ported (real distortion) -> underwater re-enabled; Vignetting's
+		// CMune shaders are still stubs -> kept off. Flip cmuneVignetteShadersReady when they are ported.
+		bool cmuneUnderwaterShaderReady = true;
+		bool cmuneVignetteShadersReady = false;
+		if (cmuneUnderwaterShaderReady && null == underWaterEffect)
 		{
 			underWaterEffect = Camera.main.gameObject.AddComponent<UnderWaterEffect>();
 			if ((bool)underWaterEffect)
@@ -105,7 +107,7 @@ public class RenderSettingsController : MonoBehaviour
 				underWaterEffect.textureRamp = (Texture)Resources.Load("ImageEffects/Underwater_ColorRamp");
 			}
 		}
-		if (cmuneUnderwaterShadersReady && null == vignetteEffect && !ApplicationDataManager.IsMobile)
+		if (cmuneVignetteShadersReady && null == vignetteEffect && !ApplicationDataManager.IsMobile)
 		{
 			vignetteEffect = Camera.main.gameObject.AddComponent<Vignetting>();
 			if ((bool)vignetteEffect)
