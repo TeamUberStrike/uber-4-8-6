@@ -361,6 +361,10 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 				Weapon1     = 9008,   // Inferno MG        -> MachineGun
 				Weapon2     = 9043,   // AWP [Gold]        -> AWP_Roughed
 				Weapon3     = 9042,   // SPAS-12 [Gold]    -> Automatic_Shotgun_Roughed
+				QuickItem1  = 2001,   // Spring Grenades (QuickItemLogic.SpringGrenade). Was UNSET, so the
+				                      // FIRST offline match (whatever map -- Temple happened to be first)
+				                      // had no quick-item in the loadout: no HUD icon, can't spawn. 2001 is
+				                      // a shop item, so EnableAllItems above already granted it.
 				SkinColor   = "FFFFFF"
 			};
 			Singleton<LoadoutManager>.Instance.UpdateLoadout(offlineLoadout);
