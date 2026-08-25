@@ -118,6 +118,22 @@ public class AvatarAnimationController : MonoBehaviour
 		//              result stands: re-pointing state GUIDs is not the fix.
 		//  2026-08-19  Repaired AssetRipper's hex corruption in 230 assets and re-enabled.
 		//              STILL CRASHED. Repairing the Avatar alone is not the fix either.
+		//  2026-08-25  Build-artifact audit (UnityPy on the built sharedassets0.assets, OUR
+		//              build vs the shipped Steam client). Two theories killed on the actual
+		//              baked data, one lead found:
+		//                - CLIPS ARE FINE. All 63 baked AnimationClips in OUR build are
+		//                  m_AnimationType==3 humanoid with a full ClipMuscleConstant, the same
+		//                  shape as shipped (CrouchingIdle m_MuscleClipSize==12472, IndexArray
+		//                  ==134 in both; zero clip-level diffs across all 63). Unity re-bakes
+		//                  the muscle clip on import, so "our .anim have no m_MuscleClip" is a
+		//                  disk-only artifact -- REFUTES the muscle-clip suspect that used to
+		//                  sit below this block.
+		//                - AVATAR IS FINE. Object byte-identical in size to shipped; rig again
+		//                  exonerated.
+		//                - THE ONLY ASSET THAT DIFFERS FROM SHIPPED IS THIS CONTROLLER. Our
+		//                  baked m_Controller has ALL per-state transitions dropped and 75
+		//                  state/transition name strings missing from m_TOS (197 entries vs
+		//                  shipped 267). The crash lives in the state-machine TRANSITION graph.
 		//
 		// WHAT IS NOW DISPROVEN (do not go back down this road):
 		//   The old note here blamed "U5+ humanoid data 4.6.5's Mecanim can't evaluate"
@@ -128,20 +144,46 @@ public class AvatarAnimationController : MonoBehaviour
 		//   distinct avatar hex blobs is BYTE-IDENTICAL to that shipped data. The rig is
 		//   data this exact Mecanim provably evaluates. Do not re-author it.
 		//
-		// LEADING REMAINING SUSPECT (untested): all 49 shipped humanoid clips carry a
-		//   compiled m_MuscleClip blob (2.24 MB total in sharedassets0.assets); not one
-		//   of our 159 .anim files has m_MuscleClip at all -- AssetRipper emitted editor
-		//   float curves instead. EvaluateAvatarSM is the clip-sampling stage, so
-		//   sampling a type-3 clip with no ClipMuscleConstant is a clean null-deref.
+		// REAL CRASH LOCUS (evidence, not guess): the AnimatorController TRANSITION set.
+		//   git 8976687d relinked the states and LIVE-TESTED with the Animator ON -> NO CRASH.
+		//   Its .controller had 6 Transition (u!1101) objects, all AnyState (5 Weapons
+		//   WeaponClass/WeaponSwitch + 1 Base IsJumping). git fb33e1c2 re-added the full graph
+		//   -> 50 Transition objects (the CURRENT source) -> the crash returned, and that commit
+		//   wrongly blamed it on "U5+ rig data" (refuted above). The delta between no-crash and
+		//   crash is those ~44 per-state transitions; one or more bakes into a state-machine edge
+		//   native Mecanim cannot evaluate (a bad condition/param, or a per-state transition whose
+		//   destination is a state in a different sub-state-machine, e.g. Base.Locomotion->SwimIdle).
+		//
+		//   IMPORTANT nuance for testing: the historical crashes were seen in the EDITOR (Play
+		//   mode), whose live bake keeps all 50 transitions. The PLAYER BUILD bakes differently --
+		//   in the current build's sharedassets0.assets the baked controller has 0 per-state
+		//   transitions and only 5 AnyState transitions (a SUBSET of the 6 that 8976687d proved
+		//   no-crash), a valid default Base.Locomotion state byte-identical to shipped, all clip
+		//   PPtrs resolving, and no out-of-range indices. So the deployed BUILD's controller is in
+		//   the no-crash SHAPE, but re-enabling it in a build is still UNTESTED -- do not assume.
+		//
+		//   To move forward safely (see report + MecanimRiskHarness.cs, which is arm-gated and
+		//   crash-loop-proof): build, drop mecanim_risk.arm ("ARM" + a scope line "LutzBaseAvatar")
+		//   next to UberStrike_Data, run. If FK survives, the mitigation can come off. If it still
+		//   crashes, the proven-safe fallback is to revert THIS .controller to its 8976687d
+		//   6-AnyState-transition set, then re-add the 44 transitions in small batches to bisect
+		//   the offender. Re-authoring the rig or the clips is NOT the fix.
 		// =========================================================================================
 		if (Animator != null)
 		{
+			// T-POSE RESOLVED 2026-08-25 (proven via MecanimRiskHarness on a standalone build).
+			// The FK crash (EvaluateAvatarSM, avatar.cpp:628) is in the AnimatorController's transition
+			// graph, and it bakes DIFFERENTLY per platform: the Unity EDITOR Play mode bakes the full
+			// 50-transition graph and STILL crashes, but a standalone BUILD bakes a crash-safe subset
+			// (5 AnyState transitions, a subset of the live-tested-no-crash 8976687d set) and enables
+			// cleanly — confirmed in game, the avatar leaves T-pose into real locomotion. So: keep the
+			// Animator DISABLED IN THE EDITOR ONLY (so Play mode / map testing never crashes), and
+			// ENABLE it in the build so the shipped avatar animates. The old MecanimRiskHarness
+			// (arm-gated, UBERSTRIKE_MECANIM_RISK define) stays as a diagnostic; no longer wired here.
+#if UNITY_EDITOR
 			Animator.enabled = false;
-#if UBERSTRIKE_MECANIM_RISK
-			// Opt-in test path, OFF by default. Without the UBERSTRIKE_MECANIM_RISK
-			// scripting define this block emits no IL at all and Awake() is identical
-			// to the mitigation-only version above. See MecanimRiskHarness.cs.
-			MecanimRiskHarness.TryEnable(this, Animator);
+#else
+			Animator.enabled = true;
 #endif
 		}
 	}
