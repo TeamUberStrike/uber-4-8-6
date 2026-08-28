@@ -325,6 +325,16 @@ public class AvatarAnimationController : MonoBehaviour
 		}
 	}
 
+	// Reproduce the shop-podium hand + head IK that native Mecanim silently no-ops on this build (the
+	// SetIK*/SetLookAt* calls below in OnAnimatorIK are issued correctly but the native solve moves
+	// nothing). Runs in LateUpdate, after the animator's FK + failed native IK pass, so our writes to the
+	// bone transforms survive the frame. All offsets are data-matched 1:1 to the shipped client. See
+	// ManualArmIK.cs. Inert (self-gating + weight blend) wherever native IK actually works.
+	private void LateUpdate()
+	{
+		ManualArmIK.ApplyManualIK(this);
+	}
+
 	private void OnAnimatorIK()
 	{
 		if ((bool)_AnchorChest && (bool)_IKAnchor)
