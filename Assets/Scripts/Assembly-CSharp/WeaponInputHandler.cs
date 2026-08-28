@@ -40,7 +40,7 @@ public abstract class WeaponInputHandler
 
 	protected static void ZoomOut(ZoomInfo zoomInfo, BaseWeaponDecorator weapon)
 	{
-		LevelCamera.DoZoomOut(75f, 10f);
+		LevelCamera.DoZoomOut(ApplicationDataManager.ApplicationOptions.VideoFOV, 10f);
 		UserInput.ZoomSpeed = 1f;
 		if (zoomInfo != null)
 		{
