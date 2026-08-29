@@ -34,6 +34,10 @@ public static class ManualArmIK
     // The look is fixed in the body frame, so headRot = root.rotation * HEAD_FROM_ROOT holds at any angle.
     static readonly Quaternion HEAD_FROM_ROOT =
         Quaternion.Inverse(Quaternion.Euler(0f, 110f, 0f)) * Quaternion.Euler(3.6f, 117.1f, 356.0f);
+    // Melee (and other non-aim) head look, data-matched from Steam: root(0,110,0) -> head(4.8,114.2,1.5).
+    // The look-at is active for melee too (_LookAtWeight=1) even though there's no hand IK there.
+    static readonly Quaternion HEAD_FROM_ROOT_MELEE =
+        Quaternion.Inverse(Quaternion.Euler(0f, 110f, 0f)) * Quaternion.Euler(4.8f, 114.2f, 1.5f);
 
     public static void ApplyManualIK(MonoBehaviour self)
     {
@@ -42,28 +46,37 @@ public static class ManualArmIK
         if ((object)anim == null) anim = self.GetComponentInChildren<Animator>();
         if ((object)anim == null) return;
 
-        // Same weight the controller feeds the native solve: layerWeight(Weapons) * _IKWeight (ramps in).
+        // The controller runs two independent refinements: hand IK (weight = layerW*_IKWeight, aim weapons
+        // only) and the head look-at (weight = layerW*_LookAtWeight, active for melee too). Handle each on
+        // its own weight so melee — which has NO hand IK but DOES look-at — still gets its head corrected.
         float layerW = (anim.layerCount > 1) ? anim.GetLayerWeight(1) : 1f;
-        float weight = Mathf.Clamp01(layerW * ReflectFloat(self, "_IKWeight", 1f));
-        if (weight <= 0f) return;
+        float handW = Mathf.Clamp01(layerW * ReflectFloat(self, "_IKWeight", 1f));
+        float lookW = Mathf.Clamp01(layerW * ReflectFloat(self, "_LookAtWeight", 1f));
+        if (handW <= 0f && lookW <= 0f) return;
 
         Transform rt = self.transform;
 
-        // RIGHT hand: holds the weapon -> its hand-frame offset levels the barrel.
-        SolveArm(anim, rt, HumanBodyBones.RightUpperArm, "RightArm", HumanBodyBones.RightLowerArm, "RightForeArm",
-                 HumanBodyBones.RightHand, "RightHand", ReflectTransform(self, "_IKRightHand"), weight, HAND_FROM_GOAL);
-        // LEFT hand: support hand -> straight onto the foregrip goal with its own hand-frame offset.
-        SolveArm(anim, rt, HumanBodyBones.LeftUpperArm, "LeftArm", HumanBodyBones.LeftLowerArm, "LeftForeArm",
-                 HumanBodyBones.LeftHand, "LeftHand", ReflectTransform(self, "_IKLeftHand"), weight, HAND_FROM_GOAL_L);
-
-        // HEAD look-at: forward down the scope. Blend by the controller's own look-at ramp
-        // (layerWeight * _LookAtWeight) so it eases in from the lobby pose instead of snapping.
-        Transform head = anim.isHuman ? anim.GetBoneTransform(HumanBodyBones.Head) : null;
-        if ((object)head == null) head = FindDeep(rt, "Head");
-        if ((object)head != null)
+        if (handW > 0f)
         {
-            float lookW = Mathf.Clamp01(layerW * ReflectFloat(self, "_LookAtWeight", 1f));
-            if (lookW > 0f) head.rotation = Quaternion.Slerp(head.rotation, rt.rotation * HEAD_FROM_ROOT, lookW);
+            // RIGHT hand holds the weapon (offset levels the barrel); LEFT hand onto the foregrip.
+            SolveArm(anim, rt, HumanBodyBones.RightUpperArm, "RightArm", HumanBodyBones.RightLowerArm, "RightForeArm",
+                     HumanBodyBones.RightHand, "RightHand", ReflectTransform(self, "_IKRightHand"), handW, HAND_FROM_GOAL);
+            SolveArm(anim, rt, HumanBodyBones.LeftUpperArm, "LeftArm", HumanBodyBones.LeftLowerArm, "LeftForeArm",
+                     HumanBodyBones.LeftHand, "LeftHand", ReflectTransform(self, "_IKLeftHand"), handW, HAND_FROM_GOAL_L);
+        }
+
+        // HEAD look-at: forward (down the scope for aim, at the camera for melee). Blend by the look-at
+        // ramp so it eases in. Aim-tagged states use the sniper look; everything else uses the melee look.
+        if (lookW > 0f)
+        {
+            Transform head = anim.isHuman ? anim.GetBoneTransform(HumanBodyBones.Head) : null;
+            if ((object)head == null) head = FindDeep(rt, "Head");
+            if ((object)head != null)
+            {
+                bool aimIK = anim.layerCount > 1 && anim.GetCurrentAnimatorStateInfo(1).IsTag("IK");
+                Quaternion headTarget = rt.rotation * (aimIK ? HEAD_FROM_ROOT : HEAD_FROM_ROOT_MELEE);
+                head.rotation = Quaternion.Slerp(head.rotation, headTarget, lookW);
+            }
         }
     }
 
