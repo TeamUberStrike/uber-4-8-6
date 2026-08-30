@@ -105,7 +105,7 @@ public static class ManualArmIK
 
     // Analytic two-bone IK (law of cosines). Preserves the current elbow bend plane (no flip); clamps an
     // unreachable target. root = upper arm, mid = elbow, end = hand. World-space Transform rotations.
-    static void TwoBoneIK(Transform root, Transform mid, Transform end, Vector3 targetPos, Quaternion targetRot, Quaternion handFromGoal)
+    internal static void TwoBoneIK(Transform root, Transform mid, Transform end, Vector3 targetPos, Quaternion targetRot, Quaternion handFromGoal)
     {
         Vector3 a = root.position, b = mid.position, c = end.position;
         float upperLen = Vector3.Distance(a, b), lowerLen = Vector3.Distance(b, c);

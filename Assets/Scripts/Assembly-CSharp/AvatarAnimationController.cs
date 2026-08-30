@@ -181,7 +181,10 @@ public class AvatarAnimationController : MonoBehaviour
 			// ENABLE it in the build so the shipped avatar animates. The old MecanimRiskHarness
 			// (arm-gated, UBERSTRIKE_MECANIM_RISK define) stays as a diagnostic; no longer wired here.
 #if UNITY_EDITOR
-			Animator.enabled = false;
+			// Enabled in-editor so the shop podium animates (needed to see/iterate the new dynamic melee stance,
+			// design decision #1). Verified crash-safe on the podium this session; NOT yet re-verified on maps in
+			// editor Play mode, so keep this local/uncommitted until map testing confirms it. See vault 2026-08-30.
+			Animator.enabled = true;
 #else
 			Animator.enabled = true;
 #endif
@@ -332,8 +335,68 @@ public class AvatarAnimationController : MonoBehaviour
 	// ManualArmIK.cs. Inert (self-gating + weight blend) wherever native IK actually works.
 	private void LateUpdate()
 	{
+#if UNITY_EDITOR
+		ApplyPodiumSway();
+#endif
 		ManualArmIK.ApplyManualIK(this);
 	}
+
+#if UNITY_EDITOR
+	// The shop/lobby side-to-side idle lean, reproduced procedurally (the ManualArmIK pattern). The build's
+	// baked Mecanim retarget renders the playing clips' intrinsic lateral motion; the editor's LIVE retarget
+	// flattens it (same editor-vs-build divergence class as the T-pose), so it can only be reproduced after FK.
+	// Mechanism = a lateral PELVIS weight-shift (matches the design intent: ShopIdle.anim's ~16cm RootT.x lateral
+	// translation, a hip slide — NOT a spine tilt) WITH FOOT RE-PLANTING via the proven two-bone IK, so the whole
+	// upper body translates side to side while the feet stay planted (exactly as described). Runs BEFORE
+	// ManualArmIK so the head look-at settles on top. Melee idle podium only for now (its arms have no hand-IK so
+	// there's no shear); build never compiles this. Amplitude starts low — tune A up by eye to match the build.
+	private void ApplyPodiumSway()
+	{
+		if (Animator == null || !Animator.enabled || !Animator.isHuman)
+		{
+			return;
+		}
+		if (GameState.Current == null || GameState.Current.IsMultiplayer)
+		{
+			return;
+		}
+		// UNIVERSAL: applies to ANY offline menu pose (melee, every gun, the lobby chill idle) — not just melee.
+		// Stationary guard only, so it never fights locomotion if the editor ever plays a map.
+		if (Mathf.Abs(Animator.GetFloat(ControlFields.SpeedZ)) > 0.05f || Mathf.Abs(Animator.GetFloat(ControlFields.SpeedX)) > 0.05f)
+		{
+			return;
+		}
+		Transform hips = Animator.GetBoneTransform(HumanBodyBones.Hips);
+		Transform lUp = Animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
+		Transform lLo = Animator.GetBoneTransform(HumanBodyBones.LeftLowerLeg);
+		Transform lFt = Animator.GetBoneTransform(HumanBodyBones.LeftFoot);
+		Transform rUp = Animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
+		Transform rLo = Animator.GetBoneTransform(HumanBodyBones.RightLowerLeg);
+		Transform rFt = Animator.GetBoneTransform(HumanBodyBones.RightFoot);
+		if (hips == null || lUp == null || lLo == null || lFt == null || rUp == null || rLo == null || rFt == null)
+		{
+			return;
+		}
+		// 1) cache both feet's post-FK world transforms FRESH this frame (non-cumulative — the animator re-FKs each frame)
+		Vector3 lFtPos = lFt.position;
+		Quaternion lFtRot = lFt.rotation;
+		Vector3 rFtPos = rFt.position;
+		Quaternion rFtRot = rFt.rotation;
+		// 2) slide the pelvis laterally (absolute offset, Y/Z untouched — no bob)
+		const float A = 0.08f;  // metres of lateral shift (reference measures ~5cm; kept a touch bigger to read clearly)
+		const float T = 6.5f;   // seconds per full side-to-side cycle — matched to the ~4.8s melee sway, a bit slower for the chill feel
+		float shift = A * Mathf.Sin(2f * Mathf.PI * Time.time / T);
+		Vector3 delta = base.transform.right * shift;
+		hips.position += delta;
+		if ((bool)_IKAnchor)
+		{
+			_IKAnchor.position += delta; // IK-driven arms (gun aim poses) ride with the torso; harmless for melee/lobby
+		}
+		// 3) re-plant both feet at their cached world transforms so THE FEET DO NOT MOVE
+		ManualArmIK.TwoBoneIK(lUp, lLo, lFt, lFtPos, lFtRot, Quaternion.identity);
+		ManualArmIK.TwoBoneIK(rUp, rLo, rFt, rFtPos, rFtRot, Quaternion.identity);
+	}
+#endif
 
 	private void OnAnimatorIK()
 	{
