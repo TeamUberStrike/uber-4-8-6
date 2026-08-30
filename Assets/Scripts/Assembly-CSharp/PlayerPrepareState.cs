@@ -13,6 +13,10 @@ internal class PlayerPrepareState : IState
 		Singleton<QuickItemController>.Instance.IsEnabled = false;
 		GameState.Current.Player.EnableWeaponControl = false;
 		Screen.lockCursor = true;
+		// Pre-warm the local avatar off-screen now (masked by the spawn transition)
+		// so its first in-map draw — and the one-time shader-variant compile — does
+		// not land on the first ESC/pause frame as a 1-3s "invisible player".
+		LevelCamera.PrewarmLocalAvatar();
 		LevelCamera.SetMode(LevelCamera.CameraMode.FirstPerson);
 		EventHandler.Global.Fire(new GameEvents.PlayerIngame());
 		AutoMonoBehaviour<UnityRuntime>.Instance.OnFixedUpdate += GameState.Current.Player.MoveController.UpdatePlayerMovement;

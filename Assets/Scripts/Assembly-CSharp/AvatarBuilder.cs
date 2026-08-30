@@ -139,6 +139,16 @@ public static class AvatarBuilder
 			avatar.SetLayers(UberstrikeLayer.RemotePlayer);
 			avatar.Configuration.SetSkinColor(PlayerDataManager.SkinColor);
 			avatar.HudInformation.SetAvatarLabel(PlayerDataManager.NameAndTag);
+			// The local third-person avatar is SetActive(false) during first-person play; the
+			// first reactivation for the ESC/pause orbit view leaves its skinned-mesh bounds
+			// stale, so it is frustum-culled for ~1s until they recompute (the residual
+			// "invisible the first time" after the camera-inside-mesh fix). Force per-frame
+			// bounds so it renders immediately, mirroring InstantiateRagdoll's ragdoll fix.
+			SkinnedMeshRenderer localSmr = avatar.GetComponentInChildren<SkinnedMeshRenderer>();
+			if ((bool)localSmr)
+			{
+				localSmr.updateWhenOffscreen = true;
+			}
 		}
 		else
 		{

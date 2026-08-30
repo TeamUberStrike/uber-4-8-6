@@ -5,25 +5,20 @@ using UnityEngine;
 // ---------------------------------------------------------------------------
 //  Bluebox / Normal map "Texture Settings"
 // ---------------------------------------------------------------------------
-//  In the retail Steam client each of a handful of maps shipped as TWO
-//  downloadable assetbundles: e.g. SpacePortAlpha.unity3d (NORMAL, grey-metal)
-//  and SpacePortAlphaB.unity3d (BLUEBOX, blue-grid). A server-localized
-//  "Texture Settings" popup on map-select chose which bundle to stream.
+//  In the retail Steam client a handful of maps shipped as TWO downloadable
+//  assetbundles (e.g. SpacePortAlpha.unity3d = NORMAL grey-metal,
+//  SpacePortAlphaB.unity3d = BLUEBOX blue-grid) and a server-localized
+//  "Texture Settings" popup on map-select chose which to stream. Our
+//  reconstruction has ONE built-in scene per map; the only per-skin difference
+//  is the pixels of that map's shared wall texture, so "load the chosen variant"
+//  is a single _MainTex swap on the wall material(s) after the scene loads.
 //
-//  Our AssetRipper reconstruction only has ONE built-in scene per map, and for
-//  SpacePortAlpha that scene's single wall material ("BlueBox") points at the
-//  BLUEBOX texture ("InsideGrayAlt 1_2.png", guid 08ff5191...). The NORMAL
-//  grey-metal texture is the byte-identical "InsideGrayAlt 1.png" (guid
-//  50b591df...) — a real asset extracted from the retail SpacePortAlpha.unity3d
-//  bundle and already present in the project. A Resources copy of it lives at
-//  Resources/MapVariants/SpacePortAlpha_WallNormal.png so it can be reached at
-//  runtime.
-//
-//  Verified from the retail bundles: the ONLY per-skin difference for
-//  SpacePortAlpha is the pixels of that one wall texture (both variants use the
-//  same 10x10 tiling on the same material/mesh). So the "load the chosen
-//  variant" step is a single main-texture swap on the shared "BlueBox"
-//  material, applied right after the scene finishes loading.
+//  Per-scene tables below drive three maps:
+//    * SpacePortAlpha - baked default BLUEBOX; NORMAL = extracted grey-metal.
+//    * CuberStrike    - baked default NORMAL; needs an explicit BLUEBOX texture
+//                       (capture-from-scene would otherwise capture the normal).
+//    * UberZone       - retail whitebox-only (no authentic normal); reuses the
+//                       shared grey-metal as its "Normal" so it still gets a tab.
 //
 //  Everything here is best-effort and fully guarded: a failure to prompt or to
 //  swap must NEVER prevent a map from loading.
@@ -40,34 +35,60 @@ public static class MapTextureVariant
 	// the reconstructed scenes already display, so doing nothing is always safe.
 	public static Variant Selected = Variant.BlueBox;
 
-	// Popup strings. In the retail client these came from server localization;
-	// we use the same literal English text the retail popup showed.
+	// Popup strings (retail used server localization; same literal English text).
 	private const string PopupTitle = "Texture Settings";
 	private const string PopupBody = "Please select the map's desired texture!";
 	private const string NormalCaption = "Normal";
 	private const string BlueBoxCaption = "Bluebox";
 
-	// Name of the shared wall material inside the variant scenes.
-	private const string WallMaterialName = "BlueBox";
-
 	// SceneName -> Resources path of the NORMAL main-wall texture for that map.
-	// Only maps that actually have a real, extracted normal texture belong here.
-	// (SpaceCity / UberZone can be added once their normal textures are imported
-	//  the same way; leaving them out simply means no popup for them.)
 	private static readonly Dictionary<string, string> NormalTextureByScene =
 		new Dictionary<string, string>
 		{
-			{ "SpacePortAlpha", "MapVariants/SpacePortAlpha_WallNormal" }
+			{ "SpacePortAlpha", "MapVariants/SpacePortAlpha_WallNormal" },
+			// CuberStrike's grey-metal normal is byte-identical pixels to
+			// SpacePortAlpha's, so it reuses the same Resources copy.
+			{ "CuberStrike", "MapVariants/SpacePortAlpha_WallNormal" },
+			// UberZone shipped whitebox-only; its authentic "Normal" IS the white
+			// "1 Uber Metre" BlueBox_D tile (extracted from the retail bundle), with
+			// the blue grid as its "Bluebox".
+			{ "UberZone", "MapVariants/UberZone_WallNormal" }
+		};
+
+	// SceneName -> explicit BLUEBOX main-wall texture, needed only for maps whose
+	// baked default is NORMAL (e.g. CuberStrike), where the capture-from-scene
+	// path would otherwise capture the normal texture as the "bluebox".
+	private static readonly Dictionary<string, string> BlueBoxTextureByScene =
+		new Dictionary<string, string>
+		{
+			{ "CuberStrike", "MapVariants/CuberStrike_WallBlueBox" }
+		};
+
+	// SceneName -> the wall material name(s) whose _MainTex we swap in that scene.
+	private static readonly Dictionary<string, string[]> WallMaterialsByScene =
+		new Dictionary<string, string[]>
+		{
+			{ "SpacePortAlpha", new string[] { "BlueBox" } },
+			{ "UberZone", new string[] { "BlueBox_Gray", "BlueBox_Blue", "BlueBox_Red" } },
+			{ "CuberStrike", new string[] { "CuberStrike", "CuberStrike2_0" } }
 		};
 
 	// Cache of the loaded normal texture, keyed by scene name.
 	private static readonly Dictionary<string, Texture> _normalCache =
 		new Dictionary<string, Texture>();
 
+	// Cache of the loaded explicit-bluebox texture, keyed by scene name.
+	private static readonly Dictionary<string, Texture> _blueBoxCache =
+		new Dictionary<string, Texture>();
+
 	// The material's original BLUEBOX texture, captured the first time we see it
-	// so we can restore it if the player switches back to Bluebox and Unity kept
-	// the mutated shared material alive across a level load.
+	// (for maps whose baked default is bluebox and have no explicit entry above).
 	private static Texture _capturedBlueBox;
+
+	// CuberStrike's wall material is a detail shader whose high-frequency _Detail
+	// overlay muddies the flat bluebox grid; captured here so we can neutralize it
+	// in bluebox mode (multiply by white) and restore it for normal.
+	private static Texture _capturedDetail;
 
 	/// <summary>True if the given scene has a selectable Bluebox/Normal texture.</summary>
 	public static bool HasVariants(string sceneName)
@@ -144,6 +165,7 @@ public static class MapTextureVariant
 			}
 
 			Texture normal = LoadNormal(sceneName, resPath);
+			Texture blueBox = LoadBlueBox(sceneName); // may be null (bluebox-default maps use capture)
 
 			// Collect the distinct shared wall material(s) in the scene.
 			UnityEngine.Object[] rends = UnityEngine.Object.FindObjectsOfType(typeof(Renderer));
@@ -167,7 +189,7 @@ public static class MapTextureVariant
 				for (int m = 0; m < mats.Length; m++)
 				{
 					Material mat = mats[m];
-					if (mat == null || !IsWallMaterial(mat.name))
+					if (mat == null || !IsWallMaterial(sceneName, mat.name))
 					{
 						continue;
 					}
@@ -176,11 +198,15 @@ public static class MapTextureVariant
 						continue;
 					}
 					Texture cur = mat.GetTexture("_MainTex");
-					// Capture the bluebox baseline: any main texture that isn't our normal one.
-					if (cur != null && cur != normal)
+					// Capture the bluebox baseline: any main texture that is neither our
+					// normal nor our explicit bluebox (covers bluebox-default maps).
+					if (cur != null && cur != normal && cur != blueBox)
 					{
 						_capturedBlueBox = cur;
 					}
+					// Prefer an explicit bluebox (required for normal-default maps like
+					// CuberStrike); otherwise fall back to the captured one.
+					Texture blueTarget = (blueBox != null) ? blueBox : _capturedBlueBox;
 					if (Selected == Variant.Normal)
 					{
 						if (normal != null && cur != normal)
@@ -191,10 +217,32 @@ public static class MapTextureVariant
 					}
 					else // Bluebox
 					{
-						if (_capturedBlueBox != null && cur != _capturedBlueBox)
+						if (blueTarget != null && cur != blueTarget)
 						{
-							mat.SetTexture("_MainTex", _capturedBlueBox);
+							mat.SetTexture("_MainTex", blueTarget);
 							swapped++;
+						}
+					}
+					// Detail-shader maps (CuberStrike) overlay a grainy _Detail texture
+					// that muddies the flat bluebox grid. Neutralize it (multiply by
+					// white) in bluebox mode; restore the captured detail for normal.
+					if (mat.HasProperty("_Detail"))
+					{
+						Texture curDetail = mat.GetTexture("_Detail");
+						if (_capturedDetail == null && curDetail != null && curDetail != Texture2D.whiteTexture)
+						{
+							_capturedDetail = curDetail;
+						}
+						if (Selected == Variant.BlueBox)
+						{
+							if (curDetail != Texture2D.whiteTexture)
+							{
+								mat.SetTexture("_Detail", Texture2D.whiteTexture);
+							}
+						}
+						else if (_capturedDetail != null && curDetail != _capturedDetail)
+						{
+							mat.SetTexture("_Detail", _capturedDetail);
 						}
 					}
 				}
@@ -208,15 +256,26 @@ public static class MapTextureVariant
 		}
 	}
 
-	private static bool IsWallMaterial(string matName)
+	private static bool IsWallMaterial(string sceneName, string matName)
 	{
 		if (string.IsNullOrEmpty(matName))
 		{
 			return false;
 		}
-		// Shared material is "BlueBox"; a runtime instance would be "BlueBox (Instance)".
-		// Must NOT match sibling materials like "BlueBox_Gray"/"BlueBox_Blue".
-		return matName == WallMaterialName || matName.StartsWith(WallMaterialName + " (");
+		string[] names;
+		if (string.IsNullOrEmpty(sceneName) || !WallMaterialsByScene.TryGetValue(sceneName, out names))
+		{
+			return false;
+		}
+		for (int i = 0; i < names.Length; i++)
+		{
+			// Match the shared material or a runtime "Name (Instance)" clone.
+			if (matName == names[i] || matName.StartsWith(names[i] + " ("))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Texture LoadNormal(string sceneName, string resPath)
@@ -233,6 +292,27 @@ public static class MapTextureVariant
 				" — leaving scene as bluebox.");
 		}
 		_normalCache[sceneName] = tex;
+		return tex;
+	}
+
+	private static Texture LoadBlueBox(string sceneName)
+	{
+		string resPath;
+		if (string.IsNullOrEmpty(sceneName) || !BlueBoxTextureByScene.TryGetValue(sceneName, out resPath))
+		{
+			return null;
+		}
+		Texture tex;
+		if (_blueBoxCache.TryGetValue(sceneName, out tex) && tex != null)
+		{
+			return tex;
+		}
+		tex = Resources.Load(resPath, typeof(Texture)) as Texture;
+		if (tex == null)
+		{
+			Debug.LogWarning("MapTextureVariant: bluebox texture not found at Resources/" + resPath + ".");
+		}
+		_blueBoxCache[sceneName] = tex;
 		return tex;
 	}
 }

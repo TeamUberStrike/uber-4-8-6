@@ -499,6 +499,14 @@ public class LevelCamera : MonoBehaviour
 			{
 				_angle.x = 290f;
 			}
+			// Snap the orbit camera to its final look-at on entry, instead of easing out
+			// from the FirstPerson eye position which sits INSIDE the local avatar mesh
+			// (the local body read as invisible for ~2-3s until the camera cleared the mesh
+			// shell). Mirrors the non-drag branch of Update() (see below) exactly.
+			Quaternion enterLookRot = Quaternion.Euler(_angle.x, _angle.y, 0f);
+			Vector3 enterPivot = camera.TargetTransform.position + offset;
+			camera.Transform.position = LookAtPosition(camera.TargetTransform, enterLookRot, _collideDistance);
+			camera.Transform.rotation = Quaternion.LookRotation(enterPivot - camera.Transform.position);
 		}
 
 		public override void Update()
@@ -801,6 +809,63 @@ public class LevelCamera : MonoBehaviour
 			Transform.position = position;
 			Transform.rotation = rotation;
 			_audioListener.enabled = true;
+		}
+	}
+
+	// Pre-warm the local avatar's renderer once per map, off-screen, during the
+	// spawn transition. The decorator is built once at login but kept inactive in
+	// first-person, so its first in-map draw would otherwise be deferred to the
+	// first ESC/pause frame — a one-time shader-variant compile that the low map
+	// framerate stretches to 1-3s of "invisible local player". Rendering it once
+	// here (to a throwaway RenderTexture, no on-screen flash) moves that cost onto
+	// the loading screen. Best-effort: any failure must never break spawn.
+	public static void PrewarmLocalAvatar()
+	{
+		try
+		{
+			if (GameState.Current == null || GameState.Current.Avatar == null)
+			{
+				return;
+			}
+			AvatarDecorator decorator = GameState.Current.Avatar.Decorator;
+			if (decorator == null)
+			{
+				return;
+			}
+			bool wasActive = decorator.gameObject.activeSelf;
+			decorator.gameObject.SetActive(true);
+			GameObject camObj = new GameObject("_AvatarPrewarmCam");
+			Camera cam = camObj.AddComponent<Camera>();
+			cam.enabled = false;
+			// Render the WHOLE scene (not just the avatar layer) from the pause orbit
+			// pose. Steam warms these variants "for free" via the pregame Overview
+			// orbit; our match flow joins straight into first-person and skips it, so
+			// the first ESC compiles the avatar's in-scene variants (fog/lights/shadows)
+			// AND the map geometry the orbit camera reveals from behind the player. This
+			// warms exactly that set, killing the residual heavy-map first-pause hitch.
+			cam.cullingMask = -1;
+			cam.clearFlags = CameraClearFlags.SolidColor;
+			cam.backgroundColor = new Color(0f, 0f, 0f, 0f);
+			cam.nearClipPlane = 0.05f;
+			cam.farClipPlane = 1500f;
+			cam.fieldOfView = 60f;
+			// Mirror the Paused/OrbitAround view: behind + slightly above the player,
+			// looking at them (same -0.5 y pivot offset SetCameraMode Paused uses).
+			Vector3 pivot = decorator.transform.position + new Vector3(0f, -0.5f, 0f);
+			camObj.transform.position = pivot - decorator.transform.forward * 2.5f + Vector3.up * 1.5f;
+			camObj.transform.LookAt(pivot);
+			RenderTexture rt = new RenderTexture(32, 32, 16);
+			cam.targetTexture = rt;
+			cam.Render();
+			cam.targetTexture = null;
+			UnityEngine.Object.Destroy(camObj);
+			rt.Release();
+			UnityEngine.Object.Destroy(rt);
+			decorator.gameObject.SetActive(wasActive);
+		}
+		catch (Exception)
+		{
+			// Pre-warm is best-effort; it must never prevent a map from spawning.
 		}
 	}
 
