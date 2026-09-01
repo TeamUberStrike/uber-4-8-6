@@ -18,11 +18,14 @@ public static class ParticleEmissionSystem
 			if (distance > 3f)
 			{
 				// Polish (requested): the instant-hit tracers (machine guns, shotguns, sniper) were hard to
-				// read on bright maps. Push the trail color toward bright white at full alpha so the streak
-				// reads as a crisp flash. Deliberate deviation from the dim 1:1 color (a design tweak, not parity).
-				Color trailColor = Color.Lerp(particleConfiguration.ParticleColor, Color.white, 0.6f);
+				// read on bright maps — too thin, too dim. Fatten the streak (x2.5) and push the color toward
+				// bright white at full alpha so it reads as a crisp flash. Size is the safe visibility lever
+				// (no effect on travel/stretch, so it can't reintroduce the far-smear the distance cap fixed).
+				// Deliberate deviation from the dim 1:1 look (a design tweak, not parity); both numbers tunable.
+				Color trailColor = Color.Lerp(particleConfiguration.ParticleColor, Color.white, 0.7f);
 				trailColor.a = 1f;
-				particleConfiguration.ParticleEmitter.Emit(muzzlePosition + direction * 3f, velocity, Random.Range(particleConfiguration.ParticleMinSize, particleConfiguration.ParticleMaxSize), energy, trailColor);
+				float trailSize = Random.Range(particleConfiguration.ParticleMinSize, particleConfiguration.ParticleMaxSize) * 2.5f;
+				particleConfiguration.ParticleEmitter.Emit(muzzlePosition + direction * 3f, velocity, trailSize, energy, trailColor);
 			}
 		}
 	}
