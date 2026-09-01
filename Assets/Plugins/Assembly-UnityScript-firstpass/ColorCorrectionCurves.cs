@@ -97,6 +97,14 @@ public class ColorCorrectionCurves : PostEffectsBase
 		rgbChannelTex.wrapMode = TextureWrapMode.Clamp;
 		rgbDepthChannelTex.wrapMode = TextureWrapMode.Clamp;
 		zCurveTex.wrapMode = TextureWrapMode.Clamp;
+		// AssetRipper rebuild: ColorCorrectionCurves(Simple/Selective).shader are //DummyShaderTextExporter
+		// stubs (lit Lambert surface shaders). As a fullscreen Blit the diffuse term collapses to BLACK ->
+		// Temple of the Raven (mode=Simple) and 6 other maps render black / wrong grade in Game view once
+		// image effects are enabled by the RenderTexture unlock. The stub is a valid shader so it does NOT
+		// auto-disable. Force off until the real CC shaders are ported (OnRenderImage then passes through).
+		// Re-enable by deleting these two lines once those shaders are real.
+		isSupported = false;
+		enabled = false;
 		if (!isSupported)
 		{
 			ReportAutoDisable();

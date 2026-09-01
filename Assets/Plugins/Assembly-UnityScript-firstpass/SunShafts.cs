@@ -53,6 +53,16 @@ public class SunShafts : PostEffectsBase
 		CheckSupport(useDepthTexture);
 		sunShaftsMaterial = CheckShaderAndCreateMaterial(sunShaftsShader, sunShaftsMaterial);
 		simpleClearMaterial = CheckShaderAndCreateMaterial(simpleClearShader, simpleClearMaterial);
+		// AssetRipper rebuild: SunShaftsComposite.shader is a //DummyShaderTextExporter stub, but
+		// OnRenderImage blits pass 4 -> "Invalid pass number for Graphics.Blit" every frame (~8200/run)
+		// once image effects are enabled by the RenderTexture unlock. Disable until the real shader is
+		// ported (OnRenderImage falls back to a passthrough Blit); enabled=false stops the per-frame
+		// calls/log. Re-enables automatically if the shader gains its passes.
+		if (isSupported && (sunShaftsMaterial == null || sunShaftsMaterial.passCount <= 4))
+		{
+			isSupported = false;
+			enabled = false;
+		}
 		if (!isSupported)
 		{
 			ReportAutoDisable();

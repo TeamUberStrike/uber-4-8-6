@@ -57,6 +57,14 @@ public class GlobalFog : PostEffectsBase
 	{
 		CheckSupport(true);
 		fogMaterial = CheckShaderAndCreateMaterial(fogShader, fogMaterial);
+		// AssetRipper rebuild: GlobalFog.shader is a //DummyShaderTextExporter stub (lit Lambert surface
+		// shader). Its CustomGraphicsBlit/SetPass over a fullscreen quad has no lights/normals, so the
+		// diffuse term collapses to BLACK -> Temple of the Raven (and any GlobalFog map) renders black in
+		// Game view once image effects are enabled by the RenderTexture unlock. The stub is a valid shader
+		// so it does NOT auto-disable. Force off until the real fog shader is ported (OnRenderImage then
+		// passes through). Re-enable by deleting these two lines once GlobalFog.shader is real.
+		isSupported = false;
+		enabled = false;
 		if (!isSupported)
 		{
 			ReportAutoDisable();
