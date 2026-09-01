@@ -317,6 +317,21 @@ public class LocalPlayer : MonoBehaviour
 		}
 	}
 
+	// Shipped in the Steam client but missing from this reconstruction: on shop entry the
+	// original zeroes the local player's residual VIEW PITCH (SetRotation(yaw) => Mouse.y=0)
+	// and levels the camera target. Without it, a leftover view pitch flows
+	// UserInput.Mouse.y -> VerticalRotation -> state.VerticalRotation -> AvatarAnimationController
+	// -> _IKAnchor.localEulerAngles.x, tilting the right-hand IK goal so the shop weapon aim
+	// pitches/twists (and the head re-aims). Restoring this matches the shipped shop pose.
+	public void ResetShopCharPos(Quaternion rot)
+	{
+		if ((bool)_cameraTarget)
+		{
+			_cameraTarget.localRotation = rot;
+		}
+		UserInput.SetRotation(rot.eulerAngles.y, 0f);
+	}
+
 	public void SetCurrentCharacterConfig(CharacterConfig character)
 	{
 		Character = character;

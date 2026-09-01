@@ -49,6 +49,9 @@ public class SceneLoader : Singleton<SceneLoader>
 		_color.a = 1f;
 		Application.LoadLevel(level);
 		yield return new WaitForEndOfFrame();
+		// Apply the chosen Bluebox/Normal map texture now that the scene's objects
+		// exist. Internally guarded — never throws, so map loading is never broken.
+		MapTextureVariant.Apply(level);
 		if (level == "Menu")
 		{
 			AutoMonoBehaviour<BackgroundMusicPlayer>.Instance.Play(GameAudio.HomeSceneBackground);

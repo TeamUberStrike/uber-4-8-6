@@ -86,7 +86,18 @@ public class RenderSettingsController : MonoBehaviour
 			advancedWater.SetActive(!ApplicationDataManager.IsMobile);
 		}
 		EnableImageEffects();
-		if (null == underWaterEffect)
+		// AssetRipper rebuild: the desktop underwater FX (UnderWaterEffect + Vignetting) bind CMune
+		// //DummyShaderTextExporter stub shaders ("CMune/Under Water Effect"/"CMune/Vignetting"/
+		// "CMune/ChromaticAberration"/"CMune/SeparableBlur"). Pre-unlock they self-disabled via
+		// !supportsImageEffects; the RenderTexture unlock makes them "supported", so on submersion (the
+		// IsUnderWater enable path below) they full-screen blit through Lambert stubs -> black/distorted
+		// underwater + broken vignette/chromatic-aberration. Skip CREATING them until the real CMune
+		// shaders are ported (every use of these fields null-checks, so leaving them null is safe).
+		// UnderWaterEffect.shader is now ported (real distortion) -> underwater re-enabled; Vignetting's
+		// CMune shaders are still stubs -> kept off. Flip cmuneVignetteShadersReady when they are ported.
+		bool cmuneUnderwaterShaderReady = true;
+		bool cmuneVignetteShadersReady = false;
+		if (cmuneUnderwaterShaderReady && null == underWaterEffect)
 		{
 			underWaterEffect = Camera.main.gameObject.AddComponent<UnderWaterEffect>();
 			if ((bool)underWaterEffect)
@@ -96,7 +107,7 @@ public class RenderSettingsController : MonoBehaviour
 				underWaterEffect.textureRamp = (Texture)Resources.Load("ImageEffects/Underwater_ColorRamp");
 			}
 		}
-		if (null == vignetteEffect && !ApplicationDataManager.IsMobile)
+		if (cmuneVignetteShadersReady && null == vignetteEffect && !ApplicationDataManager.IsMobile)
 		{
 			vignetteEffect = Camera.main.gameObject.AddComponent<Vignetting>();
 			if ((bool)vignetteEffect)

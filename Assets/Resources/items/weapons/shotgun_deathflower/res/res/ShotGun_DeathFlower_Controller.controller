@@ -34,10 +34,12 @@ StateMachine:
   m_PrefabInternal: {fileID: 0}
   m_Name: Base Layer
   m_DefaultState: {fileID: 110200000, guid: 762c16dca1443804d9464577298dcc59, type: 2}
-  m_States: []
+  m_States:
+  - {fileID: 110200000, guid: 42c675d2aa044054db9b88df96b9cde5, type: 2}
+  - {fileID: 110200000, guid: 762c16dca1443804d9464577298dcc59, type: 2}
   m_ChildStateMachine: []
   m_ChildStateMachinePosition: []
   m_OrderedTransitions: {}
-  m_MotionSetCount: 0
+  m_MotionSetCount: 1
   m_AnyStatePosition: {x: 0, y: -100, z: 0}
   m_ParentStateMachinePosition: {x: 0, y: -200, z: 0}

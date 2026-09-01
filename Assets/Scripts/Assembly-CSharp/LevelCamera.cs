@@ -331,8 +331,8 @@ public class LevelCamera : MonoBehaviour
 		{
 			if ((bool)levelCamera.MainCamera)
 			{
-				TargetFOV = 75f;
-				levelCamera.MainCamera.fieldOfView = 75f;
+				TargetFOV = ApplicationDataManager.ApplicationOptions.VideoFOV;
+				levelCamera.MainCamera.fieldOfView = ApplicationDataManager.ApplicationOptions.VideoFOV;
 			}
 		}
 	}
@@ -499,6 +499,11 @@ public class LevelCamera : MonoBehaviour
 			{
 				_angle.x = 290f;
 			}
+			// Steam-exact: the OrbitAroundState ctor does NOT touch the camera transform.
+			// The smooth first-person -> orbit pull-back is entirely Update()'s Lerp/Slerp at
+			// Time.deltaTime*5f below. (A snap here was added this session and reverted: it made
+			// Update's Lerp a no-op -> instant teleport, and concentrated the avatar-activation
+			// cost onto one frozen frame. Verified vs steam_src/LevelCamera.cs OrbitAroundState ctor.)
 		}
 
 		public override void Update()
@@ -602,6 +607,8 @@ public class LevelCamera : MonoBehaviour
 	public const int ZoomSpeed = 10;
 
 	private static LevelCamera _instance;
+
+	private static bool _pausedVariantsWarmed;
 
 	private AudioLowPassFilter _lowpassFilter;
 
@@ -787,6 +794,7 @@ public class LevelCamera : MonoBehaviour
 	{
 		if (camera != MainCamera && camera != null)
 		{
+			_pausedVariantsWarmed = false;
 			ReleaseCamera();
 			_cameraConfiguration.Parent = camera.transform.parent;
 			_cameraConfiguration.Fov = camera.fieldOfView;
@@ -796,10 +804,116 @@ public class LevelCamera : MonoBehaviour
 			MainCamera.transform.parent = base.transform;
 			MainCamera.transform.localPosition = Vector3.zero;
 			MainCamera.transform.localRotation = Quaternion.identity;
+			MainCamera.fieldOfView = ApplicationDataManager.ApplicationOptions.VideoFOV;
 			ZoomData.TargetFOV = MainCamera.fieldOfView;
 			Transform.position = position;
 			Transform.rotation = rotation;
 			_audioListener.enabled = true;
+		}
+	}
+
+	// Compile exactly the shader variants the first ESC/pause frame needs, by rendering
+	// ONE real MainCamera frame in the Paused (OrbitAround) configuration to an off-screen
+	// RenderTexture during the spawn transition. Steam gets this for free: PlayerOverviewState
+	// (CameraMode.OrbitAround) renders the local avatar in-scene through THIS SAME camera, with
+	// the SAME cullingMask (+LocalPlayer), active decorator and orbit pose, before the first ESC.
+	// Our match flow collapses PregameLoadout->Overview->MatchRunning->Playing within one frame,
+	// so an OrbitAround frame is never presented and those variants are compiled live on the first
+	// Paused frame -> a one-time compile stall the low heavy-map framerate stretches to 1-3s of
+	// "invisible local player". Using the REAL camera in the REAL Paused config (not a synthetic
+	// throwaway) makes the variant set identical to the first pause. Off-screen -> no flash.
+	// Guarded once per map. Best-effort: any failure must never break spawn.
+	public static void WarmPausedCameraVariants()
+	{
+		if (_pausedVariantsWarmed)
+		{
+			return;
+		}
+		if (!_instance || _instance.MainCamera == null)
+		{
+			return;
+		}
+		if (GameState.Current == null || !GameState.Current.IsLocalAvatarLoaded)
+		{
+			return;
+		}
+		_pausedVariantsWarmed = true;
+		try
+		{
+			// Configure the REAL camera exactly as the first ESC will (Paused == OrbitAround
+			// cullingMask +LocalPlayer + active decorator). NOTE: SetCameraMode zeroes the camera
+			// transform (:895-896) and the Steam-exact OrbitAroundState ctor does NOT snap to the
+			// final look-at (:502-506) -- so this warm renders at the un-pulled-back zero pose, and
+			// the avatar-framed second render below is what guarantees the avatar's own variants
+			// compile here (see that block). PlayerPrepareState sets FirstPerson on the next line,
+			// before any frame renders, so this leaves no lasting camera/gameplay state.
+			_instance.SetCameraMode(CameraMode.Paused, null);
+			Camera cam = _instance.MainCamera;
+			// TARGETED reflection warm (ApexTwin): force each water body PlanarReflection to render its
+			// mirror ONCE, off-screen, for THIS MainCamera -- regardless of whether a water tile is in the
+			// warm frustum. RenderHelpCameras() makes the reflection camera + its half-res RT (keyed by
+			// cam.name, so the first real pause reuses BOTH), renders the reflected scene in Forward path
+			// (compiling those variants) and binds _ReflectionTex. Costs ONE reflectCamera render per water
+			// body -- not the 8x of the removed orbit sweep. 4.6.5: no generic FindObjectsOfType<T>.
+			UnityEngine.Object[] reflections = UnityEngine.Object.FindObjectsOfType(typeof(PlanarReflection));
+			for (int ri = 0; ri < reflections.Length; ri++)
+			{
+				PlanarReflection pr = reflections[ri] as PlanarReflection;
+				if ((bool)pr && pr.enabled && pr.gameObject.activeInHierarchy)
+				{
+					pr.RenderHelpCameras(cam);
+				}
+			}
+			RenderTexture previous = cam.targetTexture;
+			RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
+			cam.targetTexture = rt;
+				// One base off-screen render compiles the non-water pause variants (reflection
+				// variants were warmed by the RenderHelpCameras loop above). The prior ApexTwin
+				// residual was the Water4 reflection compiling live on first pause; an 8-pose orbit sweep
+				// to pre-touch it made the stall WORSE (8x full+reflection renders at spawn) and was
+				// removed in favor of the targeted per-water RenderHelpCameras warm above.
+				cam.Render();
+				// SECOND warm render, explicitly FRAMING the local avatar. The base render above draws
+				// the scene at the Paused camera's UN-pulled-back zero pose: SetCameraMode zeroes the
+				// camera transform (:895-896) and the Steam-exact OrbitAroundState ctor no longer snaps
+				// to the final look-at (:502-506) -- the pull-back that frames the avatar is only
+				// Update()'s multi-frame Lerp/Slerp (:546-547), which this single render never runs. So
+				// on maps whose Map.DefaultSpawnPoint (= the avatar's world pos during pregame) is elevated
+				// far from that zero pose (ApexTwin/LostParadise2/CuberStrike/TempleOfTheRaven, spawn
+				// Y~16-49) the avatar falls OUTSIDE the base render's frustum and its SkinnedMeshRenderer
+				// variants compile live on the first ESC -> the 1-3s "invisible local player" the low
+				// heavy-map framerate stretches out. Aqualab/SPR spawn at ~ground so their avatar is
+				// already in-frame here, which is why only those four regressed. Fix: aim the REAL
+				// MainCamera at the avatar's own bounds and render once more so those variants compile
+				// HERE regardless of spawn elevation. Same cam => variant set identical to the first pause
+				// (reflections already warmed above); off-screen into the same RT => no flash; transform
+				// restored and then overwritten by SetMode(FirstPerson) on the next line => no lasting
+				// camera state. Weapons are hidden in pregame (SpawnLocalAvatar.HideWeapons) so the combined
+				// body SkinnedMeshRenderer is the only avatar renderer to frame. One extra render, once per
+				// map (guarded by _pausedVariantsWarmed) -- not the 8x orbit sweep that made ApexTwin worse.
+				if (GameState.Current.Avatar != null && (bool)GameState.Current.Avatar.Decorator)
+				{
+					SkinnedMeshRenderer avatarSmr = GameState.Current.Avatar.Decorator.GetComponentInChildren<SkinnedMeshRenderer>();
+					if (avatarSmr != null)
+					{
+						avatarSmr.updateWhenOffscreen = true;
+						Bounds b = avatarSmr.bounds;
+						float r = Mathf.Max(b.extents.magnitude, 0.5f);
+						Vector3 savedPos = cam.transform.position;
+						Quaternion savedRot = cam.transform.rotation;
+						cam.transform.position = b.center + Vector3.back * (r * 2.5f);
+						cam.transform.LookAt(b.center);
+						cam.Render();
+						cam.transform.position = savedPos;
+						cam.transform.rotation = savedRot;
+					}
+				}
+				cam.targetTexture = previous;
+			RenderTexture.ReleaseTemporary(rt);
+		}
+		catch (Exception)
+		{
+			// Warm-up is best-effort; it must never prevent a map from spawning.
 		}
 	}
 
@@ -810,7 +924,7 @@ public class LevelCamera : MonoBehaviour
 		_currentState.Finish();
 		if (IsZoomedIn)
 		{
-			DoZoomOut(75f, 10f);
+			DoZoomOut(ApplicationDataManager.ApplicationOptions.VideoFOV, 10f);
 		}
 		if (!(MainCamera != null))
 		{

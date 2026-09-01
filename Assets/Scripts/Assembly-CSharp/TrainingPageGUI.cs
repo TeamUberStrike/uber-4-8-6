@@ -54,12 +54,28 @@ public class TrainingPageGUI : MonoBehaviour
 			Rect rect = new Rect(13f + (float)num5 * v.Width(), (float)num4 * v.y + 4f, v.x, v.y);
 			if (GUI.Button(rect, string.Empty, BlueStonez.gray_background) && !GUITools.IsScrolling && !Singleton<SceneLoader>.Instance.IsLoading && allMap != null)
 			{
-				Singleton<MapManager>.Instance.LoadMap(allMap, delegate
+				// Copy to a per-iteration local so the deferred popup callback loads
+				// the map the player actually clicked.
+				UberstrikeMap mapToLoad = allMap;
+				System.Action loadIt = delegate
 				{
-					Singleton<GameStateController>.Instance.SetGameMode(new TrainingRoom());
-					GameState.Current.Actions.JoinTeam(TeamID.NONE);
-					ApplyTrainingFlags();
-				});
+					Singleton<MapManager>.Instance.LoadMap(mapToLoad, delegate
+					{
+						Singleton<GameStateController>.Instance.SetGameMode(new TrainingRoom());
+						GameState.Current.Actions.JoinTeam(TeamID.NONE);
+						ApplyTrainingFlags();
+					});
+				};
+				// Maps that shipped with two texture bundles (Bluebox / Normal) get a
+				// "Texture Settings" popup first; everything else loads immediately.
+				if (MapTextureVariant.HasVariants(mapToLoad.SceneName))
+				{
+					MapTextureVariant.PromptAndRun(loadIt);
+				}
+				else
+				{
+					loadIt();
+				}
 			}
 			GUI.BeginGroup(rect);
 			allMap.Icon.Draw(rect.CenterHorizontally(2f, 100f, 64f));

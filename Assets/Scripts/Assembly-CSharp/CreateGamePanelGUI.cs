@@ -260,6 +260,13 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 				{
 					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CreateGame, 0uL, 1f, 1f);
 					SelectMap(allMap2);
+					// Maps with two texture bundles (Bluebox / Normal) prompt for the
+					// desired texture on select; the choice is applied when the created
+					// game's scene loads (see SceneLoader -> MapTextureVariant.Apply).
+					if (MapTextureVariant.HasVariants(allMap2.SceneName))
+					{
+						MapTextureVariant.PromptAndRun(null);
+					}
 				}
 				num2++;
 			}
