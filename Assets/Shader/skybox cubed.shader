@@ -10,6 +10,7 @@ SubShader {
     Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
     Cull Off
     ZWrite Off
+    Fog { Mode Off }
 
     Pass {
         CGPROGRAM
@@ -41,7 +42,9 @@ SubShader {
 
         fixed4 frag(v2f i) : SV_Target {
             half4 tex = texCUBE(_Tex, i.texcoord);
-            half3 col = tex.rgb * _Tint.rgb * 2.0;
+            // Oracle additive tint (d3d9 asm: add r0,r0,c1 / add r0,r0,-c0), not the multiply-by-2
+            // the stub used (which shifted Temple's sky bluish). unity_ColorSpaceGrey = 0.5 in gamma.
+            half3 col = tex.rgb + _Tint.rgb - unity_ColorSpaceGrey.rgb;
             return half4(col, 1.0);
         }
         ENDCG

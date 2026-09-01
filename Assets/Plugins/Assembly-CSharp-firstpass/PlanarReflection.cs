@@ -67,8 +67,31 @@ public class PlanarReflection : MonoBehaviour
 
 	public void RenderHelpCameras(Camera currentCam)
 	{
-		// No-op on Unity 4.6 Free (no RenderTexture). See WaterTileBeingRendered.
-		return;
+		// RESTORED (1:1 shipped Water4): render the planar reflection into the reflection camera's
+		// RenderTexture and bind it to _ReflectionTex. Guarded to once per source camera per frame
+		// (LateUpdate clears helperCameras). RenderReflectionFor excludes the Water layer -> no recursion.
+		if (helperCameras == null)
+		{
+			helperCameras = new Dictionary<Camera, bool>();
+		}
+		if (!helperCameras.ContainsKey(currentCam))
+		{
+			helperCameras.Add(currentCam, false);
+		}
+		if (helperCameras[currentCam])
+		{
+			return;
+		}
+		if (reflectionCamera == null)
+		{
+			reflectionCamera = CreateReflectionCameraFor(currentCam);
+		}
+		RenderReflectionFor(currentCam, reflectionCamera);
+		helperCameras[currentCam] = true;
+		if ((bool)sharedMaterial && (bool)reflectionCamera && (bool)reflectionCamera.targetTexture)
+		{
+			sharedMaterial.SetTexture(reflectionSampler, reflectionCamera.targetTexture);
+		}
 	}
 
 	public void LateUpdate()
@@ -81,13 +104,13 @@ public class PlanarReflection : MonoBehaviour
 
 	public void WaterTileBeingRendered(Transform tr, Camera currentCam)
 	{
-		// Unity 4.6 Free cannot create RenderTextures (Pro-only), so the
-		// PlanarReflection helper-camera render would spam "Shader wants
-		// normals" warnings every frame for every renderer in view (one
-		// warning per renderer per frame on the Main Thread = ~700ms/frame
-		// stalls when water is visible). FX/Water uses cubemap reflection
-		// instead, so this whole pass is unnecessary. No-op.
-		return;
+		// RESTORED (1:1 shipped Water4): trigger the reflection render for the camera about to draw
+		// this water tile. The RenderTexture unlock makes this viable; meshes carry normals so the
+		// re-render does not spam "Shader wants normals". Reflection can be toggled via m_Enabled.
+		if ((bool)currentCam && base.enabled)
+		{
+			RenderHelpCameras(currentCam);
+		}
 	}
 
 	public void OnEnable()

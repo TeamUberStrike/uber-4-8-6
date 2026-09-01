@@ -40,15 +40,33 @@ public class Water : MonoBehaviour
 
 	private static bool s_InsideWater;
 
+	private void Awake()
+	{
+		// Unity 4.6 Free has no RenderTexture, so the reflection/refraction
+		// helper cameras in OnWillRenderObject are disabled (the bare return
+		// below). Engage the shipped WATER_SIMPLE fallback tier ONCE here so
+		// that a real multi_compile FX/Water shader would resolve to its
+		// RenderTexture-free variant instead of sampling the unassigned
+		// _ReflectionTex/_RefractionTex. This mirrors FindHardwareWaterSupport()
+		// and never touches the disabled reflection camera. On RenderTexture-
+		// capable hardware the guard is false and the shipped default stands.
+		if (!SystemInfo.supportsRenderTextures)
+		{
+			Shader.EnableKeyword("WATER_SIMPLE");
+			Shader.DisableKeyword("WATER_REFLECTIVE");
+			Shader.DisableKeyword("WATER_REFRACTIVE");
+		}
+	}
+
 	public void OnWillRenderObject()
 	{
-		// Unity 4.6 Free: RenderTexture is Pro-only, so the reflection/
-		// refraction helper-camera renders below spam "Shader wants normals"
-		// warnings ~500/frame, stalling Main Thread to 700ms/frame whenever
-		// water is visible. FX/Water uses cubemap reflection instead — no
-		// real-time planar mirror needed. See PlanarReflection.cs for the
-		// sibling no-op of the same pattern.
-		return;
+		// Lobby reflection RE-ENABLED 2026-08-25. The "wants normals" 700ms stall the old
+		// `return;` guarded against was a GAMEPLAY-MAP problem (normal-less meshes like
+		// Health5pts), NOT the lobby: Menu.unity is normals-clean (all 96 meshes carry
+		// normals), so the reflection/refraction helper cameras are safe here. RenderTextures
+		// work in our RT-unlocked editor + standalone (same path as Apex Twin's PlanarReflection).
+		// Paired with the stock FX/Water shader restore (guid 915a5308) which samples
+		// _ReflectionTex/_RefractionTex/_HorizonColor instead of the old green-tinted stub.
 		if (!base.enabled || !base.renderer || !base.renderer.sharedMaterial || !base.renderer.enabled)
 		{
 			return;

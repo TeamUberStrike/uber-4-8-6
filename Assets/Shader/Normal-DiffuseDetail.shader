@@ -33,5 +33,5 @@ SubShader {
     }
     ENDCG
 }
-Fallback "Legacy Shaders/Diffuse Detail"
+Fallback "Diffuse Detail"
 }

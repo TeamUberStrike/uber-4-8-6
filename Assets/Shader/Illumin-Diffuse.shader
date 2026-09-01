@@ -36,5 +36,5 @@ SubShader {
     }
     ENDCG
 }
-Fallback "Legacy Shaders/Self-Illumin/Diffuse"
+Fallback "Self-Illumin/Diffuse"
 }
