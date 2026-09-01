@@ -841,8 +841,11 @@ public class LevelCamera : MonoBehaviour
 		try
 		{
 			// Configure the REAL camera exactly as the first ESC will (Paused == OrbitAround
-			// pose + cullingMask +LocalPlayer + active decorator; the OrbitAroundState ctor snaps
-			// straight to the final look-at). PlayerPrepareState sets FirstPerson on the next line,
+			// cullingMask +LocalPlayer + active decorator). NOTE: SetCameraMode zeroes the camera
+			// transform (:895-896) and the Steam-exact OrbitAroundState ctor does NOT snap to the
+			// final look-at (:502-506) -- so this warm renders at the un-pulled-back zero pose, and
+			// the avatar-framed second render below is what guarantees the avatar's own variants
+			// compile here (see that block). PlayerPrepareState sets FirstPerson on the next line,
 			// before any frame renders, so this leaves no lasting camera/gameplay state.
 			_instance.SetCameraMode(CameraMode.Paused, null);
 			Camera cam = _instance.MainCamera;
@@ -870,6 +873,41 @@ public class LevelCamera : MonoBehaviour
 				// to pre-touch it made the stall WORSE (8x full+reflection renders at spawn) and was
 				// removed in favor of the targeted per-water RenderHelpCameras warm above.
 				cam.Render();
+				// SECOND warm render, explicitly FRAMING the local avatar. The base render above draws
+				// the scene at the Paused camera's UN-pulled-back zero pose: SetCameraMode zeroes the
+				// camera transform (:895-896) and the Steam-exact OrbitAroundState ctor no longer snaps
+				// to the final look-at (:502-506) -- the pull-back that frames the avatar is only
+				// Update()'s multi-frame Lerp/Slerp (:546-547), which this single render never runs. So
+				// on maps whose Map.DefaultSpawnPoint (= the avatar's world pos during pregame) is elevated
+				// far from that zero pose (ApexTwin/LostParadise2/CuberStrike/TempleOfTheRaven, spawn
+				// Y~16-49) the avatar falls OUTSIDE the base render's frustum and its SkinnedMeshRenderer
+				// variants compile live on the first ESC -> the 1-3s "invisible local player" the low
+				// heavy-map framerate stretches out. Aqualab/SPR spawn at ~ground so their avatar is
+				// already in-frame here, which is why only those four regressed. Fix: aim the REAL
+				// MainCamera at the avatar's own bounds and render once more so those variants compile
+				// HERE regardless of spawn elevation. Same cam => variant set identical to the first pause
+				// (reflections already warmed above); off-screen into the same RT => no flash; transform
+				// restored and then overwritten by SetMode(FirstPerson) on the next line => no lasting
+				// camera state. Weapons are hidden in pregame (SpawnLocalAvatar.HideWeapons) so the combined
+				// body SkinnedMeshRenderer is the only avatar renderer to frame. One extra render, once per
+				// map (guarded by _pausedVariantsWarmed) -- not the 8x orbit sweep that made ApexTwin worse.
+				if (GameState.Current.Avatar != null && (bool)GameState.Current.Avatar.Decorator)
+				{
+					SkinnedMeshRenderer avatarSmr = GameState.Current.Avatar.Decorator.GetComponentInChildren<SkinnedMeshRenderer>();
+					if (avatarSmr != null)
+					{
+						avatarSmr.updateWhenOffscreen = true;
+						Bounds b = avatarSmr.bounds;
+						float r = Mathf.Max(b.extents.magnitude, 0.5f);
+						Vector3 savedPos = cam.transform.position;
+						Quaternion savedRot = cam.transform.rotation;
+						cam.transform.position = b.center + Vector3.back * (r * 2.5f);
+						cam.transform.LookAt(b.center);
+						cam.Render();
+						cam.transform.position = savedPos;
+						cam.transform.rotation = savedRot;
+					}
+				}
 				cam.targetTexture = previous;
 			RenderTexture.ReleaseTemporary(rt);
 		}
