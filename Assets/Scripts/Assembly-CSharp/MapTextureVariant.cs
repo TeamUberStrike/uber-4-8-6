@@ -17,8 +17,7 @@ using UnityEngine;
 //    * SpacePortAlpha - baked default BLUEBOX; NORMAL = extracted grey-metal.
 //    * CuberStrike    - baked default NORMAL; needs an explicit BLUEBOX texture
 //                       (capture-from-scene would otherwise capture the normal).
-//    * UberZone       - retail whitebox-only (no authentic normal); reuses the
-//                       shared grey-metal as its "Normal" so it still gets a tab.
+//    (UberZone has no tab: a single retail bundle, one authentic look baked into its materials.)
 //
 //  Everything here is best-effort and fully guarded: a failure to prompt or to
 //  swap must NEVER prevent a map from loading.
@@ -48,11 +47,10 @@ public static class MapTextureVariant
 			{ "SpacePortAlpha", "MapVariants/SpacePortAlpha_WallNormal" },
 			// CuberStrike's grey-metal normal is byte-identical pixels to
 			// SpacePortAlpha's, so it reuses the same Resources copy.
-			{ "CuberStrike", "MapVariants/SpacePortAlpha_WallNormal" },
-			// UberZone shipped whitebox-only; its authentic "Normal" IS the white
-			// "1 Uber Metre" BlueBox_D tile (extracted from the retail bundle), with
-			// the blue grid as its "Bluebox".
-			{ "UberZone", "MapVariants/UberZone_WallNormal" }
+			{ "CuberStrike", "MapVariants/SpacePortAlpha_WallNormal" }
+			// UberZone (single retail bundle, no UberZoneB) has one authentic look: the
+			// gray BlueBox_D tile on a lit Diffuse, tiled 25x25, per-room tinted, baked into
+			// its scene materials -- no Normal/Bluebox variant, so it gets no tab.
 		};
 
 	// SceneName -> explicit BLUEBOX main-wall texture, needed only for maps whose
@@ -69,7 +67,6 @@ public static class MapTextureVariant
 		new Dictionary<string, string[]>
 		{
 			{ "SpacePortAlpha", new string[] { "BlueBox" } },
-			{ "UberZone", new string[] { "BlueBox_Gray", "BlueBox_Blue", "BlueBox_Red" } },
 			{ "CuberStrike", new string[] { "CuberStrike", "CuberStrike2_0" } }
 		};
 
@@ -89,6 +86,26 @@ public static class MapTextureVariant
 	// overlay muddies the flat bluebox grid; captured here so we can neutralize it
 	// in bluebox mode (multiply by white) and restore it for normal.
 	private static Texture _capturedDetail;
+
+	// A 1x1 mid-grey (0.5) neutral for the detail slot. Normal-DiffuseDetail combines
+	// _Detail at 2x (albedo = base * detail * 2), so its NEUTRAL value is 0.5 (0.5*2 = 1.0).
+	// White (1.0*2 = 2.0) doubled the albedo and washed CuberStrike's bluebox to full-bright.
+	// Unity 4.6.5 has no Texture2D.grayTexture, so build one lazily.
+	private static Texture2D _neutralDetail;
+	private static Texture2D NeutralDetail
+	{
+		get
+		{
+			if (_neutralDetail == null)
+			{
+				_neutralDetail = new Texture2D(1, 1, TextureFormat.RGB24, false);
+				_neutralDetail.SetPixel(0, 0, new Color(0.5f, 0.5f, 0.5f, 1f));
+				_neutralDetail.Apply();
+				_neutralDetail.hideFlags = HideFlags.HideAndDontSave;
+			}
+			return _neutralDetail;
+		}
+	}
 
 	/// <summary>True if the given scene has a selectable Bluebox/Normal texture.</summary>
 	public static bool HasVariants(string sceneName)
@@ -229,15 +246,15 @@ public static class MapTextureVariant
 					if (mat.HasProperty("_Detail"))
 					{
 						Texture curDetail = mat.GetTexture("_Detail");
-						if (_capturedDetail == null && curDetail != null && curDetail != Texture2D.whiteTexture)
+						if (_capturedDetail == null && curDetail != null && curDetail != NeutralDetail)
 						{
 							_capturedDetail = curDetail;
 						}
 						if (Selected == Variant.BlueBox)
 						{
-							if (curDetail != Texture2D.whiteTexture)
+							if (curDetail != NeutralDetail)
 							{
-								mat.SetTexture("_Detail", Texture2D.whiteTexture);
+								mat.SetTexture("_Detail", NeutralDetail);
 							}
 						}
 						else if (_capturedDetail != null && curDetail != _capturedDetail)

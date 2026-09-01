@@ -454,7 +454,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			{ "TheHangar",          "The Hangar" },
 			{ "TheWarehouse",       "The Warehouse" },
 			{ "UberZone",           "UberZone" },
-			{ "Volley",             "Volley" },
+			{ "Volley",             "DangerZone" },
 		};
 		List<MapView> list = new List<MapView>(mapData.GetLength(0));
 		for (int i = 0; i < mapData.GetLength(0); i++)

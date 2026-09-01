@@ -13,10 +13,10 @@ internal class PlayerPrepareState : IState
 		Singleton<QuickItemController>.Instance.IsEnabled = false;
 		GameState.Current.Player.EnableWeaponControl = false;
 		Screen.lockCursor = true;
-		// Pre-warm the local avatar off-screen now (masked by the spawn transition)
-		// so its first in-map draw — and the one-time shader-variant compile — does
-		// not land on the first ESC/pause frame as a 1-3s "invisible player".
-		LevelCamera.PrewarmLocalAvatar();
+		// Warm the exact shader variants the first ESC/pause will compile by rendering ONE real
+		// MainCamera frame in the Paused (OrbitAround) config, off-screen (no flash), once per map.
+		// Reproduces Steam's free pregame-Overview warm-up, which our collapsed spawn flow skips.
+		LevelCamera.WarmPausedCameraVariants();
 		LevelCamera.SetMode(LevelCamera.CameraMode.FirstPerson);
 		EventHandler.Global.Fire(new GameEvents.PlayerIngame());
 		AutoMonoBehaviour<UnityRuntime>.Instance.OnFixedUpdate += GameState.Current.Player.MoveController.UpdatePlayerMovement;

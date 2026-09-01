@@ -499,14 +499,11 @@ public class LevelCamera : MonoBehaviour
 			{
 				_angle.x = 290f;
 			}
-			// Snap the orbit camera to its final look-at on entry, instead of easing out
-			// from the FirstPerson eye position which sits INSIDE the local avatar mesh
-			// (the local body read as invisible for ~2-3s until the camera cleared the mesh
-			// shell). Mirrors the non-drag branch of Update() (see below) exactly.
-			Quaternion enterLookRot = Quaternion.Euler(_angle.x, _angle.y, 0f);
-			Vector3 enterPivot = camera.TargetTransform.position + offset;
-			camera.Transform.position = LookAtPosition(camera.TargetTransform, enterLookRot, _collideDistance);
-			camera.Transform.rotation = Quaternion.LookRotation(enterPivot - camera.Transform.position);
+			// Steam-exact: the OrbitAroundState ctor does NOT touch the camera transform.
+			// The smooth first-person -> orbit pull-back is entirely Update()'s Lerp/Slerp at
+			// Time.deltaTime*5f below. (A snap here was added this session and reverted: it made
+			// Update's Lerp a no-op -> instant teleport, and concentrated the avatar-activation
+			// cost onto one frozen frame. Verified vs steam_src/LevelCamera.cs OrbitAroundState ctor.)
 		}
 
 		public override void Update()
@@ -610,6 +607,8 @@ public class LevelCamera : MonoBehaviour
 	public const int ZoomSpeed = 10;
 
 	private static LevelCamera _instance;
+
+	private static bool _pausedVariantsWarmed;
 
 	private AudioLowPassFilter _lowpassFilter;
 
@@ -795,6 +794,7 @@ public class LevelCamera : MonoBehaviour
 	{
 		if (camera != MainCamera && camera != null)
 		{
+			_pausedVariantsWarmed = false;
 			ReleaseCamera();
 			_cameraConfiguration.Parent = camera.transform.parent;
 			_cameraConfiguration.Fov = camera.fieldOfView;
@@ -812,60 +812,70 @@ public class LevelCamera : MonoBehaviour
 		}
 	}
 
-	// Pre-warm the local avatar's renderer once per map, off-screen, during the
-	// spawn transition. The decorator is built once at login but kept inactive in
-	// first-person, so its first in-map draw would otherwise be deferred to the
-	// first ESC/pause frame — a one-time shader-variant compile that the low map
-	// framerate stretches to 1-3s of "invisible local player". Rendering it once
-	// here (to a throwaway RenderTexture, no on-screen flash) moves that cost onto
-	// the loading screen. Best-effort: any failure must never break spawn.
-	public static void PrewarmLocalAvatar()
+	// Compile exactly the shader variants the first ESC/pause frame needs, by rendering
+	// ONE real MainCamera frame in the Paused (OrbitAround) configuration to an off-screen
+	// RenderTexture during the spawn transition. Steam gets this for free: PlayerOverviewState
+	// (CameraMode.OrbitAround) renders the local avatar in-scene through THIS SAME camera, with
+	// the SAME cullingMask (+LocalPlayer), active decorator and orbit pose, before the first ESC.
+	// Our match flow collapses PregameLoadout->Overview->MatchRunning->Playing within one frame,
+	// so an OrbitAround frame is never presented and those variants are compiled live on the first
+	// Paused frame -> a one-time compile stall the low heavy-map framerate stretches to 1-3s of
+	// "invisible local player". Using the REAL camera in the REAL Paused config (not a synthetic
+	// throwaway) makes the variant set identical to the first pause. Off-screen -> no flash.
+	// Guarded once per map. Best-effort: any failure must never break spawn.
+	public static void WarmPausedCameraVariants()
 	{
+		if (_pausedVariantsWarmed)
+		{
+			return;
+		}
+		if (!_instance || _instance.MainCamera == null)
+		{
+			return;
+		}
+		if (GameState.Current == null || !GameState.Current.IsLocalAvatarLoaded)
+		{
+			return;
+		}
+		_pausedVariantsWarmed = true;
 		try
 		{
-			if (GameState.Current == null || GameState.Current.Avatar == null)
+			// Configure the REAL camera exactly as the first ESC will (Paused == OrbitAround
+			// pose + cullingMask +LocalPlayer + active decorator; the OrbitAroundState ctor snaps
+			// straight to the final look-at). PlayerPrepareState sets FirstPerson on the next line,
+			// before any frame renders, so this leaves no lasting camera/gameplay state.
+			_instance.SetCameraMode(CameraMode.Paused, null);
+			Camera cam = _instance.MainCamera;
+			// TARGETED reflection warm (ApexTwin): force each water body PlanarReflection to render its
+			// mirror ONCE, off-screen, for THIS MainCamera -- regardless of whether a water tile is in the
+			// warm frustum. RenderHelpCameras() makes the reflection camera + its half-res RT (keyed by
+			// cam.name, so the first real pause reuses BOTH), renders the reflected scene in Forward path
+			// (compiling those variants) and binds _ReflectionTex. Costs ONE reflectCamera render per water
+			// body -- not the 8x of the removed orbit sweep. 4.6.5: no generic FindObjectsOfType<T>.
+			UnityEngine.Object[] reflections = UnityEngine.Object.FindObjectsOfType(typeof(PlanarReflection));
+			for (int ri = 0; ri < reflections.Length; ri++)
 			{
-				return;
+				PlanarReflection pr = reflections[ri] as PlanarReflection;
+				if ((bool)pr && pr.enabled && pr.gameObject.activeInHierarchy)
+				{
+					pr.RenderHelpCameras(cam);
+				}
 			}
-			AvatarDecorator decorator = GameState.Current.Avatar.Decorator;
-			if (decorator == null)
-			{
-				return;
-			}
-			bool wasActive = decorator.gameObject.activeSelf;
-			decorator.gameObject.SetActive(true);
-			GameObject camObj = new GameObject("_AvatarPrewarmCam");
-			Camera cam = camObj.AddComponent<Camera>();
-			cam.enabled = false;
-			// Render the WHOLE scene (not just the avatar layer) from the pause orbit
-			// pose. Steam warms these variants "for free" via the pregame Overview
-			// orbit; our match flow joins straight into first-person and skips it, so
-			// the first ESC compiles the avatar's in-scene variants (fog/lights/shadows)
-			// AND the map geometry the orbit camera reveals from behind the player. This
-			// warms exactly that set, killing the residual heavy-map first-pause hitch.
-			cam.cullingMask = -1;
-			cam.clearFlags = CameraClearFlags.SolidColor;
-			cam.backgroundColor = new Color(0f, 0f, 0f, 0f);
-			cam.nearClipPlane = 0.05f;
-			cam.farClipPlane = 1500f;
-			cam.fieldOfView = 60f;
-			// Mirror the Paused/OrbitAround view: behind + slightly above the player,
-			// looking at them (same -0.5 y pivot offset SetCameraMode Paused uses).
-			Vector3 pivot = decorator.transform.position + new Vector3(0f, -0.5f, 0f);
-			camObj.transform.position = pivot - decorator.transform.forward * 2.5f + Vector3.up * 1.5f;
-			camObj.transform.LookAt(pivot);
-			RenderTexture rt = new RenderTexture(32, 32, 16);
+			RenderTexture previous = cam.targetTexture;
+			RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
 			cam.targetTexture = rt;
-			cam.Render();
-			cam.targetTexture = null;
-			UnityEngine.Object.Destroy(camObj);
-			rt.Release();
-			UnityEngine.Object.Destroy(rt);
-			decorator.gameObject.SetActive(wasActive);
+				// One base off-screen render compiles the non-water pause variants (reflection
+				// variants were warmed by the RenderHelpCameras loop above). The prior ApexTwin
+				// residual was the Water4 reflection compiling live on first pause; an 8-pose orbit sweep
+				// to pre-touch it made the stall WORSE (8x full+reflection renders at spawn) and was
+				// removed in favor of the targeted per-water RenderHelpCameras warm above.
+				cam.Render();
+				cam.targetTexture = previous;
+			RenderTexture.ReleaseTemporary(rt);
 		}
 		catch (Exception)
 		{
-			// Pre-warm is best-effort; it must never prevent a map from spawning.
+			// Warm-up is best-effort; it must never prevent a map from spawning.
 		}
 	}
 

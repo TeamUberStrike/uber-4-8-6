@@ -8,7 +8,13 @@ public static class ParticleEmissionSystem
 		{
 			float num = 200f;
 			Vector3 velocity = direction * num;
-			float energy = distance / num * 0.9f;
+			// Cap the tracer's lifetime by a fixed travel distance so a far/dead-center shot draws
+			// the SAME short streak as a close one, instead of the legacy Stretch billboard sweeping
+			// all the way to the vanishing point (where velocity is parallel to view, the screen-space
+			// velocity collapses, and the quad degenerates into the vertical smear). Mirrors 4.3.8's
+			// tracer, whose length is fixed and has zero dependence on hit distance. Near shots
+			// (distance <= 10) are unchanged.
+			float energy = Mathf.Min(distance, 10f) / num * 0.9f;
 			if (distance > 3f)
 			{
 				particleConfiguration.ParticleEmitter.Emit(muzzlePosition + direction * 3f, velocity, Random.Range(particleConfiguration.ParticleMinSize, particleConfiguration.ParticleMaxSize), energy, particleConfiguration.ParticleColor);

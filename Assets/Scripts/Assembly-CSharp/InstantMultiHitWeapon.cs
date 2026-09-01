@@ -61,7 +61,13 @@ public class InstantMultiHitWeapon : BaseWeaponLogic
 			}
 			else
 			{
-				array[i].point = ray.origin + ray.direction * 1000f;
+				// Miss: trace this pellet down its OWN dispersed direction, not the undispersed
+				// view axis. Using ray.direction here collapsed every missed pellet's tracer onto
+				// the crosshair; N stacked view-parallel Stretch billboards degenerate into the
+				// vertical far-smear (the shotgun-only smear the lifetime cap couldn't fix). The
+				// raycast above already used `direction`, so this also makes the miss endpoint
+				// consistent with the ray actually fired.
+				array[i].point = ray.origin + direction * 1000f;
 				array[i].normal = hitInfo.normal;
 			}
 		}
