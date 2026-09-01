@@ -124,22 +124,27 @@ public static class MapTextureVariant
 	{
 		try
 		{
+			// Button colours: the popup's OK button takes the coloured (button_green/blue) style
+			// via ActionType.Positive; the Cancel button is always grey. Put BLUEBOX on the OK
+			// button so it reads blue and NORMAL on Cancel so it reads grey (per the requested
+			// swap of "Normal=blue / Bluebox=grey"). This also makes the default choice (Bluebox)
+			// the highlighted/positive button, which is the sensible default.
 			PopupSystem.ShowMessage(
 				PopupTitle,
 				PopupBody,
 				PopupSystem.AlertType.OKCancel,
 				delegate
 				{
-					Selected = Variant.Normal;
-					RunSafe(afterChoice);
-				},
-				NormalCaption,
-				delegate
-				{
 					Selected = Variant.BlueBox;
 					RunSafe(afterChoice);
 				},
 				BlueBoxCaption,
+				delegate
+				{
+					Selected = Variant.Normal;
+					RunSafe(afterChoice);
+				},
+				NormalCaption,
 				PopupSystem.ActionType.Positive);
 		}
 		catch (Exception e)
