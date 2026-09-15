@@ -41,7 +41,7 @@
 //   9027 Sniper [Frosted]  (base 1004 PaintSniper)
 //   9028 Shotgun [Frosted] (base 1003 PaintShotty)
 //   9029 Cannon [Frosted]  (base 1005 Cannon)
-//   9030 MG [Lava]         (base 1002 MachineGun)   -- the [Lava] set: same water shader and the
+//   9030 MG [Lava]         (base 1002 MachineGun)   -- the [Lava] set: a -30%-flow lava shader variant and the
 //   9031 Sniper [Lava]     (base 1004 PaintSniper)     same four water textures as [Watery],
 //   9032 Shotgun [Lava]    (base 1003 PaintShotty)     three colours apart. NO painted art and
 //   9033 Cannon [Lava]     (base 1005 Cannon)          NO flames -- see LavaBindings.
@@ -261,6 +261,7 @@ public static class WeaponSkinHelper
 		// 9037. NOT a Glass-Hangar skin -- it keeps AWP_Roughed's own Bumped Specular, so unlike
 		// 9020/9021/9035/9036 on the same weapon, alpha here means GLOSS and not transparency.
 		{ 9037, "9037_FrostSerpent.png" },
+		{ 9079, "9079_AWPUberverse.png" },
 		// 2026-08-13. The glacier set: the first skins in this file that are GENERATED rather
 		// than painted. tools/make_glacier_skin.py transforms each base pixel-wise -- luminance
 		// through an ice ramp, procedural fractures and frost scaled by a glass weight, edge
@@ -455,6 +456,7 @@ public static class WeaponSkinHelper
 	// 0.07 off the shader's own time input, so the water flows with NO MonoBehaviour driving it
 	// -- unlike the flame overlay, which needs WeaponFlameAnimator.
 	public const string WaterShader = "CMune/Water/Opaque_Flowing";
+	public const string LavaShader  = "CMune/Lava/Opaque_Flowing";  // -30% flow variant, lava-only (9030-9033)
 
 	// Resources paths for the water assets, in the LOWERCASE form the build's index actually
 	// stores. This client keeps its Resources index in UberStrike_Data/mainData, and every
@@ -475,6 +477,7 @@ public static class WeaponSkinHelper
 	private const string WaterCausticsPath = "items/shared/textures/caustics_a_dm";
 	private const string WaterCubePath     = "items/shared/cubemaps/studio_a";
 	private const string WaterShaderPath   = "items/shared/shaders/water_flowing_a";
+	private const string LavaShaderPath    = "items/shared/shaders/lava_flowing_a";
 
 	/// <summary>
 	/// Optional per-skin SHADER override, in preference order, with the first one that
@@ -545,15 +548,15 @@ public static class WeaponSkinHelper
 		{ 9023, new string[] { WaterShader } },
 		{ 9024, new string[] { WaterShader } },
 		{ 9025, new string[] { WaterShader } },
-		// 9030-9033 [Lava] take the SAME shader. Molten rock is flowing liquid with a black body
+		// 9030-9033 [Lava] take a -30%-flow lava variant (Lava_Flowing_A) of the water shader. Molten rock is flowing liquid with a black body
 		// and a hot reflection, which is this shader with three colours changed -- see
 		// LavaBindings. Every argument above applies unchanged, including the OPAQUE one: these
 		// are the same dozens-of-overlapping-parts firearms that rendered hollow under
 		// Glass-Hangar, and this shader writes depth.
-		{ 9030, new string[] { WaterShader } },
-		{ 9031, new string[] { WaterShader } },
-		{ 9032, new string[] { WaterShader } },
-		{ 9033, new string[] { WaterShader } },
+		{ 9030, new string[] { LavaShader } },
+		{ 9031, new string[] { LavaShader } },
+		{ 9032, new string[] { LavaShader } },
+		{ 9033, new string[] { LavaShader } },
 	};
 
 	/// <summary>
@@ -579,10 +582,10 @@ public static class WeaponSkinHelper
 		// [Lava] gets the same second route, and it is not optional bookkeeping: these skins have
 		// no painted art to fall back on, so a Shader.Find miss without this entry would leave
 		// them rendering fully STOCK -- not "a bit wrong", but the base weapon.
-		{ 9030, WaterShaderPath },
-		{ 9031, WaterShaderPath },
-		{ 9032, WaterShaderPath },
-		{ 9033, WaterShaderPath },
+		{ 9030, LavaShaderPath },
+		{ 9031, LavaShaderPath },
+		{ 9032, LavaShaderPath },
+		{ 9033, LavaShaderPath },
 	};
 
 	// ------------------------------------------------- extra per-skin material bindings
@@ -1455,6 +1458,7 @@ public static class WeaponSkinHelper
 		{ 9066, "9066_SPAS12ChromeMax_Icon.png" },
 		{ 9067, "9067_AWPChromeMax_Icon.png" },
 		{ 9037, "9037_FrostSerpent_Icon.png" },
+		{ 9079, "9079_AWPUberverse_Icon.png" },
 		// Framing inherited per BASE weapon, not chosen: each of these takes the camera of the
 		// shipped skin on the same weapon (9008 for the MG, 9012 sniper, 9013 shotgun, 9014
 		// cannon), which is what keeps a family of icons looking like a set. The stock icons
@@ -1673,6 +1677,13 @@ public static class WeaponSkinHelper
 			ParticleTint    = new Color(0.20f, 0.62f, 1.70f, 1f),
 			ParticleObjects = new string[] { "Sfx", "Spark" },
 			TintRenderers   = new string[] { "SplatterTrail" } } },
+		{ 9079, new MuzzleTintSpec {   // AWP [Uberverse]  (AWP_Roughed) -- CYAN muzzle
+			HasLight        = true,
+			LightColour     = new Color(0.20f, 0.85f, 1.00f, 1f),
+			HasParticles    = true,
+			ParticleTint    = new Color(0.30f, 1.30f, 1.60f, 1f),
+			ParticleObjects = new string[] { "Sfx", "Spark" },
+			TintRenderers   = new string[] { "SplatterTrail" } } },
 
 		// 9021 Icebreaker IS DELIBERATELY ABSENT, and this is the record of why -- it was asked
 		// for in the same breath as 9020 and is a completely different problem.
@@ -1708,93 +1719,19 @@ public static class WeaponSkinHelper
 	private static readonly Dictionary<int, Texture2D> _skinCache = new Dictionary<int, Texture2D>();
 	private static readonly Dictionary<int, Texture2D> _iconCache = new Dictionary<int, Texture2D>();
 
-	/// <summary>
-	/// Folder holding the skin PNGs, relative to <c>UberStrike_Data</c>.
-	/// Distributed through the patcher's Entry.txt like any other game file.
-	/// </summary>
-	public const string SkinFolder = "Skins";
-
-	/// <summary>Prefix for the embedded resource names, set via LogicalName in the csproj.</summary>
 	private const string ResourcePrefix = "WeaponSkins.";
 
-	/// <summary>
-	/// Resources sub-folder holding the skin art in this Unity project:
-	/// <c>Assets/Resources/weaponskins/</c>.
-	///
-	/// THE NAMING CONTRACT, and it is exact. The art keeps its ORIGINAL file name and gains
-	/// a ".bytes" extension on the end, which is what makes Unity import it as a TextAsset
-	/// (raw bytes) instead of running it through the texture importer:
-	///
-	///   9020_Permafrost.jpg        -> Assets/Resources/weaponskins/9020_Permafrost.jpg.bytes
-	///   9020_Permafrost.alpha.png  -> Assets/Resources/weaponskins/9020_Permafrost.alpha.png.bytes
-	///   9040_M4A1Gold_Icon.png     -> Assets/Resources/weaponskins/9040_M4A1Gold_Icon.png.bytes
-	///
-	/// Resources.Load takes the path with the LAST extension removed, so the resource names
-	/// are "weaponskins/9020_Permafrost.jpg", "weaponskins/9020_Permafrost.alpha.png" and
-	/// "weaponskins/9040_M4A1Gold_Icon.png" -- still carrying the .jpg/.png, which is exactly
-	/// why the contract APPENDS ".bytes" rather than replacing the extension. That is what
-	/// lets this string be a plain prefix + the same fileName every other byte source takes,
-	/// with no per-file rewriting to get wrong.
-	/// </summary>
+	// Skin art in this Unity project: Assets/Resources/weaponskins/<file>.bytes. The .bytes
+	// suffix makes Unity import it as a raw TextAsset, not through the texture importer.
+	// Resources.Load strips the final extension, so the resource name is "weaponskins/<file>"
+	// (still carrying .jpg/.png) -- which is why the contract APPENDS .bytes.
 	private const string ResourceFolder = "weaponskins/";
 
-	/// <summary>Absolute path of a skin file, for logging and for the patcher's manifest.</summary>
-	public static string SkinPath(string fileName)
-	{
-		// Application.dataPath is "<install>/UberStrike_Data" for a Windows player.
-		return Path.Combine(Path.Combine(Application.dataPath, SkinFolder), fileName);
-	}
-
-	// ------------------------------------------------------------------ byte sources
-
-	/// <summary>
-	/// Read a skin file: loose file on disk first, then the copy under Assets/Resources,
-	/// then the copy embedded in this assembly. Returns null if none of the three exists.
-	///
-	/// THE RESOURCES SOURCE IS THE ONE THAT ACTUALLY FIRES IN A BUILD FROM THIS PROJECT.
-	/// Unity has no equivalent of an MSBuild &lt;EmbeddedResource&gt;, so ReadEmbedded can never
-	/// find anything in an Editor-produced Assembly-CSharp.dll. It is kept anyway, and kept
-	/// last, so this file stays diff-able line-for-line against the copy in the shipped
-	/// UberClient/Assembly-CSharp tree -- deleting it would make every future comparison of
-	/// the two loaders noise.
-	///
-	/// The Resources copy carries no import settings that could damage the art: it is a
-	/// TextAsset, so what comes back is the JPEG/PNG file byte-for-byte and the decode is
-	/// still Texture2D.LoadImage in DecodeTexture, identical to the shipped path. Importing
-	/// the art as Texture2D instead would hand it to the texture importer, where DXT
-	/// compression eats the alpha masks and isReadable/NPOT settings are one more thing to
-	/// get wrong.
-	///
-	/// All three paths are needed and they are not redundant.
-	///
-	/// The embedded copy is what makes "clone, compile, run" work with no deployment step.
-	/// Shipping only the DLL was the defect behind "all skins PR doesn't work": the code
-	/// landed, the art did not, and a missing skin file is SILENT - the weapon simply renders
-	/// stock, which is indistinguishable from the patch not working at all.
-	///
-	/// The disk override still wins when present, which is what keeps the patcher useful:
-	/// art can be updated without re-shipping code, and Deploy-WeaponSkins.ps1 keeps working
-	/// exactly as before. It also means a build with the resources stripped
-	/// (-p:EmbedSkins=false) is still fully functional against a deployed Skins folder.
-	/// </summary>
+	// Skins load from built-in resources only: Unity Resources first, assembly-embedded
+	// fallback. No disk/folder path. ReadEmbedded fires only if this tree is compiled with
+	// MSBuild EmbeddedResources; a Unity Editor build has none, so Resources is what runs.
 	private static byte[] ReadSkinBytes(string fileName)
 	{
-		string disk = SkinPath(fileName);
-		if (File.Exists(disk))
-		{
-			try
-			{
-				return File.ReadAllBytes(disk);
-			}
-			catch (Exception e)
-			{
-				// Fall through to the built-in copies rather than failing: a half-written or
-				// locked override should not break the skin.
-				Debug.LogWarning("WeaponSkinHelper: could not read override " + disk
-					+ " (" + e.Message + "); using the built-in copy.");
-			}
-		}
-
 		byte[] fromResources = ReadResource(fileName);
 		if (fromResources != null)
 			return fromResources;
@@ -1802,20 +1739,9 @@ public static class WeaponSkinHelper
 		return ReadEmbedded(fileName);
 	}
 
-	/// <summary>
-	/// Read a skin file out of Assets/Resources/weaponskins as raw bytes. Returns null when
-	/// the resource does not exist, which is not an error here: LoadSkinFile probes for a
-	/// ".jpg" and a ".alpha.png" companion that plenty of skins legitimately do not have.
-	///
-	/// Resources.Load(path, typeof(TextAsset)) as TextAsset, NOT the generic overload:
-	/// this exact two-argument form is what the shipped 4.6.5 client itself compiles against
-	/// (see Localization.cs and LocalizedStrings.cs in this same folder), so it is known to
-	/// exist in this Unity version rather than assumed. Same for TextAsset.bytes, used by
-	/// ByteReader.
-	///
-	/// The path passed in must NOT include the ".bytes" that is on disk -- Unity strips the
-	/// final extension when it forms a resource name. See ResourceFolder for the contract.
-	/// </summary>
+	// Read a skin from Assets/Resources/weaponskins as raw bytes. Null = not present (not an
+	// error: LoadSkinFile probes for a .jpg/.alpha.png companion many skins lack). Two-arg
+	// Resources.Load(path, typeof(TextAsset)) is the form the 4.6.5 client compiles against.
 	private static byte[] ReadResource(string fileName)
 	{
 		string resource = ResourceFolder + fileName;
@@ -1885,21 +1811,8 @@ public static class WeaponSkinHelper
 		}
 	}
 
-	/// <summary>
-	/// Load a skin texture, from a loose file if one is deployed and from the embedded copy
-	/// otherwise. See ReadSkinBytes for why both exist.
-	///
-	/// The art was embedded once before and removed, because a plain EmbeddedResource list took
-	/// Assembly-CSharp.dll from 1.4 MB to 51 MB - 97 percent of the file was PNG - so every
-	/// code-only fix re-shipped 50 MB of art. That objection is answered here by the
-	/// EmbedSkins property rather than by dropping the resources: build with
-	/// -p:EmbedSkins=false and the assembly is code-only at ~1.4 MB, loading art from the
-	/// deployed Skins folder exactly as before. The default build embeds, so a fresh clone
-	/// compiles and runs with skins visible and no deployment step.
-	///
-	/// Texture2D.LoadImage handles PNG and JPEG on this client (Unity 4.6.5), and produces
-	/// a texture with mipmaps disabled, matching the previous embedded behaviour exactly.
-	/// </summary>
+	// JPEG colour + separate .alpha.png mask, or a single RGBA PNG. Texture2D.LoadImage
+	// handles PNG/JPEG on Unity 4.6.5, mipmaps off.
 	private static Texture2D LoadSkinFile(string fileName)
 	{
 		// Preferred layout: colour as JPEG, specular mask as a separate lossless PNG.
@@ -1953,13 +1866,19 @@ public static class WeaponSkinHelper
 			// so a mask of mostly zero alpha leaves it invisible as intended, while a fully
 			// opaque texture turns it into a visible square. Losing the alpha here shows up
 			// on the flash long before it is noticeable on the gun body.
-			Texture2D merged = new Texture2D(colour.width, colour.height, TextureFormat.RGBA32, false);
+			// Uberverse (9079) is a starfield-heavy skin whose fine detail aliases/shimmers under
+			// camera motion and scope zoom WITHOUT mipmaps. Enable mipmaps + trilinear for it ONLY,
+			// so the other 56 skins keep their exact shipped (mip-free) behaviour unchanged.
+			bool uberverseMips = stem != null && stem.IndexOf("Uberverse", StringComparison.OrdinalIgnoreCase) >= 0;
+			Texture2D merged = new Texture2D(colour.width, colour.height, TextureFormat.RGBA32, uberverseMips);
 			Color[] rgb = colour.GetPixels();
 			Color[] a = maskTex.GetPixels();
 			for (int i = 0; i < rgb.Length; i++)
 				rgb[i].a = a[i].r; // greyscale mask: any channel carries the value
 			merged.SetPixels(rgb);
-			merged.Apply(false);
+			merged.Apply(uberverseMips);
+			if (uberverseMips)
+				merged.filterMode = FilterMode.Trilinear;
 
 			// Free the two decode intermediates. Only `merged` is returned and cached;
 			// `colour` and `maskTex` are unreachable from here on. Without this each
@@ -1975,8 +1894,7 @@ public static class WeaponSkinHelper
 		byte[] single = ReadSkinBytes(fileName);
 		if (single == null)
 		{
-			Debug.LogError("WeaponSkinHelper: skin file not found on disk (" + SkinPath(fileName)
-				+ "), not in Resources as \"" + ResourceFolder + fileName
+			Debug.LogError("WeaponSkinHelper: skin not in Resources as \"" + ResourceFolder + fileName
 				+ "\" (expected Assets/Resources/" + ResourceFolder + fileName + ".bytes)"
 				+ " and not embedded as \"" + ResourcePrefix + fileName + "\"");
 			return null;
@@ -2036,6 +1954,10 @@ public static class WeaponSkinHelper
 		if (weaponRoot == null)
 			return;
 
+		// Independent of diffuse delivery: attaches the AWP [Uberverse] orbital-system FX for
+		// item 9079, and removes it on pooled-root skin changes. Safe no-op for every other id.
+		UberverseWeaponEffect.Apply(weaponRoot, itemId);
+
 		// Before the texture check: the tracer is independent of whether this item has
 		// a skin registered, so an item could have one without the other.
 		ApplyTracer(weaponRoot, itemId);
@@ -2063,6 +1985,9 @@ public static class WeaponSkinHelper
 		foreach (Renderer r in renderers)
 		{
 			if (r == null)
+				continue;
+			// Never repaint the Uberverse FX renderers with the gun's diffuse atlas.
+			if (UberverseWeaponEffect.Owns(r))
 				continue;
 
 			// Skip effect renderers. A weapon's children include its muzzle flash and shell
@@ -2616,6 +2541,8 @@ public static class WeaponSkinHelper
 		foreach (Renderer src in renderers)
 		{
 			if (src == null)
+				continue;
+			if (UberverseWeaponEffect.Owns(src))
 				continue;
 
 			// INSPECT VIA sharedMaterial, NOT material. This is the 63a9776 fix that landed in
