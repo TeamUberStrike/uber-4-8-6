@@ -1040,6 +1040,14 @@ public static partial class WeaponSkinHelper
 		return tex;
 	}
 
+	// True for any renderer belonging to one of our procedural FX (Uberverse V1/V1.2/V2 and the
+	// three themed auras). ApplyToWeapon must never repaint these with the gun's diffuse atlas.
+	private static bool IsEffectRenderer(Renderer r)
+	{
+		return UberverseWeaponEffect.Owns(r) || UberverseV1Effect.Owns(r) || UberverseV12Effect.Owns(r)
+			|| WeaponEmitterEffect.Owns(r);
+	}
+
 	// Called from Avatar.AssignWeapon right after a weapon is attached to a player.
 	public static void ApplyToWeapon(GameObject weaponRoot, int itemId)
 	{
@@ -1049,6 +1057,20 @@ public static partial class WeaponSkinHelper
 		// Independent of diffuse delivery: attaches the AWP [Uberverse] orbital-system FX for
 		// item 2067, and removes it on pooled-root skin changes. Safe no-op for every other id.
 		UberverseWeaponEffect.Apply(weaponRoot, itemId);
+		// V1 (2071) and V1.2 (2072): the earlier procedural-sphere Uberverse FX, kept selectable
+		// alongside V2 so the team can compare. Each is a no-op for every id but its own.
+		UberverseV1Effect.Apply(weaponRoot, itemId);
+		UberverseV12Effect.Apply(weaponRoot, itemId);
+		// Themed auras for the three new AWP skins. Same contract: attach on match, tear down on
+		// switch, no-op otherwise.
+		CyberNeonWeaponEffect.Apply(weaponRoot, itemId);
+		ToxicVenomWeaponEffect.Apply(weaponRoot, itemId);
+		MoltenInfernoWeaponEffect.Apply(weaponRoot, itemId);
+		// New weapons' auras (attach to their own meshes, not the AWP): Voidglass on the Wrecker,
+		// Prism Splatter on the Splattergun. No-op for every other id.
+		VoidglassWeaponEffect.Apply(weaponRoot, itemId);
+		PrismSplatterWeaponEffect.Apply(weaponRoot, itemId);
+		DragonsMawWeaponEffect.Apply(weaponRoot, itemId);
 
 		// Before the texture check: the tracer is independent of whether this item has
 		// a skin registered, so an item could have one without the other.
@@ -1078,8 +1100,8 @@ public static partial class WeaponSkinHelper
 		{
 			if (r == null)
 				continue;
-			// Never repaint the Uberverse FX renderers with the gun's diffuse atlas.
-			if (UberverseWeaponEffect.Owns(r))
+			// Never repaint the procedural FX renderers with the gun's diffuse atlas.
+			if (IsEffectRenderer(r))
 				continue;
 
 			// Skip effect renderers. A weapon's children include its muzzle flash and shell
@@ -1634,7 +1656,7 @@ public static partial class WeaponSkinHelper
 		{
 			if (src == null)
 				continue;
-			if (UberverseWeaponEffect.Owns(src))
+			if (IsEffectRenderer(src))
 				continue;
 
 			// INSPECT VIA sharedMaterial, NOT material. This is the 63a9776 fix that landed in
