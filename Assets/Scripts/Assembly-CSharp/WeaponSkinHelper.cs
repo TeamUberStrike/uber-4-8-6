@@ -41,7 +41,7 @@
 //   2030 Sniper [Frosted]  (base 1004 PaintSniper)
 //   2031 Shotgun [Frosted] (base 1003 PaintShotty)
 //   2032 Cannon [Frosted]  (base 1005 Cannon)
-//   2033 MG [Lava]         (base 1002 MachineGun)   -- the [Lava] set: a -30%-flow lava shader variant and the
+//   2033 MG [Lava]         (base 1002 MachineGun)   -- the [Lava] set: a half-flow lava shader variant and the
 //   2034 Sniper [Lava]     (base 1004 PaintSniper)     same four water textures as [Watery],
 //   2035 Shotgun [Lava]    (base 1003 PaintShotty)     three colours apart. NO painted art and
 //   2036 Cannon [Lava]     (base 1005 Cannon)          NO flames -- see LavaBindings.
@@ -206,7 +206,7 @@ public static partial class WeaponSkinHelper
 	// 0.07 off the shader's own time input, so the water flows with NO MonoBehaviour driving it
 	// -- unlike the flame overlay, which needs WeaponFlameAnimator.
 	public const string WaterShader = "CMune/Water/Opaque_Flowing";
-	public const string LavaShader  = "CMune/Lava/Opaque_Flowing";  // -30% flow variant, lava-only (2033-2036)
+	public const string LavaShader  = "CMune/Lava/Opaque_Flowing";  // half-speed flow variant, lava-only (2033-2036)
 
 	// Resources paths for the water assets, in the LOWERCASE form the build's index actually
 	// stores. This client keeps its Resources index in UberStrike_Data/mainData, and every

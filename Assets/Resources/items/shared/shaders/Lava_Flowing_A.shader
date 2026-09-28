@@ -15,7 +15,7 @@ Properties {
 	// UberStrike_Data/resources.assets @ 307673488, length 61657
 	// (2636 lines, 16 d3d9 + 16 opengl SubPrograms, 0 d3d11).
 	// Constants are transcribed from the ps_3_0 listing, not chosen:
-	//   scroll 0.035 (_MainTex) / 0.049 (_BumpMap)  [LAVA -30% variant of Water_Flowing_A] on _Time.xy  -> def c8.x / c9.x
+	//   scroll 0.025 (_MainTex) / 0.035 (_BumpMap)  [LAVA half-speed variant of Water_Flowing_A] on _Time.xy  -> def c8.x / c9.x
 	//   specular exponent 128 * _Gloss                        -> def c9.z
 	//   caustics tiling 3.375, deform 0.1, gain 1.5           -> c9.w / c10.w / c11.x
 	//   Luminance weights .21997070/.70703125/.07098389       -> def c10.xyz
@@ -85,8 +85,8 @@ Properties {
 		{
 			float2 uv = IN.uv_MainTex * _Tiling;
 
-			fixed3 n1 = UnpackNormal (tex2D (_MainTex, uv + _Time.xy * 0.035));
-			fixed3 n2 = UnpackNormal (tex2D (_BumpMap, uv + _Time.xy * 0.049));
+			fixed3 n1 = UnpackNormal (tex2D (_MainTex, uv + _Time.xy * 0.025));
+			fixed3 n2 = UnpackNormal (tex2D (_BumpMap, uv + _Time.xy * 0.035));
 
 			o.Normal = normalize (n1 + n2);
 			o.Albedo = _WaterColor_Dark.rgb;
