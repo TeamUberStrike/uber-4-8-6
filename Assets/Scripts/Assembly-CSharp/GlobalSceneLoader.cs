@@ -51,6 +51,15 @@ public class GlobalSceneLoader : MonoBehaviour
 
 	private void Awake()
 	{
+		// Dev tour: reflection keeps builds without Assets/Dev inert.
+		string[] tourArgs = Environment.GetCommandLineArgs();
+		for (int i = 0; i + 1 < tourArgs.Length; i++)
+		{
+			if (tourArgs[i] != "-verifyTour" || tourArgs[i + 1].StartsWith("-")) continue;
+			Type tour = Type.GetType("VerifyTour471");
+			if (tour != null) tour.GetMethod("Boot").Invoke(null, null);
+			break;
+		}
 		PopupSkin.Initialize(popupSkin);
 		_blackTexture = new Texture2D(1, 1, TextureFormat.RGB24, false);
 		_color = Color.black;
