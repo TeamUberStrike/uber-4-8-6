@@ -810,6 +810,8 @@ public static partial class WeaponSkinHelper
 
 	private static readonly Dictionary<int, Texture2D> _skinCache = new Dictionary<int, Texture2D>();
 	private static readonly Dictionary<int, Texture2D> _iconCache = new Dictionary<int, Texture2D>();
+	private static readonly Dictionary<string, Texture2D> _flameCache = new Dictionary<string, Texture2D>();
+	private static readonly HashSet<int> _reportedShaderBindings = new HashSet<int>();
 
 	private const string ResourcePrefix = "WeaponSkins.";
 
@@ -934,18 +936,18 @@ public static partial class WeaponSkinHelper
 
 			byte[] maskBytes = ReadSkinBytes(maskName);
 			if (maskBytes == null)
-				return colour; // colour-only skin, e.g. one with no specular mask
+				return MakeNonReadable(colour); // colour-only skin, e.g. one with no specular mask
 
 			Texture2D maskTex = DecodeTexture(maskBytes, maskName);
 			if (maskTex == null)
-				return colour;
+				return MakeNonReadable(colour);
 
 			if (maskTex.width != colour.width || maskTex.height != colour.height)
 			{
 				Debug.LogError("WeaponSkinHelper: alpha mask size " + maskTex.width + "x" + maskTex.height
 					+ " does not match colour " + colour.width + "x" + colour.height + " for " + stem);
 				UnityEngine.Object.Destroy(maskTex); // colour is returned; the mask is dead weight
-				return colour;
+				return MakeNonReadable(colour);
 			}
 
 			// Texture2D.LoadImage REPLACES the texture format to match the file it read.
@@ -963,12 +965,12 @@ public static partial class WeaponSkinHelper
 			// so the other 56 skins keep their exact shipped (mip-free) behaviour unchanged.
 			bool uberverseMips = stem != null && stem.IndexOf("Uberverse", StringComparison.OrdinalIgnoreCase) >= 0;
 			Texture2D merged = new Texture2D(colour.width, colour.height, TextureFormat.RGBA32, uberverseMips);
-			Color[] rgb = colour.GetPixels();
-			Color[] a = maskTex.GetPixels();
+			Color32[] rgb = colour.GetPixels32();
+			Color32[] a = maskTex.GetPixels32();
 			for (int i = 0; i < rgb.Length; i++)
 				rgb[i].a = a[i].r; // greyscale mask: any channel carries the value
-			merged.SetPixels(rgb);
-			merged.Apply(uberverseMips);
+			merged.SetPixels32(rgb);
+			merged.Apply(uberverseMips, true);
 			if (uberverseMips)
 				merged.filterMode = FilterMode.Trilinear;
 
@@ -991,7 +993,14 @@ public static partial class WeaponSkinHelper
 				+ " and not embedded as \"" + ResourcePrefix + fileName + "\"");
 			return null;
 		}
-		return DecodeTexture(single, fileName);
+		return MakeNonReadable(DecodeTexture(single, fileName));
+	}
+
+	private static Texture2D MakeNonReadable(Texture2D texture)
+	{
+		if (texture != null)
+			texture.Apply(false, true); // decoded singles have no mipmaps; keep the uploaded pixels
+		return texture;
 	}
 
 	private static Texture2D DecodeTexture(byte[] data, string label)
@@ -1003,6 +1012,7 @@ public static partial class WeaponSkinHelper
 		if (!tex.LoadImage(data))
 		{
 			Debug.LogError("WeaponSkinHelper: Texture2D.LoadImage failed for " + label);
+			UnityEngine.Object.Destroy(tex);
 			return null;
 		}
 		return tex;
@@ -1137,16 +1147,17 @@ public static partial class WeaponSkinHelper
 
 			// Past this point the renderer IS being skinned, so instantiating its material
 			// is intended -- and keeps the change per-instance, off the shared asset.
-			if (r.material == null)
+			Material material = WeaponSkinCleanup.GetMaterial(weaponRoot, r);
+			if (material == null)
 				continue;
 
 			// Guarded only for the bindings-without-art case above. For all 18 painted skins
 			// tex is non-null and this is byte-for-byte the behaviour it always had.
 			if (tex != null)
 			{
-				r.material.mainTexture = tex;
-				if (r.material.HasProperty("_MainTex"))
-					r.material.SetTexture("_MainTex", tex);
+				material.mainTexture = tex;
+				if (material.HasProperty("_MainTex"))
+					material.SetTexture("_MainTex", tex);
 			}
 
 			ApplyShaderOverride(r, itemId);
@@ -1300,11 +1311,12 @@ public static partial class WeaponSkinHelper
 			// cannot be -- at this texture's mean red 0.277 the two _ReflectColor settings differ
 			// by 32/57/75 out of 255, rising to 58/111/151 at p90. "Bound shader X" was never
 			// evidence that the COLOURS landed; this line is.
-			Debug.Log(string.Format(
-				"WeaponSkinHelper: skin {0} bound shader '{1}' via {2}; bindings={3} _Color={4} _ReflectColor={5}",
-				itemId, s.name, how, bind == null ? "NONE" : "yes",
-				r.material.HasProperty("_Color") ? r.material.GetColor("_Color").ToString() : "(absent)",
-				r.material.HasProperty("_ReflectColor") ? r.material.GetColor("_ReflectColor").ToString() : "(absent)"));
+			if (_reportedShaderBindings.Add(itemId))
+				Debug.Log(string.Format(
+					"WeaponSkinHelper: skin {0} bound shader '{1}' via {2}; bindings={3} _Color={4} _ReflectColor={5}",
+					itemId, s.name, how, bind == null ? "NONE" : "yes",
+					r.material.HasProperty("_Color") ? r.material.GetColor("_Color").ToString() : "(absent)",
+					r.material.HasProperty("_ReflectColor") ? r.material.GetColor("_ReflectColor").ToString() : "(absent)"));
 		}
 
 		AddDepthPrime(r, itemId);
@@ -1605,10 +1617,7 @@ public static partial class WeaponSkinHelper
 		if (!SkinFlames.TryGetValue(itemId, out sheet))
 			return;
 
-		Texture2D flame = LoadSkinFile(sheet);
-		if (flame == null)
-			return;
-		flame.wrapMode = TextureWrapMode.Repeat;   // it scrolls, so it must tile
+		Texture2D flame = null; // load only after a renderer needs a new overlay
 
 		Shader additive = Shader.Find("Particles/Additive");
 		if (additive == null)
@@ -1712,6 +1721,15 @@ public static partial class WeaponSkinHelper
 			// respawn until the blade was a white blob.
 			if (src.transform.FindChild(FlameChildName) != null)
 				continue;
+
+			if (flame == null && (!_flameCache.TryGetValue(sheet, out flame) || flame == null))
+			{
+				flame = LoadSkinFile(sheet);
+				if (flame == null)
+					return;
+				flame.wrapMode = TextureWrapMode.Repeat;   // it scrolls, so it must tile
+				_flameCache[sheet] = flame;
+			}
 
 			// SKIP TRIVIALLY SMALL PARTS, IN HELIX MODE ONLY. This is what makes 2023 shippable.
 			//
@@ -1890,6 +1908,7 @@ public static partial class WeaponSkinHelper
 				or = go.AddComponent<MeshRenderer>();
 			}
 			Material m = new Material(additive);
+			WeaponSkinCleanup.Track(go, m);
 			m.mainTexture = flame;
 			if (m.HasProperty("_TintColor"))
 			{
@@ -2584,7 +2603,7 @@ public static partial class WeaponSkinHelper
 				{
 					if (fr[k] == null)
 						continue;
-					Material fm = fr[k].material;      // per-instance clone; stock weapon untouched
+					Material fm = WeaponSkinCleanup.GetMaterial(weaponRoot, fr[k]);      // per-instance clone; stock weapon untouched
 					if (fm == null || !fm.HasProperty("_TintColor"))
 						continue;
 					Color cur = fm.GetColor("_TintColor");
@@ -2613,7 +2632,7 @@ public static partial class WeaponSkinHelper
 					if (rends[i].gameObject.name != spec.TintRenderers[j])
 						continue;
 					// `.material`, per-instance, so the stock weapon is untouched.
-					Material rm = rends[i].material;
+					Material rm = WeaponSkinCleanup.GetMaterial(weaponRoot, rends[i]);
 					if (rm != null && rm.HasProperty("_TintColor"))
 					{
 						Color cur = rm.GetColor("_TintColor");
@@ -2665,7 +2684,7 @@ public static partial class WeaponSkinHelper
 					Renderer pr = systems[i].GetComponent<Renderer>();
 					if (pr != null)
 					{
-						Material pm = pr.material;
+						Material pm = WeaponSkinCleanup.GetMaterial(weaponRoot, pr);
 						string sh = pm != null && pm.shader != null ? pm.shader.name : "(null)";
 						bool has = pm != null && pm.HasProperty("_TintColor");
 						if (has)
@@ -2752,7 +2771,7 @@ public class WeaponFlameAnimator : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		if (_renderer == null || _renderer.material == null)
+		if (_renderer == null || _renderer.sharedMaterial == null)
 			return;
 
 		// Two independent motions, which is what stops it reading as a rigid spinning tube:
@@ -2768,7 +2787,7 @@ public class WeaponFlameAnimator : MonoBehaviour
 
 		_v = Mathf.Repeat(_v + Speed * Time.deltaTime, 1f);
 		float u = Mathf.Sin(Time.time * SwaySpeed * 6.2832f) * SwayAmount;
-		_renderer.material.SetTextureOffset("_MainTex", new Vector2(u, _v));
+		_renderer.sharedMaterial.SetTextureOffset("_MainTex", new Vector2(u, _v));
 	}
 }
 

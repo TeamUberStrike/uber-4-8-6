@@ -17,6 +17,7 @@ public sealed class UberverseWeaponEffect : MonoBehaviour
     // Gemini/Nano-Banana baked planet orbs, embedded as WeaponSkins.<name> in the csproj.
     // Additive billboards replace the old procedural spheres: image quality, no shimmer.
     private static readonly string[] PlanetTextures = { "planet_violet.png", "planet_magenta.png", "planet_blue.png" };
+    private static readonly Dictionary<string, Texture2D> PlanetTextureCache = new Dictionary<string, Texture2D>();
     private const float PlanetBillboardScale = 1.85f; // quad half-extent as a multiple of PlanetRadius
     private readonly List<UnityEngine.Object> owned = new List<UnityEngine.Object>();
     private readonly List<Renderer> renderers = new List<Renderer>();
@@ -183,7 +184,7 @@ public sealed class UberverseWeaponEffect : MonoBehaviour
             Material material = Keep(new Material(additive));
             material.name = "Uberverse_Planet_" + i;
             int tex = zSpread > 0f ? GalaxyPlanetTex[i] : i % PlanetTextures.Length;
-            material.mainTexture = Keep(LoadPlanetTexture(PlanetTextures[tex]));
+            material.mainTexture = LoadPlanetTexture(PlanetTextures[tex]); // shared, never instance-owned
             if (material.HasProperty("_TintColor")) material.SetColor("_TintColor", new Color(.5f, .5f, .5f, .5f));
             Vector3[] verts; Color[] cols;
             planetMeshes[i] = Keep(NewQuadMesh(1, out verts, out cols));
@@ -687,8 +688,11 @@ public sealed class UberverseWeaponEffect : MonoBehaviour
     // Load a baked Gemini orb (WeaponSkins.<name>, embedded) and bake luminance into its alpha.
     // The orbs are RGB on black; folding brightness into alpha makes the black drop out under the
     // alpha-blended fallback shader too, and tapers the glow edge. Mipmaps + trilinear de-shimmer.
-    private Texture2D LoadPlanetTexture(string fileName)
+    private static Texture2D LoadPlanetTexture(string fileName)
     {
+        Texture2D cached;
+        if (PlanetTextureCache.TryGetValue(fileName, out cached) && cached != null)
+            return cached;
         byte[] data = ReadPlanetBytes(fileName);
         if (data == null)
             throw new InvalidOperationException("Uberverse planet image missing: " + fileName);
@@ -710,9 +714,10 @@ public sealed class UberverseWeaponEffect : MonoBehaviour
         planet.name = "Uberverse_GeminiPlanet_" + fileName;
         planet.wrapMode = TextureWrapMode.Clamp;
         planet.SetPixels(pixels);
-        planet.Apply(true);
+        planet.Apply(true, true);
         planet.filterMode = FilterMode.Trilinear;
         Destroy(raw);
+        PlanetTextureCache[fileName] = planet;
         return planet;
     }
 
