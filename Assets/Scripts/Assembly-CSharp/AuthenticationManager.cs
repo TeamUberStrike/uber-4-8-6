@@ -577,7 +577,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		yield return UnityRuntime.StartRoutine(Singleton<CommsManager>.Instance.GetContactsByGroups());
 		_progress.Text = LocalizedStrings.LoadingCharacterData;
 		_progress.Progress = 0.3f;
-		yield return ApplicationWebServiceClient.GetConfigurationData("4.7.1", delegate(ApplicationConfigurationView appConfigView)
+		yield return ApplicationWebServiceClient.GetConfigurationData("4.8.6", delegate(ApplicationConfigurationView appConfigView)
 		{
 			XpPointsUtil.Config = appConfigView;
 		}, delegate
