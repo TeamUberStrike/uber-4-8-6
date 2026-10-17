@@ -392,6 +392,10 @@ public class WeaponFeedbackManager : MonoBehaviour
 		{
 			if (base.IsRunning && base.IsValid && !(_time > _transitionTime))
 			{
+				if (LevelCamera.IsZoomedIn)
+				{
+					Finish();
+				}
 				if (base.Decorator.IsMelee)
 				{
 					_currentRotation = Mathf.Lerp(_currentRotation, -90f, _time / _transitionTime);
@@ -782,17 +786,13 @@ public class WeaponFeedbackManager : MonoBehaviour
 	{
 		if (_pickupWeaponState != null && _pickupWeaponState.IsValid)
 		{
-			// Hide the previous weapon's GameObject immediately so it doesn't
-			// render on top of the incoming PickUpState pose. Non-melee weapons
-			// share the same pivot transform, so without this the prev gun
-			// ghosts in roughly the new gun's position for PutDownDuration.
-			// PutDownState still runs (and its Finish() will redundantly
-			// disable on completion), but the GameObject is inactive so the
-			// animated transform has no visual effect.
+			// Guns share the incoming weapon's pivot and must hide immediately to avoid
+			// the Vlad/Stinger scope ghost. Melee uses its own position/Z rotation:
+			// let PutDown finish as in retail, so its legacy swing can keep advancing.
 			BaseWeaponDecorator prevDecorator = _pickupWeaponState.Decorator;
 			PutDownWeapon(_pickupWeaponState.Weapon, _pickupWeaponState.Decorator, destroy);
 			_pickupWeaponState = null;
-			if ((bool)prevDecorator)
+			if ((bool)prevDecorator && !prevDecorator.IsMelee)
 			{
 				prevDecorator.IsEnabled = false;
 			}

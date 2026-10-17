@@ -185,7 +185,7 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 
 	public virtual void ShowShootEffect(RaycastHit[] hits)
 	{
-		if (!IsEnabled)
+		if (!IsEnabled || hits == null)
 		{
 			return;
 		}
@@ -348,7 +348,7 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 				point.z = (GameState.Current.Map.WaterPlaneHeight - hit.point.y) / direction.y * direction.z + hit.point.z;
 			}
 		}
-		ParticleEffectController.ShowHitEffect(_effectType, value, direction, point, hitNormal, muzzlePosition, distance, ref _trailRenderer, _parent);
+		ParticleEffectController.ShowHitEffect(_effectType, value, direction, point, hitNormal, muzzlePosition, distance, ref _trailRenderer, _parent, 0, GetComponent<WeaponTracerTinter>());
 	}
 
 	public void SetMuzzlePosition(Transform muzzle)

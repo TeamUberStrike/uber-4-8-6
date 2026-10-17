@@ -2712,28 +2712,6 @@ public static partial class WeaponSkinHelper
 
 
 /// <summary>
-/// Recolours the muzzle to hitpoint beam produced by MoveTrailrendererObject.
-///
-/// Two things make this less obvious than it looks:
-///
-/// 1. The trail is NOT under the weapon. BaseWeaponDecorator caches
-///    _parent = transform.parent during Awake, but WeaponSlot.ConfigureWeaponDecorator
-///    re-parents the decorator afterwards, so _parent is stale and effectively null.
-///    ParticleEffectController.ShowTrailEffect then parents each spawned trail to that,
-///    which drops it at the scene root. Hence the scene wide lookup rather than a walk
-///    down our own hierarchy.
-///
-/// 2. Colour lives in two places. The LineRenderer vertex colours decide the hue (the
-///    stock ParticleLance gradient has red at zero, which is exactly why that beam reads
-///    cyan no matter what the material says), while the material _TintColor is multiplied
-///    by the trail texture. MoveTrailrendererObject.Update only rewrites _TintColor's
-///    alpha and preserves RGB, so a tint applied once survives the whole fade.
-///
-/// Renderer.material returns a per instance copy, so nothing shared is touched. That
-/// matters because SRParticleLanceTrail.mat is also used by SpringGrenade and
-/// LR_FinalWord_MissileSticky.
-/// </summary>
-/// <summary>
 /// Scrolls the flame overlay's UVs so the fire moves up the blade.
 ///
 /// The sheet is authored to tile seamlessly top to bottom -- verified by measuring the wrap
@@ -2791,37 +2769,19 @@ public class WeaponFlameAnimator : MonoBehaviour
 	}
 }
 
+/// <summary>
+/// Tints only a trail created for this weapon, at the spawn site. Trails may be
+/// parented at the scene root, so hierarchy or scene-wide searches cannot identify ownership.
+/// MoveTrailrendererObject owns the single material instance and preserves RGB while fading.
+/// </summary>
 public class WeaponTracerTinter : MonoBehaviour
 {
 	public Color StartColour = Color.white;
 	public Color EndColour = Color.white;
 	public Color MatTint = Color.white;
 
-	private void LateUpdate()
+	public void Tint(MoveTrailrendererObject trail)
 	{
-		UnityEngine.Object[] trails = UnityEngine.Object.FindObjectsOfType(typeof(MoveTrailrendererObject));
-		for (int i = 0; i < trails.Length; i++)
-		{
-			MoveTrailrendererObject trail = trails[i] as MoveTrailrendererObject;
-			if (trail == null)
-				continue;
-
-			LineRenderer line = trail.GetComponent<LineRenderer>();
-			if (line == null)
-				line = trail.GetComponentInChildren<LineRenderer>();
-			if (line == null)
-				continue;
-
-			// SetColors, not startColor/endColor: those properties are Unity 5.5 and later,
-			// and this client is built with Unity 4.6.5.
-			line.SetColors(StartColour, EndColour);
-
-			Material mat = line.material;
-			if (mat != null && mat.HasProperty("_TintColor"))
-			{
-				Color existing = mat.GetColor("_TintColor");
-				mat.SetColor("_TintColor", new Color(MatTint.r, MatTint.g, MatTint.b, existing.a));
-			}
-		}
+		trail.SetTint(StartColour, EndColour, MatTint);
 	}
 }

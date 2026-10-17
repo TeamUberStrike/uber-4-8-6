@@ -7,6 +7,10 @@ internal class PregameLoadoutState : IState
 
 	private bool _enteringMatch;
 
+	private int _warmupGeneration;
+
+	private GameEvents.PlayerRespawn _pendingRespawn;
+
 	public PregameLoadoutState(StateMachine<GameStateId> stateMachine)
 	{
 		this.stateMachine = stateMachine;
@@ -14,7 +18,9 @@ internal class PregameLoadoutState : IState
 
 	public void OnEnter()
 	{
+		++_warmupGeneration;
 		_enteringMatch = false;
+		_pendingRespawn = null;
 		GamePageManager.Instance.LoadPage(IngamePageType.PreGame);
 		Singleton<QuickItemController>.Instance.Restriction.RenewRoundUses();
 		EventHandler.Global.AddListener<GameEvents.PlayerRespawn>(OnPlayerRespawn);
@@ -27,6 +33,8 @@ internal class PregameLoadoutState : IState
 
 	public void OnExit()
 	{
+		++_warmupGeneration;
+		_pendingRespawn = null;
 		EventHandler.Global.RemoveListener<GameEvents.PlayerRespawn>(OnPlayerRespawn);
 		GamePageManager.Instance.UnloadCurrentPage();
 	}
@@ -58,20 +66,25 @@ internal class PregameLoadoutState : IState
 	// first drawn cold at the first ESC -> 1-2s invisible on heavy maps. Hold here in Overview
 	// until the avatar's combined SkinnedMeshRenderer has actually been drawn (isVisible for 2
 	// frames = bounds settled + shader variants compiled), realtime-timeout-capped so it can
-	// never wedge match start, THEN run the ORIGINAL transition byte-for-byte. Same class as the
+	// never wedge match start, THEN run the original state transition. Spawn data is applied
+	// immediately so a countdown/state change cannot lose it. Same class as the
 	// existing WarmPausedCameraVariants / updateWhenOffscreen reconstruction compensations.
 	// uber-audit: correctness/regression/output-sanity/provenance CONFIRM; parity-drift accepted.
 	private void OnPlayerRespawn(GameEvents.PlayerRespawn ev)
 	{
+		// Consume every authoritative spawn immediately, including a newer spawn during
+		// warm-up. Only the Overview -> Playing transition needs to wait for rendering.
+		_pendingRespawn = ev;
+		GameState.Current.RespawnLocalPlayerAt(ev.Position, Quaternion.Euler(0f, ev.Rotation, 0f));
 		if (_enteringMatch)
 		{
 			return;
 		}
 		_enteringMatch = true;
-		UnityRuntime.StartRoutine(EnterMatchWhenAvatarWarm(ev));
+		UnityRuntime.StartRoutine(EnterMatchWhenAvatarWarm(_warmupGeneration));
 	}
 
-	private IEnumerator EnterMatchWhenAvatarWarm(GameEvents.PlayerRespawn ev)
+	private IEnumerator EnterMatchWhenAvatarWarm(int generation)
 	{
 		SkinnedMeshRenderer smr = null;
 		if (GameState.Current.IsLocalAvatarLoaded && (bool)GameState.Current.Avatar.Decorator)
@@ -85,17 +98,23 @@ internal class PregameLoadoutState : IState
 		while (smr != null && visibleFrames < 2 && Time.realtimeSinceStartup < deadline)
 		{
 			yield return new WaitForEndOfFrame();
+			if (generation != _warmupGeneration)
+			{
+				yield break;
+			}
 			if (smr == null || !smr.gameObject.activeInHierarchy)
 			{
 				break;
 			}
 			visibleFrames = (smr.isVisible ? (visibleFrames + 1) : 0);
 		}
-		if (stateMachine.CurrentStateId != GameStateId.PregameLoadout)
+		if (generation != _warmupGeneration || stateMachine.CurrentStateId != GameStateId.PregameLoadout)
 		{
 			yield break;
 		}
+		GameEvents.PlayerRespawn respawn = _pendingRespawn;
+		_pendingRespawn = null;
 		stateMachine.SetState(GameStateId.MatchRunning);
-		stateMachine.Events.Fire(ev);
+		stateMachine.Events.Fire(respawn);
 	}
 }

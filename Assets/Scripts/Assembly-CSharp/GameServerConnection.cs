@@ -37,7 +37,7 @@ public class GameServerConnection : MonoBehaviour
 					TimeLimit = 10,
 					PlayerLimit = 10,
 					KillLimit = 10
-				}, string.Empty, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+				}, string.Empty, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			}
 			if (GUI.Button(new Rect(100f, 80f, 200f, 20f), "Leave"))
 			{

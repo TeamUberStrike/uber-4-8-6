@@ -294,7 +294,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		bool mapsLoadedFromServer = false;
 		try
 		{
-			mapsCoroutine = ApplicationWebServiceClient.GetMaps("4.8.6", DefinitionType.StandardDefinition, delegate(List<MapView> callback)
+			mapsCoroutine = ApplicationWebServiceClient.GetMaps(ApplicationDataManager.Version, DefinitionType.StandardDefinition, delegate(List<MapView> callback)
 			{
 				bool loaded = Singleton<MapManager>.Instance.InitializeMapsToLoad(callback);
 				mapsLoadedFromServer = loaded;
@@ -515,7 +515,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			MemberAuthenticationResultView authenticationView = null;
 			_progress.Text = "Authenticating with UberStrike";
 			_progress.Progress = 0.1f;
-			yield return AuthenticationWebServiceClient.LoginSteam("4.8.6", PlayerDataManager.SteamId, authToken, machineId, string.Empty, ApplicationDataManager.IsMac, delegate(MemberAuthenticationResultView result)
+			yield return AuthenticationWebServiceClient.LoginSteam(ApplicationDataManager.Version, PlayerDataManager.SteamId, authToken, machineId, string.Empty, ApplicationDataManager.IsMac, delegate(MemberAuthenticationResultView result)
 			{
 				authenticationView = result;
 				PlayerPrefs.SetString("CurrentSteamUser", PlayerDataManager.SteamId);
@@ -577,7 +577,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		yield return UnityRuntime.StartRoutine(Singleton<CommsManager>.Instance.GetContactsByGroups());
 		_progress.Text = LocalizedStrings.LoadingCharacterData;
 		_progress.Progress = 0.3f;
-		yield return ApplicationWebServiceClient.GetConfigurationData("4.8.6", delegate(ApplicationConfigurationView appConfigView)
+		yield return ApplicationWebServiceClient.GetConfigurationData(ApplicationDataManager.Version, delegate(ApplicationConfigurationView appConfigView)
 		{
 			XpPointsUtil.Config = appConfigView;
 		}, delegate
@@ -588,7 +588,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		_progress.Text = LocalizedStrings.LoadingMapData;
 		_progress.Progress = 0.5f;
 		bool mapsLoadedSuccessfully = false;
-		yield return ApplicationWebServiceClient.GetMaps("4.8.6", DefinitionType.StandardDefinition, delegate(List<MapView> callback)
+		yield return ApplicationWebServiceClient.GetMaps(ApplicationDataManager.Version, DefinitionType.StandardDefinition, delegate(List<MapView> callback)
 		{
 			mapsLoadedSuccessfully = Singleton<MapManager>.Instance.InitializeMapsToLoad(callback);
 		}, delegate

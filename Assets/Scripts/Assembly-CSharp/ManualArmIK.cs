@@ -65,8 +65,8 @@ public static class ManualArmIK
                      HumanBodyBones.LeftHand, "LeftHand", ReflectTransform(self, "_IKLeftHand"), handW, HAND_FROM_GOAL_L);
         }
 
-        // HEAD look-at: forward (down the scope for aim, at the camera for melee). Blend by the look-at
-        // ramp so it eases in. Aim-tagged states use the sniper look; everything else uses the melee look.
+        // Keep the measured podium pose offline. In multiplayer use retail's live look-at target,
+        // so remote heads follow aim pitch as well as the hands. Blend by the original look-at ramp.
         if (lookW > 0f)
         {
             Transform head = anim.isHuman ? anim.GetBoneTransform(HumanBodyBones.Head) : null;
@@ -75,6 +75,23 @@ public static class ManualArmIK
             {
                 bool aimIK = anim.layerCount > 1 && anim.GetCurrentAnimatorStateInfo(1).IsTag("IK");
                 Quaternion headTarget = rt.rotation * (aimIK ? HEAD_FROM_ROOT : HEAD_FROM_ROOT_MELEE);
+                Transform lookAt = ReflectTransform(self, "_IKLeftHand");
+                if (GameState.Current != null && GameState.Current.IsMultiplayer && (object)lookAt != null)
+                {
+                    // Retail OnAnimatorIK looks at the left-hand goal + 0.2m in world Y.
+                    // The goal inherits the IK anchor's clamped [-70, 70] aim pitch.
+                    Vector3 direction = lookAt.position + Vector3.up * 0.2f - head.position;
+                    if (direction.sqrMagnitude > kEps)
+                    {
+                        // SetLookAtWeight(weight) defaults: body=0, head=1, eyes=0,
+                        // clamp=0.5. Bound the manual head-only solve to the forward
+                        // hemisphere; the exact Mecanim muscle clamp is native-only.
+                        const float clampWeight = 0.5f;
+                        direction = Vector3.RotateTowards(rt.forward, direction.normalized,
+                            Mathf.PI * (1f - clampWeight), 0f);
+                        headTarget = Quaternion.FromToRotation(head.forward, direction) * head.rotation;
+                    }
+                }
                 head.rotation = Quaternion.Slerp(head.rotation, headTarget, lookW);
             }
         }

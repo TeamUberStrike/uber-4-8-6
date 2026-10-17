@@ -636,7 +636,7 @@ public class GlobalUIRibbon : MonoBehaviour
 
 	private void DoFpsAndVersion()
 	{
-		string text = string.Format("{0} v{1}", ApplicationDataManager.FrameRate, "4.7.1");
+		string text = string.Format("{0} v{1}", ApplicationDataManager.FrameRate, ApplicationDataManager.Version);
 		GUI.color = Color.white.SetAlpha(0.3f);
 		GUI.Label(new Rect(5f, Screen.height - 25, 190f, 20f), text, BlueStonez.label_interparkmed_11pt_right);
 		GUI.color = Color.white;

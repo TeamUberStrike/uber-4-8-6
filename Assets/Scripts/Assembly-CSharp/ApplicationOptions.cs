@@ -72,12 +72,12 @@ public class ApplicationOptions
 	{
 		string text = PlayerPrefs.GetString("Version", "Invalid");
 		bool flag = false;
-		if ("4.7.1" != text)
+		if (ApplicationDataManager.Version != text)
 		{
 			flag = true;
 			CmunePrefs.Reset();
 			QualitySettings.SetQualityLevel(2, true);
-			PlayerPrefs.SetString("Version", "4.7.1");
+			PlayerPrefs.SetString("Version", ApplicationDataManager.Version);
 		}
 		Application.targetFrameRate = -1;
 		QualitySettings.maxQueuedFrames = -1;

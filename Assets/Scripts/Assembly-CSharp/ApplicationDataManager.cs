@@ -12,7 +12,7 @@ public static class ApplicationDataManager
 
 	public const string StandaloneFilename = "UberStrike";
 
-	public const string Version = "4.7.1";
+	public static string Version;
 
 	public static bool IsMac
 	{
@@ -92,6 +92,7 @@ public static class ApplicationDataManager
 		WebServiceBaseUrl = "http://127.0.0.1:8888/2.0/";
 		ImagePath = "http://127.0.0.1:8888/images/";
 		IsDebug = true;
+		Version = "4.8.6";
 		applicationDateTime = 0f;
 		serverDateTime = DateTime.Now;
 		WebPlayerHasResult = false;

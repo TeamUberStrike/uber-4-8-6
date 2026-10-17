@@ -279,12 +279,12 @@ public class GamePeer : BaseGamePeer
 	{
 		if (base.IsConnected)
 		{
-			base.Operations.SendCreateRoom(data, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendCreateRoom(data, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendCreateRoom(data, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendCreateRoom(data, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 		};
 		Connect(data.Server.ConnectionString);
 	}
@@ -294,12 +294,12 @@ public class GamePeer : BaseGamePeer
 		Debug.Log("JoinGame " + server + ":" + roomId + "[current:" + base.Peer.ServerAddress + "]");
 		if (base.IsConnected)
 		{
-			base.Operations.SendEnterRoom(roomId, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendEnterRoom(roomId, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendEnterRoom(roomId, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendEnterRoom(roomId, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 		};
 		Connect(server);
 	}
