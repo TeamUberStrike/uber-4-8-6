@@ -14,6 +14,11 @@ public static class ApplicationDataManager
 
 	public const string Version = "4.7.1";
 
+	public static bool IsMac
+	{
+		get { return Application.platform == RuntimePlatform.OSXPlayer; }
+	}
+
 	public const int MinimalWidth = 989;
 
 	public const int MinimalHeight = 560;

@@ -421,5 +421,50 @@ namespace UberStrike.Realtime.Client
 				}
 			}
 		}
+
+		public void SendTrustedModules(string modules)
+		{
+			using (MemoryStream memoryStream = new MemoryStream())
+			{
+				StringProxy.Serialize(memoryStream, modules);
+				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
+				dictionary.Add(__id, memoryStream.ToArray());
+				Dictionary<byte, object> customOpParameters = dictionary;
+				if (sendOperation != null)
+				{
+					sendOperation(27, customOpParameters);
+				}
+			}
+		}
+
+		public void SendAuthentication(string hwid)
+		{
+			using (MemoryStream memoryStream = new MemoryStream())
+			{
+				StringProxy.Serialize(memoryStream, hwid);
+				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
+				dictionary.Add(__id, memoryStream.ToArray());
+				Dictionary<byte, object> customOpParameters = dictionary;
+				if (sendOperation != null)
+				{
+					sendOperation(28, customOpParameters);
+				}
+			}
+		}
+
+		public void SendUberBeatReport(string report)
+		{
+			using (MemoryStream memoryStream = new MemoryStream())
+			{
+				StringProxy.Serialize(memoryStream, report);
+				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
+				dictionary.Add(__id, memoryStream.ToArray());
+				Dictionary<byte, object> customOpParameters = dictionary;
+				if (sendOperation != null)
+				{
+					sendOperation(29, customOpParameters);
+				}
+			}
+		}
 	}
 }

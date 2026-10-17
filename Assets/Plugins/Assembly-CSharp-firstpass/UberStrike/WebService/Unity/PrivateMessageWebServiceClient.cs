@@ -15,7 +15,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, pageNumber);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "UberStrike.DataCenter.WebService.CWS.PrivateMessageWebServiceContract.svc", "GetAllMessageThreadsForUser", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "PrivateMessageWebService", "GetAllMessageThreadsForUser", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -32,7 +32,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, otherCmid);
 				Int32Proxy.Serialize(memoryStream, pageNumber);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "UberStrike.DataCenter.WebService.CWS.PrivateMessageWebServiceContract.svc", "GetThreadMessages", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "PrivateMessageWebService", "GetThreadMessages", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -49,7 +49,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, receiverCmid);
 				StringProxy.Serialize(memoryStream, content);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "UberStrike.DataCenter.WebService.CWS.PrivateMessageWebServiceContract.svc", "SendMessage", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "PrivateMessageWebService", "SendMessage", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -65,7 +65,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, messageId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "UberStrike.DataCenter.WebService.CWS.PrivateMessageWebServiceContract.svc", "GetMessageWithIdForCmid", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "PrivateMessageWebService", "GetMessageWithIdForCmid", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -81,7 +81,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, otherCmid);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "UberStrike.DataCenter.WebService.CWS.PrivateMessageWebServiceContract.svc", "MarkThreadAsRead", memoryStream.ToArray(), delegate
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "PrivateMessageWebService", "MarkThreadAsRead", memoryStream.ToArray(), delegate
 				{
 					if (callback != null)
 					{
@@ -97,7 +97,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, otherCmid);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "UberStrike.DataCenter.WebService.CWS.PrivateMessageWebServiceContract.svc", "DeleteThread", memoryStream.ToArray(), delegate
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IPrivateMessageWebServiceContract", "PrivateMessageWebService", "DeleteThread", memoryStream.ToArray(), delegate
 				{
 					if (callback != null)
 					{

@@ -76,6 +76,10 @@ public class GamePeerAction : BaseGamePeer
 	{
 	}
 
+	protected override void OnRoomRejoin(GameRoomData data, string password)
+	{
+	}
+
 	protected override void OnRoomLeft()
 	{
 	}

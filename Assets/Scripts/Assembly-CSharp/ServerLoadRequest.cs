@@ -109,6 +109,10 @@ public class ServerLoadRequest : BaseGamePeer
 	{
 	}
 
+	protected override void OnRoomRejoin(GameRoomData data, string password)
+	{
+	}
+
 	protected override void OnRoomLeft()
 	{
 	}

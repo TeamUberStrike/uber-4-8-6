@@ -154,13 +154,14 @@ namespace UberStrike.Realtime.Client
 			}
 		}
 
-		public void SendDirectHitDamage(int target, byte bodyPart, byte bullets)
+		public void SendDirectHitDamage(int target, byte bodyPart, byte bullets, byte weaponSlot)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				Int32Proxy.Serialize(memoryStream, target);
 				ByteProxy.Serialize(memoryStream, bodyPart);
 				ByteProxy.Serialize(memoryStream, bullets);
+				ByteProxy.Serialize(memoryStream, weaponSlot);
 				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
 				dictionary.Add(__id, memoryStream.ToArray());
 				Dictionary<byte, object> customOpParameters = dictionary;

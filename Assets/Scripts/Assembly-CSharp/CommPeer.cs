@@ -19,7 +19,7 @@ public class CommPeer : BaseCommPeer
 	{
 		if (PlayerDataManager.IsPlayerLoggedIn)
 		{
-			base.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			Singleton<ChatManager>.Instance.UpdateFriendSection();
 		}
 	}

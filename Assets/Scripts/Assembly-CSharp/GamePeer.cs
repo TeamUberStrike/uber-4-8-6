@@ -279,12 +279,12 @@ public class GamePeer : BaseGamePeer
 	{
 		if (base.IsConnected)
 		{
-			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendCreateRoom(data, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendCreateRoom(data, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 		};
 		Connect(data.Server.ConnectionString);
 	}
@@ -294,12 +294,12 @@ public class GamePeer : BaseGamePeer
 		Debug.Log("JoinGame " + server + ":" + roomId + "[current:" + base.Peer.ServerAddress + "]");
 		if (base.IsConnected)
 		{
-			base.Operations.SendEnterRoom(roomId, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendEnterRoom(roomId, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendEnterRoom(roomId, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendEnterRoom(roomId, password, "4.8.6", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 		};
 		Connect(server);
 	}
@@ -333,12 +333,12 @@ public class GamePeer : BaseGamePeer
 		Connect(serverAddress);
 	}
 
-	private void ReconnectToCurrentGame()
+	private void ReconnectToCurrentGame(string password = "")
 	{
 		if (lastRoomJoined != 0)
 		{
 			Singleton<GameStateController>.Instance.UnloadGameMode();
-			JoinGame(base.Peer.ServerAddress, lastRoomJoined, string.Empty);
+			JoinGame(base.Peer.ServerAddress, lastRoomJoined, password);
 		}
 		else
 		{
@@ -357,5 +357,10 @@ public class GamePeer : BaseGamePeer
 		{
 			Debug.LogError("Failed to reconnect because GameRoom is null!");
 		}
+	}
+
+	protected override void OnRoomRejoin(GameRoomData data, string password)
+	{
+		ReconnectToCurrentGame(password);
 	}
 }

@@ -54,12 +54,17 @@ namespace UberStrike.Realtime.Client
 			case 11:
 				DisconnectAndDisablePhoton(data);
 				break;
+			case 12:
+				OnWeekendChallengeAchivement();
+				break;
 			}
 		}
 
 		protected abstract void OnHeartbeatChallenge(string challengeHash);
 
 		protected abstract void OnRoomEntered(GameRoomData game);
+
+		protected abstract void OnRoomRejoin(GameRoomData data, string password);
 
 		protected abstract void OnRoomEnterFailed(string server, int roomId, string message);
 
@@ -92,8 +97,20 @@ namespace UberStrike.Realtime.Client
 		{
 			using (MemoryStream bytes = new MemoryStream(_bytes))
 			{
-				GameRoomData game = GameRoomDataProxy.Deserialize(bytes);
-				OnRoomEntered(game);
+				GameRoomData gameRoomData = GameRoomDataProxy.Deserialize(bytes);
+				if (BooleanProxy.Deserialize(bytes))
+				{
+					string password = "";
+					if (gameRoomData.IsPasswordProtected)
+					{
+						password = StringProxy.Deserialize(bytes);
+					}
+					OnRoomRejoin(gameRoomData, password);
+				}
+				else
+				{
+					OnRoomEntered(gameRoomData);
+				}
 			}
 		}
 
@@ -180,6 +197,10 @@ namespace UberStrike.Realtime.Client
 				string message = StringProxy.Deserialize(bytes);
 				OnDisconnectAndDisablePhoton(message);
 			}
+		}
+
+		protected virtual void OnWeekendChallengeAchivement()
+		{
 		}
 	}
 }

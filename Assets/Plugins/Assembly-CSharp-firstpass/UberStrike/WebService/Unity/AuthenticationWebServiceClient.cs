@@ -19,7 +19,7 @@ namespace UberStrike.WebService.Unity
 				EnumProxy<ChannelType>.Serialize(memoryStream, channel);
 				StringProxy.Serialize(memoryStream, locale);
 				StringProxy.Serialize(memoryStream, machineId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "CreateUser", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "AuthenticationWebService", "CreateUser", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -38,7 +38,7 @@ namespace UberStrike.WebService.Unity
 				EnumProxy<ChannelType>.Serialize(memoryStream, channel);
 				StringProxy.Serialize(memoryStream, locale);
 				StringProxy.Serialize(memoryStream, machineId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "CompleteAccount", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "AuthenticationWebService", "CompleteAccount", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -56,7 +56,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, password);
 				EnumProxy<ChannelType>.Serialize(memoryStream, channelType);
 				StringProxy.Serialize(memoryStream, machineId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "LoginMemberEmail", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "AuthenticationWebService", "LoginMemberEmail", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -73,7 +73,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, facebookPlayerAccessToken);
 				EnumProxy<ChannelType>.Serialize(memoryStream, channelType);
 				StringProxy.Serialize(memoryStream, machineId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "LoginMemberFacebookUnitySdk", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "AuthenticationWebService", "LoginMemberFacebookUnitySdk", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -86,7 +86,7 @@ namespace UberStrike.WebService.Unity
 		// UBZ AspNetCore server deserializes LoginSteam as 6-arg:
 		// (clientVersion, steamId, authToken, machineId, hwid, isMac)
 		// Serialization order must match exactly or version check returns NewUpdate.
-		public static Coroutine LoginSteam(string clientVersion, string steamId, string authToken, string machineId, Action<MemberAuthenticationResultView> callback, Action<Exception> handler)
+		public static Coroutine LoginSteam(string clientVersion, string steamId, string authToken, string machineId, string hwid, bool isMac, Action<MemberAuthenticationResultView> callback, Action<Exception> handler)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
@@ -94,9 +94,9 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, steamId);
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, machineId);
-				StringProxy.Serialize(memoryStream, string.Empty); // hwid — tolerated empty by UberBeatManager
-				BooleanProxy.Serialize(memoryStream, false);       // isMac
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "LoginSteam", memoryStream.ToArray(), delegate(byte[] data)
+				StringProxy.Serialize(memoryStream, hwid);
+				BooleanProxy.Serialize(memoryStream, isMac);
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "AuthenticationWebService", "LoginSteam", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -113,7 +113,7 @@ namespace UberStrike.WebService.Unity
 				Int32Proxy.Serialize(memoryStream, cmid);
 				StringProxy.Serialize(memoryStream, hash);
 				StringProxy.Serialize(memoryStream, machineId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "LoginMemberPortal", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "AuthenticationWebService", "LoginMemberPortal", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -131,7 +131,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, password);
 				StringProxy.Serialize(memoryStream, steamId);
 				StringProxy.Serialize(memoryStream, machineId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.AuthenticationWebServiceContract.svc", "LinkSteamMember", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IAuthenticationWebServiceContract", "AuthenticationWebService", "LinkSteamMember", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{

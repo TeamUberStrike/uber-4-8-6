@@ -12,6 +12,7 @@ namespace UberStrike.Realtime.Client
 		GameListUpdateEnd = 8,
 		GetGameInformation = 9,
 		ServerLoadData = 10,
-		DisconnectAndDisablePhoton = 11
+		DisconnectAndDisablePhoton = 11,
+		WeekendChallenge = 12
 	}
 }

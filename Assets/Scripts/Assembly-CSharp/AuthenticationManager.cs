@@ -515,7 +515,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			MemberAuthenticationResultView authenticationView = null;
 			_progress.Text = "Authenticating with UberStrike";
 			_progress.Progress = 0.1f;
-			yield return AuthenticationWebServiceClient.LoginSteam("4.8.6", PlayerDataManager.SteamId, authToken, machineId, delegate(MemberAuthenticationResultView result)
+			yield return AuthenticationWebServiceClient.LoginSteam("4.8.6", PlayerDataManager.SteamId, authToken, machineId, string.Empty, ApplicationDataManager.IsMac, delegate(MemberAuthenticationResultView result)
 			{
 				authenticationView = result;
 				PlayerPrefs.SetString("CurrentSteamUser", PlayerDataManager.SteamId);
@@ -588,7 +588,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		_progress.Text = LocalizedStrings.LoadingMapData;
 		_progress.Progress = 0.5f;
 		bool mapsLoadedSuccessfully = false;
-		yield return ApplicationWebServiceClient.GetMaps("4.7.1", DefinitionType.StandardDefinition, delegate(List<MapView> callback)
+		yield return ApplicationWebServiceClient.GetMaps("4.8.6", DefinitionType.StandardDefinition, delegate(List<MapView> callback)
 		{
 			mapsLoadedSuccessfully = Singleton<MapManager>.Instance.InitializeMapsToLoad(callback);
 		}, delegate

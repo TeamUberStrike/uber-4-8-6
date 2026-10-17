@@ -240,7 +240,7 @@ public class CompleteAccountPanelGUI : PanelGuiBase
 				list.Add(Singleton<ItemManager>.Instance.GetItemInShop(key));
 			}
 			PlayerDataManager.Name = name;
-			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			StartCoroutine(StartPreparingNewPlayersLoadout(list));
 			break;
 		}
