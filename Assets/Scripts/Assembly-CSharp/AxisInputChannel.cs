@@ -144,7 +144,7 @@ public class AxisInputChannel : IInputChannel
 		// triggers NextWeapon/PrevWeapon on the same frame. Leave analog
 		// channels (Mouse X/Y, gamepad sticks) on GetAxis to preserve
 		// look/aim smoothing.
-		if (_axis.StartsWith("Mouse ScrollWheel"))
+		if (_axis.StartsWith("Mouse ScrollWheel", System.StringComparison.Ordinal))
 		{
 			return Input.GetAxisRaw(_axis);
 		}

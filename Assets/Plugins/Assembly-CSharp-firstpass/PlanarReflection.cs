@@ -94,6 +94,20 @@ public class PlanarReflection : MonoBehaviour
 		}
 	}
 
+	private void OnDestroy()
+	{
+		if ((bool)reflectionCamera)
+		{
+			RenderTexture rt = reflectionCamera.targetTexture;
+			reflectionCamera.targetTexture = null;
+			if ((bool)rt)
+			{
+				Destroy(rt);
+			}
+			Destroy(reflectionCamera.gameObject);
+		}
+	}
+
 	public void LateUpdate()
 	{
 		if (helperCameras != null)

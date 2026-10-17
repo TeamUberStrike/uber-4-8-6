@@ -161,7 +161,7 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		// toggle -- a real match never sets it, so also honor the room's actual
 		// GameFlags (set via CreateGamePanelGUI, synced through RoomData), mirroring
 		// how GameState.ConfigureAvatar reads LowGravity the same way.
-		bool quickSwitchActive = TrainingPageGUI.QuickSwitchEnabled || (GameState.Current.RoomData != null && GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, GameState.Current.RoomData.GameFlags));
+		bool quickSwitchActive = (TrainingPageGUI.QuickSwitchEnabled && !GameState.Current.IsMultiplayer) || (GameState.Current.RoomData != null && GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, GameState.Current.RoomData.GameFlags));
 		if (_currentSlot != _weapons[_currentSlotID.Current] && quickSwitchActive)
 		{
 			_holsterTime = 0f;
@@ -190,13 +190,14 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 			// this poll, full-auto stalls after a switch until the player
 			// releases-and-represses LMB. Synthesize the missed press once
 			// per held cycle; latch resets on switch and on LMB release.
-			if (Input.GetMouseButton(0))
+			InputManager im = AutoMonoBehaviour<InputManager>.Instance;
+			if (im.IsInputEnabled && im.IsDown(GameInputKey.PrimaryFire))
 			{
-				if (!_reconciledFireHeld)
+				if (!_reconciledFireHeld && (_currentSlot.InputHandler.FireHandler is FullAutoFireHandler || _currentSlot.InputHandler is MinigunInputHandler))
 				{
 					_currentSlot.InputHandler.OnPrimaryFire(true);
-					_reconciledFireHeld = true;
 				}
+				_reconciledFireHeld = true;
 			}
 			else
 			{

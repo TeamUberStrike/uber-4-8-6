@@ -14,6 +14,8 @@ public class TrainingPageGUI : MonoBehaviour
 	private static bool _lowGravity;
 	private static bool _quickSwitch;
 
+	private static GUIStyle _mapLabelStyle;
+
 	public static bool LowGravityEnabled { get { return _lowGravity; } }
 	public static bool QuickSwitchEnabled { get { return _quickSwitch; } }
 
@@ -83,10 +85,14 @@ public class TrainingPageGUI : MonoBehaviour
 			// names like "Temple of the Raven" and "SuperPRISM Reactor" don't clip into
 			// neighbouring cells. Previous layout used the natural text width which
 			// overflowed when Unity 6 metrics differ from the legacy interparkbold font.
-			GUIStyle labelStyle = new GUIStyle(BlueStonez.label_interparkbold_11pt);
-			labelStyle.alignment = TextAnchor.MiddleCenter;
-			labelStyle.wordWrap = false;
-			labelStyle.clipping = TextClipping.Clip;
+			if (_mapLabelStyle == null)
+			{
+				_mapLabelStyle = new GUIStyle(BlueStonez.label_interparkbold_11pt);
+				_mapLabelStyle.alignment = TextAnchor.MiddleCenter;
+				_mapLabelStyle.wordWrap = false;
+				_mapLabelStyle.clipping = TextClipping.Clip;
+			}
+			GUIStyle labelStyle = _mapLabelStyle;
 			GUI.contentColor = white;
 			GUI.Label(new Rect(2f, rect.height - 18f, rect.width - 4f, 16f), allMap.Name, labelStyle);
 			GUI.contentColor = Color.white;

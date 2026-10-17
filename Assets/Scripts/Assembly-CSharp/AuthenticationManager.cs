@@ -32,15 +32,18 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 	// the real UBZ email auth path. Requires UBZ server running and a user account
 	// at DEV_REAL_AUTH_EMAIL / DEV_REAL_AUTH_PASS (create one via the in-game
 	// signup flow once if needed). Flip back to false for offline iteration.
+#if UNITY_EDITOR
 	private const bool DEV_REAL_AUTH_TEST = false;
 	private const string DEV_REAL_AUTH_EMAIL = "aaa@bbb.com";
 	private const string DEV_REAL_AUTH_PASS = "dev123";
+#endif
 
 	public void LoginByChannel()
 	{
 		string text = PlayerPrefs.GetString("CurrentSteamUser", string.Empty);
 		Debug.Log(string.Format("SteamWorks SteamID:{0}, PlayerPrefs SteamID:{1}", PlayerDataManager.SteamId, text));
 
+#if UNITY_EDITOR
 		if (DEV_REAL_AUTH_TEST)
 		{
 			Debug.LogWarning("[AuthenticationManager] DEV_REAL_AUTH_TEST=true — routing to UBZ email auth ("
@@ -71,6 +74,13 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			UnityRuntime.StartRoutine(StartOfflineLogin());
 			return;
 		}
+#else
+		if (PlayerDataManager.SteamId == PlayerDataManager.OFFLINE_STEAMID)
+		{
+			ApplicationDataManager.LockApplication("Steam must be running and logged in to play UberStrike.");
+			return;
+		}
+#endif
 
 		if (string.IsNullOrEmpty(text) || text != PlayerDataManager.SteamId)
 		{
@@ -513,7 +523,6 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			}, delegate(Exception error)
 			{
 				Debug.LogError("Account authentication error: " + error);
-				ShowLoginErrorPopup(LocalizedStrings.Error, "There was an error logging you in. Please try again or contact us at http://support.cmune.com");
 			});
 			yield return UnityRuntime.StartRoutine(CompleteAuthentication(authenticationView));
 		}
@@ -653,7 +662,6 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			MenuPageManager.Instance.LoadPage(PageType.Home);
 			IsAuthComplete = true;
 		}
-		Debug.LogWarning(string.Format("AuthToken:{0}, MagicHash:{1}", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash));
 	}
 
 	public void StartLogout()

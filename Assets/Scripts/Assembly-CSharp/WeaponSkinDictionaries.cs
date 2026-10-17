@@ -23,7 +23,11 @@ public static partial class WeaponSkinHelper
 		public MuzzleTintSpec? MuzzleTints;
 	}
 
-	public static readonly Dictionary<int, SkinDef> Skins = new Dictionary<int, SkinDef>
+	public static readonly Dictionary<int, SkinDef> Skins;
+
+	static Dictionary<int, SkinDef> BuildSkins()
+	{
+		return new Dictionary<int, SkinDef>
 	{
 		{ 2010, new SkinDef { SkinTextures = "2010_NaturalShotgun.png", IconTextures = "2010_NaturalShotgun_Icon.png" } },
 		{ 2011, new SkinDef { SkinTextures = "2011_PlasmaBat.png", IconTextures = "2011_PlasmaBat_Icon.png" } },
@@ -92,9 +96,11 @@ public static partial class WeaponSkinHelper
 		{ 2074, new SkinDef { SkinTextures = "2074_SplattergunPrismSplatter.png", IconTextures = "2074_SplattergunPrismSplatter_Icon.png" } },
 		{ 2075, new SkinDef { SkinTextures = "2075_LauncherDragonsMaw.png", IconTextures = "2075_LauncherDragonsMaw_Icon.png" } },
 	};
+	}
 
 	static WeaponSkinHelper()
 	{
+		Skins = BuildSkins();
 		foreach (var kv in Skins)
 		{
 			int id = kv.Key; var s = kv.Value;
