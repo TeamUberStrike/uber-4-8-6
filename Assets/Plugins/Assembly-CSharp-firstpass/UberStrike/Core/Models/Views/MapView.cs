@@ -15,7 +15,13 @@ namespace UberStrike.Core.Models.Views
 
 		public string SceneName { get; set; }
 
-		public bool IsBlueBox { get; set; }
+		public GameBoxType BoxType { get; set; }
+
+		public bool IsBlueBox
+		{
+			get { return BoxType == GameBoxType.BLUE; }
+			set { BoxType = value ? GameBoxType.BLUE : GameBoxType.NORMAL; }
+		}
 
 		public int RecommendedItemId { get; set; }
 
