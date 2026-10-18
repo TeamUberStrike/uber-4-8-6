@@ -18,12 +18,10 @@ public class WeaponTailSound : BaseWeaponEffect
 	{
 		if ((bool)_tailSound)
 		{
-			_tailAudioSource = base.gameObject.AddComponent<AudioSource>();
-			if ((bool)_tailAudioSource)
-			{
-				_tailAudioSource.clip = _tailSound;
-				_tailAudioSource.playOnAwake = false;
-			}
+			// tail on own object next to gun. switch disables gun = cut tail
+			_tailAudioSource = new GameObject(base.gameObject.name + " TailAudio").AddComponent<AudioSource>();
+			_tailAudioSource.clip = _tailSound;
+			_tailAudioSource.playOnAwake = false;
 			_tailSoundMaxLength = _tailSound.length * 0.8f;
 		}
 		else
@@ -57,6 +55,17 @@ public class WeaponTailSound : BaseWeaponEffect
 	{
 		if ((bool)_tailAudioSource)
 		{
+			Transform t = _tailAudioSource.transform;
+			Transform gun = base.transform;
+			while ((bool)gun.parent && !gun.GetComponent<BaseWeaponDecorator>())
+			{
+				gun = gun.parent;
+			}
+			if (t.parent != gun.parent)
+			{
+				t.parent = gun.parent;
+			}
+			t.position = base.transform.position;
 			_tailAudioSource.Stop();
 			_tailAudioSource.Play();
 		}
@@ -64,9 +73,13 @@ public class WeaponTailSound : BaseWeaponEffect
 
 	public override void Hide()
 	{
+	}
+
+	private void OnDestroy()
+	{
 		if ((bool)_tailAudioSource)
 		{
-			_tailAudioSource.Stop();
+			Object.Destroy(_tailAudioSource.gameObject, 3f);
 		}
 	}
 
