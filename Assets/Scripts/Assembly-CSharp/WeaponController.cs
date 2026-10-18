@@ -334,6 +334,7 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		{
 			if (CheckAmmoCount())
 			{
+				BaseWeaponDecorator._noAmmoSoundPlaying = false;
 				_currentSlot.InputHandler.FireHandler.RegisterShot();
 				_holsterTime = WeaponConfigurationHelper.GetRateOfFire(_currentSlot.View);
 				Ray ray = new Ray(GameState.Current.PlayerData.ShootingPoint + GameState.Current.Player.EyePosition, GameState.Current.PlayerData.ShootingDirection);
@@ -349,7 +350,7 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 			}
 			else
 			{
-				_currentSlot.Decorator.PlayOutOfAmmoSound();
+				_currentSlot.Decorator.PlayOutOfAmmoSound(_currentSlot.View);
 				GameData.Instance.OnNotificationFull.Fire(string.Empty, "Out of ammo!", 1f);
 			}
 		}

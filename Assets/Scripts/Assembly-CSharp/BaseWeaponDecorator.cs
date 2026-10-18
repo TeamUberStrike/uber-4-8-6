@@ -31,6 +31,21 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 
 	private AudioSource _shotAudioSource;
 
+	private static float _noAmmoSoundUntil;
+
+	// team client: out-of-ammo click rate-limited to the weapon's rate of fire
+	public static bool _noAmmoSoundPlaying
+	{
+		get
+		{
+			return Time.time < _noAmmoSoundUntil;
+		}
+		set
+		{
+			_noAmmoSoundUntil = ((!value) ? 0f : float.MaxValue);
+		}
+	}
+
 	private Dictionary<string, SurfaceEffectType> _effectMap;
 
 	private List<BaseWeaponEffect> _effects = new List<BaseWeaponEffect>();
@@ -351,9 +366,14 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 		Debug.LogError("Not Implemented: Should play WeaponHit sound!");
 	}
 
-	public void PlayOutOfAmmoSound()
+	public void PlayOutOfAmmoSound(UberStrike.Core.Models.Views.UberStrikeItemWeaponView weapon)
 	{
-		Play3dAudioClip(_mainAudioSource, GameAudio.OutOfAmmoClick);
+		if (!_noAmmoSoundPlaying)
+		{
+			// timestamp, not a coroutine: the gun is disabled on switch and would kill the timer
+			_noAmmoSoundUntil = Time.time + WeaponConfigurationHelper.GetRateOfFire(weapon);
+			Play3dAudioClip(_mainAudioSource, GameAudio.OutOfAmmoClick);
+		}
 	}
 
 	public void PlayImpactSoundAt(HitPoint point)
