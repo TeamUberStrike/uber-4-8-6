@@ -29,6 +29,8 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 
 	protected AudioSource _mainAudioSource;
 
+	private AudioSource _shotAudioSource;
+
 	private Dictionary<string, SurfaceEffectType> _effectMap;
 
 	private List<BaseWeaponEffect> _effects = new List<BaseWeaponEffect>();
@@ -251,6 +253,10 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 	public virtual void StopSound()
 	{
 		_mainAudioSource.Stop();
+		if ((bool)_shotAudioSource)
+		{
+			_shotAudioSource.Stop();
+		}
 	}
 
 	public void PlayShootSound()
@@ -261,9 +267,57 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 			AudioClip audioClip = _shootSounds[num];
 			if ((bool)audioClip)
 			{
-				_mainAudioSource.volume = ((!ApplicationDataManager.ApplicationOptions.AudioEnabled) ? 0f : ApplicationDataManager.ApplicationOptions.AudioEffectsVolume);
-				_mainAudioSource.PlayOneShot(audioClip);
+				AudioSource source = GetShotAudioSource();
+				source.volume = ((!ApplicationDataManager.ApplicationOptions.AudioEnabled) ? 0f : ApplicationDataManager.ApplicationOptions.AudioEffectsVolume);
+				source.PlayOneShot(audioClip);
 			}
+		}
+	}
+
+	// shot sound on own object next to gun. switch disables gun = cut shot
+	private AudioSource GetShotAudioSource()
+	{
+		if (!_shotAudioSource)
+		{
+			_shotAudioSource = new GameObject(base.gameObject.name + " ShotAudio").AddComponent<AudioSource>();
+			CopyAudioSource(_mainAudioSource, _shotAudioSource);
+		}
+		Transform t = _shotAudioSource.transform;
+		if (t.parent != base.transform.parent)
+		{
+			t.parent = base.transform.parent;
+		}
+		t.localPosition = base.transform.localPosition;
+		return _shotAudioSource;
+	}
+
+	private static void CopyAudioSource(AudioSource from, AudioSource to)
+	{
+		to.playOnAwake = false;
+		to.enabled = from.enabled;
+		to.mute = from.mute;
+		to.bypassEffects = from.bypassEffects;
+		to.bypassListenerEffects = from.bypassListenerEffects;
+		to.bypassReverbZones = from.bypassReverbZones;
+		to.ignoreListenerVolume = from.ignoreListenerVolume;
+		to.ignoreListenerPause = from.ignoreListenerPause;
+		to.velocityUpdateMode = from.velocityUpdateMode;
+		to.priority = from.priority;
+		to.pitch = from.pitch;
+		to.pan = from.pan;
+		to.panLevel = from.panLevel;
+		to.spread = from.spread;
+		to.dopplerLevel = from.dopplerLevel;
+		to.rolloffMode = from.rolloffMode;
+		to.minDistance = from.minDistance;
+		to.maxDistance = from.maxDistance;
+	}
+
+	protected virtual void OnDestroy()
+	{
+		if ((bool)_shotAudioSource)
+		{
+			Destroy(_shotAudioSource.gameObject, 3f);
 		}
 	}
 
