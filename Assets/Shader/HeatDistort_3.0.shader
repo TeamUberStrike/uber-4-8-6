@@ -1,112 +1,157 @@
-// Per pixel bumped refraction.
-// Uses a normal map to distort the image behind, and
-// an additional texture to tint the color.
-//
-// Copied verbatim from production uber-client-4-3-8-unity_2022_working
-// (UberStrike.Unity/Assets/Scenes/Props/Teleport/FBX/Materials/HeatDistort_3.0.shader)
-// where it is proven to render correctly.
-
-Shader "HeatDistort_3.0" {
+Shader "Cross Platform Shaders/HeatDistort_3.0" {
 Properties {
-	_BumpAmt  ("Distortion", range (0,128)) = 10
-	_MainTex ("Tint Color (RGB)", 2D) = "white" {}
-	_BumpMap ("Normalmap", 2D) = "bump" {}
+ _BumpAmt ("Distortion", Range(0,128)) = 10
+ _MainTex ("Tint Color (RGB)", 2D) = "white" {}
+ _BumpMap ("Normalmap", 2D) = "bump" {}
 }
-
-CGINCLUDE
-#pragma fragmentoption ARB_precision_hint_fastest
-#pragma fragmentoption ARB_fog_exp2
-#include "UnityCG.cginc"
-
-sampler2D _GrabTexture : register(s0);
-float4 _GrabTexture_TexelSize;
-sampler2D _BumpMap : register(s1);
-sampler2D _MainTex : register(s2);
-
-struct v2f {
-	float4 vertex : POSITION;
-	float4 uvgrab : TEXCOORD0;
-	float2 uvbump : TEXCOORD1;
-	float2 uvmain : TEXCOORD2;
-};
-
-uniform float _BumpAmt;
-
-
-half4 frag( v2f i ) : COLOR
-{
-	// calculate perturbed coordinates
-	half2 bump = UnpackNormal(tex2D( _BumpMap, i.uvbump )).rg; // we could optimize this by just reading the x & y without reconstructing the Z
-	float2 offset = bump * _BumpAmt * _GrabTexture_TexelSize.xy;
-	i.uvgrab.xy = offset * i.uvgrab.z + i.uvgrab.xy;
-
-	half4 col = tex2Dproj( _GrabTexture, i.uvgrab.xyw );
-	half4 tint = tex2D( _MainTex, i.uvmain );
-	return col * tint;
+SubShader { 
+ Tags { "QUEUE"="Overlay" "RenderType"="Overlay" }
+ GrabPass {
+  Name "BASE"
+  Tags { "LIGHTMODE"="Always" }
+ }
+ Pass {
+  Name "BASE"
+  Tags { "LIGHTMODE"="Always" "QUEUE"="Overlay" "RenderType"="Overlay" }
+  Fog { Mode Off }
+Program "vp" {
+// Platform d3d11 had shader errors
+//   <no keywords>
+// Platform d3d11_9x had shader errors
+//   <no keywords>
+SubProgram "opengl " {
+Bind "vertex" Vertex
+Bind "texcoord" TexCoord0
+"!!ARBvp1.0
+PARAM c[13] = { { 0, 0.5 },
+		state.matrix.mvp,
+		state.matrix.texture[1],
+		state.matrix.texture[2] };
+TEMP R0;
+TEMP R1;
+DP4 R1.z, vertex.position, c[4];
+DP4 R1.x, vertex.position, c[1];
+DP4 R1.y, vertex.position, c[2];
+MOV R0.w, R1.z;
+DP4 R0.z, vertex.position, c[3];
+MOV R0.x, R1;
+MOV R0.y, R1;
+MOV result.position, R0;
+MOV result.texcoord[0].zw, R0;
+ADD R1.xy, R1.z, R1;
+MOV R0.zw, c[0].x;
+MOV R0.xy, vertex.texcoord[0];
+DP4 result.texcoord[1].y, R0, c[6];
+DP4 result.texcoord[1].x, R0, c[5];
+DP4 result.texcoord[2].y, R0, c[10];
+DP4 result.texcoord[2].x, R0, c[9];
+MUL result.texcoord[0].xy, R1, c[0].y;
+END
+# 17 instructions, 2 R-regs
+"
 }
-ENDCG
-
-Category {
-
-	// We must be transparent, so other objects are drawn before this one.
-	Tags { "Queue"="Transparent+100" "RenderType"="Opaque" }
-
-	Fog { Mode Off }
-
-	SubShader {
-
-		// This pass grabs the screen behind the object into a texture.
-		// We can access the result in the next pass as _GrabTexture
-		GrabPass {
-			Name "BASE"
-			Tags { "LightMode" = "Always" }
- 		}
-
- 		// Main pass: Take the texture grabbed above and use the bumpmap to perturb it
- 		// on to the screen
-		Pass {
-			Name "BASE"
-			Tags { "LightMode" = "Always" }
-
-CGPROGRAM
-#pragma vertex vert
-#pragma fragment frag
-
-struct appdata_t {
-	float4 vertex : POSITION;
-	float2 texcoord: TEXCOORD0;
-};
-
-v2f vert (appdata_t v)
-{
-	v2f o;
-	o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-	#if UNITY_UV_STARTS_AT_TOP
-	float scale = -1.0;
-	#else
-	float scale = 1.0;
-	#endif
-	o.uvgrab.xy = (float2(o.vertex.x, o.vertex.y*scale) + o.vertex.w) * 0.5;
-	o.uvgrab.zw = o.vertex.zw;
-	o.uvbump = MultiplyUV( UNITY_MATRIX_TEXTURE1, v.texcoord );
-	o.uvmain = MultiplyUV( UNITY_MATRIX_TEXTURE2, v.texcoord );
-	return o;
+SubProgram "d3d9 " {
+Bind "vertex" Vertex
+Bind "texcoord" TexCoord0
+Matrix 0 [glstate_matrix_mvp]
+Matrix 4 [glstate_matrix_texture1]
+Matrix 8 [glstate_matrix_texture2]
+"vs_2_0
+def c12, 0.50000000, 0.00000000, 0, 0
+dcl_position0 v0
+dcl_texcoord0 v1
+dp4 r1.z, v0, c3
+dp4 r1.x, v0, c0
+dp4 r1.y, v0, c1
+mov r0.y, r1
+mov r0.w, r1.z
+dp4 r0.z, v0, c2
+mov r0.x, r1
+mov oPos, r0
+mov oT0.zw, r0
+mov r1.y, -r1
+add r1.xy, r1.z, r1
+mov r0.zw, c12.y
+mov r0.xy, v1
+dp4 oT1.y, r0, c5
+dp4 oT1.x, r0, c4
+dp4 oT2.y, r0, c9
+dp4 oT2.x, r0, c8
+mul oT0.xy, r1, c12.x
+"
 }
-ENDCG
-		}
-	}
-
-	// ------------------------------------------------------------------
-	// Fallback for older cards and Unity non-Pro
-
-	SubShader {
-		Blend DstColor Zero
-		Pass {
-			Name "BASE"
-			SetTexture [_MainTex] {	combine texture }
-		}
-	}
-
 }
-
+Program "fp" {
+// Platform d3d11 skipped due to earlier errors
+// Platform d3d11_9x skipped due to earlier errors
+// Platform d3d11 had shader errors
+//   <no keywords>
+// Platform d3d11_9x had shader errors
+//   <no keywords>
+SubProgram "opengl " {
+Vector 0 [_GrabTexture_TexelSize]
+Float 1 [_BumpAmt]
+SetTexture 0 [_GrabTexture] 2D 0
+SetTexture 1 [_BumpMap] 2D 1
+SetTexture 2 [_MainTex] 2D 2
+"!!ARBfp1.0
+OPTION ARB_precision_hint_fastest;
+OPTION ARB_fog_exp2;
+PARAM c[3] = { program.local[0..1],
+		{ 2, 1 } };
+TEMP R0;
+TEMP R1;
+TEX R0.yw, fragment.texcoord[1], texture[1], 2D;
+TEX R1, fragment.texcoord[2], texture[2], 2D;
+MAD R0.xy, R0.wyzw, c[2].x, -c[2].y;
+MUL R0.xy, R0, c[1].x;
+MUL R0.xy, R0, c[0];
+MAD R0.xy, R0, fragment.texcoord[0].z, fragment.texcoord[0];
+MOV R0.z, fragment.texcoord[0].w;
+TXP R0, R0.xyzz, texture[0], 2D;
+MUL result.color, R0, R1;
+END
+# 9 instructions, 2 R-regs
+"
+}
+SubProgram "d3d9 " {
+Vector 0 [_GrabTexture_TexelSize]
+Float 1 [_BumpAmt]
+SetTexture 0 [_GrabTexture] 2D 0
+SetTexture 1 [_BumpMap] 2D 1
+SetTexture 2 [_MainTex] 2D 2
+"ps_2_0
+dcl_2d s1
+dcl_2d s0
+dcl_2d s2
+def c2, 2.00000000, -1.00000000, 0, 0
+dcl t0
+dcl t1.xy
+dcl t2.xy
+texld r0, t1, s1
+mov r0.x, r0.w
+mad_pp r0.xy, r0, c2.x, c2.y
+mul r0.xy, r0, c1.x
+mul r0.xy, r0, c0
+mad r1.xy, r0, t0.z, t0
+mov r1.w, t0
+texld r0, t2, s2
+texldp r1, r1, s0
+mul_pp r0, r1, r0
+mov_pp oC0, r0
+"
+}
+}
+ }
+}
+SubShader { 
+ Tags { "QUEUE"="Overlay" "RenderType"="Overlay" }
+ Pass {
+  Name "BASE"
+  Tags { "QUEUE"="Overlay" "RenderType"="Overlay" }
+  Fog { Mode Off }
+  Blend DstColor Zero
+  SetTexture [_MainTex] { combine texture }
+ }
+}
 }
