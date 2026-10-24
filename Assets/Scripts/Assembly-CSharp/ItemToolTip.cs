@@ -2,6 +2,7 @@ using System;
 using Cmune.DataCenter.Common.Entities;
 using UberStrike.Core.Models.Views;
 using UberStrike.Core.Types;
+using UberStrike.Realtime.UnitySdk;
 using UnityEngine;
 
 public class ItemToolTip : AutoMonoBehaviour<ItemToolTip>
@@ -99,6 +100,8 @@ public class ItemToolTip : AutoMonoBehaviour<ItemToolTip>
 	private IUnityItem _item;
 
 	private Rect _cacheRect;
+
+	private int _startAmmo;
 
 	private float _alpha;
 
@@ -293,6 +296,7 @@ public class ItemToolTip : AutoMonoBehaviour<ItemToolTip>
 			UberStrikeItemWeaponView uberStrikeItemWeaponView3 = item.View as UberStrikeItemWeaponView;
 			if (uberStrikeItemWeaponView3 != null)
 			{
+				_startAmmo = uberStrikeItemWeaponView3.StartAmmo;
 				_ammo.Value = WeaponConfigurationHelper.GetAmmo(uberStrikeItemWeaponView3);
 				_ammo.Max = WeaponConfigurationHelper.MaxAmmo;
 				_damage.Value = WeaponConfigurationHelper.GetDamage(uberStrikeItemWeaponView3);
@@ -320,6 +324,7 @@ public class ItemToolTip : AutoMonoBehaviour<ItemToolTip>
 			UberStrikeItemWeaponView uberStrikeItemWeaponView = item.View as UberStrikeItemWeaponView;
 			if (uberStrikeItemWeaponView != null)
 			{
+				_startAmmo = uberStrikeItemWeaponView.StartAmmo;
 				_ammo.Value = WeaponConfigurationHelper.GetAmmo(uberStrikeItemWeaponView);
 				_ammo.Max = WeaponConfigurationHelper.MaxAmmo;
 				_damage.Value = WeaponConfigurationHelper.GetDamage(uberStrikeItemWeaponView);
@@ -382,17 +387,17 @@ public class ItemToolTip : AutoMonoBehaviour<ItemToolTip>
 
 	private void DrawGear()
 	{
-		ProgressBar(new Rect(20f, 120f, 200f, 12f), _armorCarried.Title, _armorCarried.Percent, ColorScheme.ProgressBar, string.Empty);
+		ProgressBar(new Rect(20f, 120f, 200f, 12f), _armorCarried.Title, _armorCarried.Percent, ColorScheme.ProgressBar, _armorCarried.Value.ToString("F0") + "AP");
 	}
 
 	private void DrawProjectileWeapon()
 	{
 		bool flag = Singleton<DragAndDrop>.Instance.IsDragging && ShopUtils.IsProjectileWeapon(Singleton<DragAndDrop>.Instance.DraggedItem.Item) && Singleton<DragAndDrop>.Instance.DraggedItem.Item.View.ItemClass == _item.View.ItemClass;
-		ProgressBar(new Rect(20f, 120f, 200f, 12f), _damage.Title, _damage.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 135f, 200f, 12f), _fireRate.Title, 1f - _fireRate.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 150f, 200f, 12f), _velocity.Title, _velocity.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 165f, 200f, 12f), _damageRadius.Title, _damageRadius.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 180f, 200f, 12f), _ammo.Title, _ammo.Percent, ColorScheme.ProgressBar, string.Empty);
+		ProgressBar(new Rect(20f, 120f, 200f, 12f), _damage.Title, _damage.Percent, ColorScheme.ProgressBar, _damage.Value.ToString("F0") + "HP");
+		ProgressBar(new Rect(20f, 135f, 200f, 12f), _fireRate.Title, 1f - _fireRate.Percent, ColorScheme.ProgressBar, (1f / _fireRate.Value).ToString("F1") + "/s");
+		ProgressBar(new Rect(20f, 150f, 200f, 12f), _velocity.Title, _velocity.Percent, ColorScheme.ProgressBar, _velocity.Value.ToString("F0") + "m/s");
+		ProgressBar(new Rect(20f, 165f, 200f, 12f), _damageRadius.Title, _damageRadius.Percent, ColorScheme.ProgressBar, _damageRadius.Value.ToString("F1") + "m");
+		ProgressBar(new Rect(20f, 180f, 200f, 12f), _ammo.Title, _ammo.Percent, ColorScheme.ProgressBar, _startAmmo + "/" + _ammo.Value.ToString("F0"));
 		if (flag)
 		{
 			UberStrikeItemWeaponView view = Singleton<DragAndDrop>.Instance.DraggedItem.Item.View as UberStrikeItemWeaponView;
@@ -406,10 +411,10 @@ public class ItemToolTip : AutoMonoBehaviour<ItemToolTip>
 	private void DrawInstantHitWeapon()
 	{
 		bool flag = Singleton<DragAndDrop>.Instance.IsDragging && ShopUtils.IsInstantHitWeapon(Singleton<DragAndDrop>.Instance.DraggedItem.Item) && Singleton<DragAndDrop>.Instance.DraggedItem.Item.View.ItemClass == _item.View.ItemClass;
-		ProgressBar(new Rect(20f, 120f, 200f, 12f), _damage.Title, _damage.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 135f, 200f, 12f), _fireRate.Title, 1f - _fireRate.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 150f, 200f, 12f), _accuracy.Title, _accuracy.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 165f, 200f, 12f), _ammo.Title, _ammo.Percent, ColorScheme.ProgressBar, string.Empty);
+		ProgressBar(new Rect(20f, 120f, 200f, 12f), _damage.Title, _damage.Percent, ColorScheme.ProgressBar, _damage.Value.ToString("F0") + "HP");
+		ProgressBar(new Rect(20f, 135f, 200f, 12f), _fireRate.Title, 1f - _fireRate.Percent, ColorScheme.ProgressBar, (1f / _fireRate.Value).ToString("F1") + "/s");
+		ProgressBar(new Rect(20f, 150f, 200f, 12f), _accuracy.Title, _accuracy.Percent, ColorScheme.ProgressBar, CmunePrint.Percent(_accuracy.Value / _accuracy.Max));
+		ProgressBar(new Rect(20f, 165f, 200f, 12f), _ammo.Title, _ammo.Percent, ColorScheme.ProgressBar, _startAmmo + "/" + _ammo.Value.ToString("F0"));
 		if (flag)
 		{
 			UberStrikeItemWeaponView view = Singleton<DragAndDrop>.Instance.DraggedItem.Item.View as UberStrikeItemWeaponView;
@@ -421,8 +426,8 @@ public class ItemToolTip : AutoMonoBehaviour<ItemToolTip>
 
 	private void DrawMeleeWeapon()
 	{
-		ProgressBar(new Rect(20f, 120f, 200f, 12f), _damage.Title, _damage.Percent, ColorScheme.ProgressBar, string.Empty);
-		ProgressBar(new Rect(20f, 135f, 200f, 12f), _fireRate.Title, 1f - _fireRate.Percent, ColorScheme.ProgressBar, string.Empty);
+		ProgressBar(new Rect(20f, 120f, 200f, 12f), _damage.Title, _damage.Percent, ColorScheme.ProgressBar, _damage.Value.ToString("F0") + "HP");
+		ProgressBar(new Rect(20f, 135f, 200f, 12f), _fireRate.Title, 1f - _fireRate.Percent, ColorScheme.ProgressBar, (1f / _fireRate.Value).ToString("F1") + "/s");
 		if (Singleton<DragAndDrop>.Instance.IsDragging && ShopUtils.IsMeleeWeapon(Singleton<DragAndDrop>.Instance.DraggedItem.Item))
 		{
 			UberStrikeItemWeaponView view = Singleton<DragAndDrop>.Instance.DraggedItem.Item.View as UberStrikeItemWeaponView;
