@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class GameAudio
 {
-	public static AudioClip HomeSceneBackground { get; private set; }
+	public static AudioClip HomeSceneBackground { get; set; }
 
 	public static AudioClip BigSplash { get; private set; }
 
@@ -384,7 +384,6 @@ public static class GameAudio
 			Debug.LogError("Missing instance of the prefab with name: GameAudio!");
 			return;
 		}
-		HomeSceneBackground = component.Assets[0];
 		BigSplash = component.Assets[1];
 		ImpactCement1 = component.Assets[2];
 		ImpactCement2 = component.Assets[3];

@@ -21,6 +21,9 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 	private AuthenticationManager()
 	{
 		_progress = new ProgressPopupDialog(LocalizedStrings.SettingUp, LocalizedStrings.ProcessingLogin);
+		GameObject gameObject = new GameObject("Plugin Holder");
+		gameObject.AddComponent<UberKill>();
+		UnityEngine.Object.DontDestroyOnLoad(gameObject);
 	}
 
 	public void SetAuthComplete(bool enabled)
