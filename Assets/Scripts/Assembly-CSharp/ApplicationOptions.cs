@@ -30,7 +30,7 @@ public class ApplicationOptions
 
 	public bool VideoPostProcessing = true;
 
-	public float VideoFOV = 75f;
+	public bool FOVMode;
 
 	public float InputXMouseSensitivity = 3f;
 
@@ -96,7 +96,7 @@ public class ApplicationOptions
 		VideoMotionBlur = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoMotionBlur, VideoMotionBlur);
 		VideoShowFps = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoShowFps, VideoShowFps);
 		VideoPostProcessing = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoPostProcessing, VideoPostProcessing);
-		VideoFOV = Mathf.Clamp(CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoFOV, 75f), 60f, 90f);
+		FOVMode = CmunePrefs.ReadKey(CmunePrefs.Key.Options_FOVMode, FOVMode);
 		IsFullscreen = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoIsFullscreen, true);
 		ScreenResolution = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoScreenRes, ScreenResolutionManager.CurrentResolutionIndex);
 		InputXMouseSensitivity = Mathf.Clamp(CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputXMouseSensitivity, 3f), 1f, 10f);
@@ -135,7 +135,7 @@ public class ApplicationOptions
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_VideoIsFullscreen, IsFullscreen);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_VideoShowFps, VideoShowFps);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_VideoPostProcessing, VideoPostProcessing);
-		CmunePrefs.WriteKey(CmunePrefs.Key.Options_VideoFOV, VideoFOV);
+		CmunePrefs.WriteKey(CmunePrefs.Key.Options_FOVMode, FOVMode);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_InputXMouseSensitivity, InputXMouseSensitivity);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_InputYMouseSensitivity, InputYMouseSensitivity);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_InputMouseRotationMaxX, InputMouseRotationMaxX);

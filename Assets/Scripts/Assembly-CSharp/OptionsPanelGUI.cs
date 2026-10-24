@@ -49,7 +49,6 @@ public class OptionsPanelGUI : PanelGuiBase
 
 	private bool _postProcessing;
 
-	private float _fov;
 
 	private Rect _rect;
 
@@ -273,7 +272,6 @@ public class OptionsPanelGUI : PanelGuiBase
 			break;
 		}
 		_vsync = QualitySettings.vSyncCount;
-		_fov = ApplicationDataManager.ApplicationOptions.VideoFOV;
 	}
 
 	public static bool HorizontalScrollbar(Rect rect, string title, ref float value, float min, float max)
@@ -333,11 +331,7 @@ public class OptionsPanelGUI : PanelGuiBase
 			graphicsChanged = true;
 			SetCurrentQuality(qualitySet.Length - 1);
 		}
-		if (HorizontalScrollbar(new Rect(8f, 120f, width, 30f), "Field of View", ref _fov, 60f, 90f))
-		{
-			ApplicationDataManager.ApplicationOptions.VideoFOV = Mathf.RoundToInt(_fov);
-		}
-		int num5 = 160;
+		int num5 = 130;
 		if (!ApplicationDataManager.IsMobile)
 		{
 			_postProcessing = GUI.Toggle(new Rect(8f, num5, width, 30f), ApplicationDataManager.ApplicationOptions.VideoPostProcessing, LocalizedStrings.ShowPostProcessingEffects, BlueStonez.toggle);
@@ -348,7 +342,8 @@ public class OptionsPanelGUI : PanelGuiBase
 			}
 			num5 += 30;
 		}
-		bool flag = GUI.Toggle(new Rect(8f, num5, width, 30f), ApplicationDataManager.ApplicationOptions.VideoShowFps, LocalizedStrings.ShowFPS, BlueStonez.toggle);
+		bool flag = GUI.Toggle(new Rect(8f, num5, 130f, 30f), ApplicationDataManager.ApplicationOptions.VideoShowFps, LocalizedStrings.ShowFPS, BlueStonez.toggle);
+		ApplicationDataManager.ApplicationOptions.FOVMode = GUI.Toggle(new Rect(140f, num5, width, 30f), ApplicationDataManager.ApplicationOptions.FOVMode, "FOV Mode", BlueStonez.toggle);
 		if (flag != ApplicationDataManager.ApplicationOptions.VideoShowFps)
 		{
 			ApplicationDataManager.ApplicationOptions.VideoShowFps = flag;

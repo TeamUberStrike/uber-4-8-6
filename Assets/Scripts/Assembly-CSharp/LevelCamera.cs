@@ -331,8 +331,16 @@ public class LevelCamera : MonoBehaviour
 		{
 			if ((bool)levelCamera.MainCamera)
 			{
-				TargetFOV = ApplicationDataManager.ApplicationOptions.VideoFOV;
-				levelCamera.MainCamera.fieldOfView = ApplicationDataManager.ApplicationOptions.VideoFOV;
+				if (ApplicationDataManager.ApplicationOptions.FOVMode)
+				{
+					TargetFOV = 100f;
+					levelCamera.MainCamera.fieldOfView = 100f;
+				}
+				else
+				{
+					TargetFOV = 75f;
+					levelCamera.MainCamera.fieldOfView = 75f;
+				}
 			}
 		}
 	}
@@ -804,7 +812,6 @@ public class LevelCamera : MonoBehaviour
 			MainCamera.transform.parent = base.transform;
 			MainCamera.transform.localPosition = Vector3.zero;
 			MainCamera.transform.localRotation = Quaternion.identity;
-			MainCamera.fieldOfView = ApplicationDataManager.ApplicationOptions.VideoFOV;
 			ZoomData.TargetFOV = MainCamera.fieldOfView;
 			Transform.position = position;
 			Transform.rotation = rotation;
@@ -922,9 +929,13 @@ public class LevelCamera : MonoBehaviour
 		Feedback.timeToEnd = 0f;
 		CurrentMode = mode;
 		_currentState.Finish();
-		if (IsZoomedIn)
+		if (IsZoomedIn && ApplicationDataManager.ApplicationOptions.FOVMode)
 		{
-			DoZoomOut(ApplicationDataManager.ApplicationOptions.VideoFOV, 10f);
+			DoZoomOut(100f, 10f);
+		}
+		else
+		{
+			DoZoomOut(75f, 10f);
 		}
 		if (!(MainCamera != null))
 		{

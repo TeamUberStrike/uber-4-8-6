@@ -33,14 +33,28 @@ public abstract class WeaponInputHandler
 				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperZoomOut);
 			}
 			zoomInfo.CurrentMultiplier = Mathf.Clamp(zoomInfo.CurrentMultiplier + zoom, zoomInfo.MinMultiplier, zoomInfo.MaxMultiplier);
-			LevelCamera.DoZoomIn(75f / zoomInfo.CurrentMultiplier, 20f, hideWeapon);
+			if (ApplicationDataManager.ApplicationOptions.FOVMode)
+			{
+				LevelCamera.DoZoomIn(100f / zoomInfo.CurrentMultiplier, 20f, hideWeapon);
+			}
+			else
+			{
+				LevelCamera.DoZoomIn(75f / zoomInfo.CurrentMultiplier, 20f, hideWeapon);
+			}
 			UserInput.ZoomSpeed = 0.5f;
 		}
 	}
 
 	protected static void ZoomOut(ZoomInfo zoomInfo, BaseWeaponDecorator weapon)
 	{
-		LevelCamera.DoZoomOut(ApplicationDataManager.ApplicationOptions.VideoFOV, 10f);
+		if (ApplicationDataManager.ApplicationOptions.FOVMode)
+		{
+			LevelCamera.DoZoomOut(100f, 10f);
+		}
+		else
+		{
+			LevelCamera.DoZoomOut(75f, 10f);
+		}
 		UserInput.ZoomSpeed = 1f;
 		if (zoomInfo != null)
 		{
