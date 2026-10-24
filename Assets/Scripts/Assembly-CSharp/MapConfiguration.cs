@@ -104,7 +104,11 @@ public class MapConfiguration : MonoBehaviour
 	{
 		get
 		{
-			return (!_waterPlane) ? float.MinValue : _waterPlane.position.y;
+			if ((bool)_waterPlane)
+			{
+				return _waterPlane.position.y;
+			}
+			return float.MinValue;
 		}
 	}
 
@@ -131,7 +135,9 @@ public class MapConfiguration : MonoBehaviour
 	{
 		audioSources = new Dictionary<AudioSource, float>();
 		AudioSource[] componentsInChildren = GetComponentsInChildren<AudioSource>();
-		foreach (AudioSource audioSource in componentsInChildren)
+		AudioSource[] array = componentsInChildren;
+		AudioSource[] array2 = array;
+		foreach (AudioSource audioSource in array2)
 		{
 			audioSources.Add(audioSource, audioSource.volume);
 		}

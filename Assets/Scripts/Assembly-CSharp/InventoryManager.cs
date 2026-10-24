@@ -42,6 +42,7 @@ public class InventoryManager : Singleton<InventoryManager>
 		{
 			IPopupDialog popupDialog = PopupSystem.ShowMessage(LocalizedStrings.UpdatingInventory, LocalizedStrings.WereUpdatingYourInventoryPleaseWait, PopupSystem.AlertType.None);
 			yield return UnityRuntime.StartRoutine(Singleton<ItemManager>.Instance.StartGetInventory(false));
+			yield return UnityRuntime.StartRoutine(Singleton<PlayerDataManager>.Instance.StartGetMember());
 			PopupSystem.HideMessage(popupDialog);
 			if (equipNow)
 			{
@@ -53,14 +54,13 @@ public class InventoryManager : Singleton<InventoryManager>
 			}
 			else if (item.View.ItemProperties.ContainsKey(ItemPropertyType.PointsBoost) || item.View.ItemProperties.ContainsKey(ItemPropertyType.XpBoost))
 			{
-				InventoryItem invItem = GetItem(item.View.ID);
-				PopupSystem.ShowItem(item, "\nYou just bought the boost item!\nThis item is activated and expires in " + invItem.DaysRemaining + " days");
+				InventoryItem item2 = GetItem(item.View.ID);
+				PopupSystem.ShowItem(item, "\nYou just bought the boost item!\nThis item is activated and expires in " + item2.DaysRemaining + " days");
 			}
 			else
 			{
 				PopupSystem.ShowItem(item, string.Empty);
 			}
-			yield return UnityRuntime.StartRoutine(Singleton<PlayerDataManager>.Instance.StartGetMember());
 		}
 	}
 
@@ -126,7 +126,7 @@ public class InventoryManager : Singleton<InventoryManager>
 				case UberstrikeItemType.Gear:
 					slotType = ItemUtil.SlotFromItemClass(item.Item.View.ItemClass);
 					Singleton<LoadoutManager>.Instance.SetLoadoutItem(slotType, item.Item);
-					AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipGear);
+					AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipGear, 0uL);
 					if (GameState.Current.Avatar != null)
 					{
 						GameState.Current.Avatar.HideWeapons();
@@ -141,7 +141,7 @@ public class InventoryManager : Singleton<InventoryManager>
 						Singleton<LoadoutManager>.Instance.RemoveDuplicateWeaponClass(item);
 						Singleton<LoadoutManager>.Instance.SetLoadoutItem(slotType, item.Item);
 						Singleton<LoadoutManager>.Instance.EquipWeapon(slotType, item.Item);
-						AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.WeaponSwitch);
+						AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.WeaponSwitch, 0uL);
 						break;
 					}
 					if (slotType == LoadoutSlotType.None || slotType == LoadoutSlotType.WeaponMelee)
@@ -155,7 +155,7 @@ public class InventoryManager : Singleton<InventoryManager>
 					}
 					Singleton<LoadoutManager>.Instance.SetLoadoutItem(slotType, item.Item);
 					Singleton<LoadoutManager>.Instance.EquipWeapon(slotType, item.Item);
-					AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipWeapon);
+					AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipWeapon, 0uL);
 					break;
 				}
 				case UberstrikeItemType.QuickUse:
@@ -174,11 +174,11 @@ public class InventoryManager : Singleton<InventoryManager>
 							Singleton<LoadoutManager>.Instance.SwapLoadoutItems(slotType, lastRemovedSlot);
 						}
 						Singleton<LoadoutManager>.Instance.SetLoadoutItem(slotType, item.Item);
-						AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipItem);
+						AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipItem, 0uL);
 					}
 					break;
 				default:
-					AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipItem);
+					AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipItem, 0uL);
 					Debug.LogError("Equip item of type: " + item.Item.View.ItemType);
 					break;
 				}
@@ -204,7 +204,7 @@ public class InventoryManager : Singleton<InventoryManager>
 		{
 			Singleton<LoadoutManager>.Instance.SwapLoadoutItems(slotType, lastRemovedSlot);
 		}
-		AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipItem);
+		AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.EquipItem, 0uL);
 		Singleton<LoadoutManager>.Instance.SetLoadoutItem(slotType, item.Item);
 	}
 
@@ -316,7 +316,7 @@ public class InventoryManager : Singleton<InventoryManager>
 		foreach (InventoryItem value in _inventoryItems.Values)
 		{
 			bool flag = value.DaysRemaining <= 0 && value.Item.View.Prices != null && value.Item.View.Prices.Count > 0;
-			if (value.DaysRemaining <= 0 && !value.IsPermanent && !flag)
+			if (!(value.DaysRemaining > 0 || value.IsPermanent || flag))
 			{
 				continue;
 			}
@@ -372,7 +372,11 @@ public class InventoryManager : Singleton<InventoryManager>
 
 	public bool TryGetInventoryItem(int itemID, out InventoryItem item)
 	{
-		return _inventoryItems.TryGetValue(itemID, out item) && item != null && item.Item != null;
+		if (_inventoryItems.TryGetValue(itemID, out item) && item != null)
+		{
+			return item.Item != null;
+		}
+		return false;
 	}
 
 	public bool HasClanLicense()
@@ -382,13 +386,25 @@ public class InventoryManager : Singleton<InventoryManager>
 
 	public bool IsItemValidForDays(InventoryItem item, int days)
 	{
-		return item != null && (item.DaysRemaining > days || item.IsPermanent);
+		if (item != null)
+		{
+			if (item.DaysRemaining <= days)
+			{
+				return item.IsPermanent;
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public bool Contains(int itemId)
 	{
 		InventoryItem value;
-		return _inventoryItems.TryGetValue(itemId, out value) && IsItemValidForDays(value, 0);
+		if (_inventoryItems.TryGetValue(itemId, out value))
+		{
+			return IsItemValidForDays(value, 0);
+		}
+		return false;
 	}
 
 	public void UpdateInventoryItems(List<ItemInventoryView> inventory)

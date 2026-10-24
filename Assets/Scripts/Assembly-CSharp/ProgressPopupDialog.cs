@@ -15,7 +15,7 @@ public class ProgressPopupDialog : GeneralPopupDialog
 
 	protected override void DrawPopupWindow()
 	{
-		GUI.Label(new Rect(17f, 95f, _size.x - 34f, 32f), Text, BlueStonez.label_interparkbold_11pt);
+		GUI.Label(new Rect(17f, 95f, _size.x - 34f, 32f), base.Text, BlueStonez.label_interparkbold_11pt);
 		if (_progress != null)
 		{
 			DrawLevelBar(new Rect(17f, 125f, _size.x - 34f, 16f), _progress(), ColorScheme.ProgressBar);

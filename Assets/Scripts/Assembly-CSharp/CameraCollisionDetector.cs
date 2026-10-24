@@ -53,7 +53,11 @@ public class CameraCollisionDetector
 				_collidedDistance = num2;
 			}
 		}
-		return _lHitResult || _rHitResult;
+		if (!_lHitResult)
+		{
+			return _rHitResult;
+		}
+		return true;
 	}
 
 	public void OnDrawGizmos()

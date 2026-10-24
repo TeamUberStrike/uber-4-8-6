@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using UberStrike.Core.Models.Views;
 using UberStrike.Core.Types;
 using UnityEngine;
 
@@ -32,6 +34,8 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 	private Dictionary<string, SurfaceEffectType> _effectMap;
 
 	private List<BaseWeaponEffect> _effects = new List<BaseWeaponEffect>();
+
+	public static bool _noAmmoSoundPlaying;
 
 	public bool IsEnabled
 	{
@@ -77,7 +81,11 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 	{
 		get
 		{
-			return (!_muzzlePosition) ? Vector3.zero : _muzzlePosition.position;
+			if ((bool)_muzzlePosition)
+			{
+				return _muzzlePosition.position;
+			}
+			return Vector3.zero;
 		}
 	}
 
@@ -185,7 +193,7 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 
 	public virtual void ShowShootEffect(RaycastHit[] hits)
 	{
-		if (!IsEnabled)
+		if (!IsEnabled || hits == null)
 		{
 			return;
 		}
@@ -229,12 +237,7 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 		EmitImpactParticles(hit, direction, muzzlePosition, distance, playSound);
 	}
 
-	private static void Play3dAudioClip(AudioSource audioSource, AudioClip soundEffect)
-	{
-		Play3dAudioClip(audioSource, soundEffect, 0f);
-	}
-
-	private static void Play3dAudioClip(AudioSource audioSource, AudioClip soundEffect, float delay)
+	private static void Play3dAudioClip(AudioSource audioSource, AudioClip soundEffect, float delay = 0f)
 	{
 		try
 		{
@@ -244,7 +247,7 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 		}
 		catch
 		{
-			Debug.LogError(string.Concat("Play3dAudioClip: ", soundEffect, " failed."));
+			Debug.LogError("Play3dAudioClip: " + (((object)soundEffect != null) ? soundEffect.ToString() : null) + " failed.");
 		}
 	}
 
@@ -255,7 +258,7 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 
 	public void PlayShootSound()
 	{
-		if ((bool)_mainAudioSource && _shootSounds != null && _shootSounds.Length > 0)
+		if ((bool)_mainAudioSource && _shootSounds != null && _shootSounds.Length != 0)
 		{
 			int num = Random.Range(0, _shootSounds.Length);
 			AudioClip audioClip = _shootSounds[num];
@@ -289,7 +292,7 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 
 	public virtual void PlayEquipSound()
 	{
-		AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.WeaponSwitch);
+		AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.WeaponSwitch, 0uL);
 	}
 
 	public virtual void PlayHitSound()
@@ -297,9 +300,28 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 		Debug.LogError("Not Implemented: Should play WeaponHit sound!");
 	}
 
-	public void PlayOutOfAmmoSound()
+	public void PlayOutOfAmmoSound(UberStrikeItemWeaponView _weapon)
 	{
-		Play3dAudioClip(_mainAudioSource, GameAudio.OutOfAmmoClick);
+		if (!_noAmmoSoundPlaying)
+		{
+			StartCoroutine(StopAmmoTimer(_weapon));
+			try
+			{
+				Play3dAudioClip(_mainAudioSource, GameAudio.OutOfAmmoClick);
+			}
+			catch
+			{
+				AudioClip outOfAmmoClick = GameAudio.OutOfAmmoClick;
+				Debug.LogError("Play3dAudioClip: " + (((object)outOfAmmoClick != null) ? outOfAmmoClick.ToString() : null) + " failed.");
+			}
+		}
+	}
+
+	private IEnumerator StopAmmoTimer(UberStrikeItemWeaponView _weapon)
+	{
+		_noAmmoSoundPlaying = true;
+		yield return new WaitForSeconds(WeaponConfigurationHelper.GetRateOfFire(_weapon));
+		_noAmmoSoundPlaying = false;
 	}
 
 	public void PlayImpactSoundAt(HitPoint point)
@@ -307,17 +329,16 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 		if (point != null)
 		{
 			float num = ((!_muzzlePosition) ? 0f : _muzzlePosition.position.y);
-			float num2 = ((!(GameState.Current.Map != null) || !GameState.Current.Map.HasWaterPlane) ? num : GameState.Current.Map.WaterPlaneHeight);
-			if ((num > num2 && point.Point.y < num2) || (num < num2 && point.Point.y > num2))
-			{
-				Vector3 point2 = point.Point;
-				point2.y = 0f;
-				AutoMonoBehaviour<SfxManager>.Instance.PlayImpactSound("Water", point2);
-			}
-			else
+			float num2 = num;
+			float num3 = ((!(GameState.Current.Map != null) || !GameState.Current.Map.HasWaterPlane) ? num2 : GameState.Current.Map.WaterPlaneHeight);
+			if ((!(num2 > num3) || !(point.Point.y < num3)) && (!(num2 < num3) || !(point.Point.y > num3)))
 			{
 				EmitImpactSound(point.Tag, point.Point);
+				return;
 			}
+			Vector3 point2 = point.Point;
+			point2.y = 0f;
+			AutoMonoBehaviour<SfxManager>.Instance.PlayImpactSound("Water", point2);
 		}
 	}
 
@@ -344,8 +365,12 @@ public abstract class BaseWeaponDecorator : MonoBehaviour
 			point.y = GameState.Current.Map.WaterPlaneHeight;
 			if (!Mathf.Approximately(direction.y, 0f))
 			{
-				point.x = (GameState.Current.Map.WaterPlaneHeight - hit.point.y) / direction.y * direction.x + hit.point.x;
-				point.z = (GameState.Current.Map.WaterPlaneHeight - hit.point.y) / direction.y * direction.z + hit.point.z;
+				float waterPlaneHeight = GameState.Current.Map.WaterPlaneHeight;
+				float num = (waterPlaneHeight - hit.point.y) / direction.y * direction.x;
+				point.x = num + hit.point.x;
+				float waterPlaneHeight2 = GameState.Current.Map.WaterPlaneHeight;
+				float num2 = (waterPlaneHeight2 - hit.point.y) / direction.y * direction.z;
+				point.z = num2 + hit.point.z;
 			}
 		}
 		ParticleEffectController.ShowHitEffect(_effectType, value, direction, point, hitNormal, muzzlePosition, distance, ref _trailRenderer, _parent);

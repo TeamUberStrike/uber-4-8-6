@@ -214,7 +214,9 @@ public class ReportPlayerPanelGUI : PanelGuiBase
 	{
 		GUI.BeginGroup(rect, string.Empty, BlueStonez.group_grey81);
 		GUI.EndGroup();
-		GUI.Label(new Rect(rect.x + 18f, rect.y - 8f, style.CalcSize(new GUIContent(title)).x + 10f, 16f), title, style);
+		float left = rect.x + 18f;
+		float top = rect.y - 8f;
+		GUI.Label(new Rect(left, top, style.CalcSize(new GUIContent(title)).x + 10f, 16f), title, style);
 	}
 
 	private int DoDropDownList(Rect position, Rect size, string[] items, ref string defaultText, bool canEdit)

@@ -352,7 +352,7 @@ public class ModerationPanelGUI : PanelGuiBase
 		{
 		case Actions.UNMUTE_PLAYER:
 			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.Operations.SendModerationMutePlayer(0, _selectedCommUser.Cmid, false);
-			PopupSystem.ShowMessage("Action Executed", string.Format("The Player '{0}' was unmuted.", _selectedCommUser.Name));
+			PopupSystem.ShowMessage("Action Executed", "The Player '" + _selectedCommUser.Name + "' was unmuted.");
 			break;
 		case Actions.GHOST_PLAYER:
 			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.Operations.SendModerationMutePlayer(_banDurationIndex, _selectedCommUser.Cmid, false);
@@ -360,23 +360,22 @@ public class ModerationPanelGUI : PanelGuiBase
 			break;
 		case Actions.MUTE_PLAYER:
 			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.Operations.SendModerationMutePlayer(_banDurationIndex, _selectedCommUser.Cmid, true);
-			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.Operations.SendModerationMutePlayer(_banDurationIndex, _selectedCommUser.Cmid, false);
 			PopupSystem.ShowMessage("Action Executed", string.Format("The Player '{0}' was muted for {1} minutes.", _selectedCommUser.Name, _banDurationIndex));
 			break;
 		case Actions.KICK_FROM_GAME:
 			if (_selectedCommUser.CurrentGame != null && _selectedCommUser.CurrentGame.Server != null)
 			{
 				GamePeerAction.KickPlayer(_selectedCommUser.CurrentGame.Server.ConnectionString, _selectedCommUser.Cmid);
-				PopupSystem.ShowMessage("Action Executed", string.Format("The Player '{0}' was kicked out of his current game!", _selectedCommUser.Name));
+				PopupSystem.ShowMessage("Action Executed", "The Player '" + _selectedCommUser.Name + "' was kicked out of his current game!");
 			}
 			else
 			{
-				PopupSystem.ShowMessage("Warning", string.Format("The Player '{0}' is currently not in a game!", _selectedCommUser.Name));
+				PopupSystem.ShowMessage("Warning", "The Player '" + _selectedCommUser.Name + "' is currently not in a game!");
 			}
 			break;
 		case Actions.KICK_FROM_APP:
 			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.Operations.SendModerationBanPlayer(_selectedCommUser.Cmid);
-			PopupSystem.ShowMessage("Action Executed", string.Format("The Player '{0}' was disconnected from all servers!", _selectedCommUser.Name));
+			PopupSystem.ShowMessage("Action Executed", "The Player '" + _selectedCommUser.Name + "' was disconnected from all servers!");
 			break;
 		}
 		_moderationSelection = Actions.NONE;

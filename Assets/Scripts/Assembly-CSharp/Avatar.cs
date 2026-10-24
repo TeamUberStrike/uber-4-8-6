@@ -88,7 +88,9 @@ public class Avatar
 			Ragdoll.transform.rotation = Decorator.transform.rotation;
 			AvatarDecoratorConfig.CopyBones(Decorator.Configuration, Ragdoll);
 			ArrowProjectile[] componentsInChildren = Decorator.GetComponentsInChildren<ArrowProjectile>(true);
-			foreach (ArrowProjectile arrowProjectile in componentsInChildren)
+			ArrowProjectile[] array = componentsInChildren;
+			ArrowProjectile[] array2 = array;
+			foreach (ArrowProjectile arrowProjectile in array2)
 			{
 				Vector3 localPosition = arrowProjectile.transform.localPosition;
 				Quaternion localRotation = arrowProjectile.transform.localRotation;
@@ -97,7 +99,9 @@ public class Avatar
 				arrowProjectile.transform.localRotation = localRotation;
 			}
 			Rigidbody[] componentsInChildren2 = Ragdoll.GetComponentsInChildren<Rigidbody>(true);
-			foreach (Rigidbody rigidbody in componentsInChildren2)
+			Rigidbody[] array3 = componentsInChildren2;
+			Rigidbody[] array4 = array3;
+			foreach (Rigidbody rigidbody in array4)
 			{
 				if (rigidbody.gameObject.GetComponent<RagdollBodyPart>() == null)
 				{
@@ -146,7 +150,9 @@ public class Avatar
 			_weapons[slot] = weapon;
 			weapon.transform.parent = Decorator.WeaponAttachPoint;
 			Transform[] componentsInChildren = weapon.gameObject.transform.GetComponentsInChildren<Transform>(true);
-			foreach (Transform transform in componentsInChildren)
+			Transform[] array = componentsInChildren;
+			Transform[] array2 = array;
+			foreach (Transform transform in array2)
 			{
 				if (transform.gameObject.name == "Head")
 				{
@@ -158,6 +164,7 @@ public class Avatar
 			weapon.transform.localRotation = Quaternion.identity;
 			weapon.IsEnabled = slot == CurrentWeaponSlot;
 			weapon.WeaponClass = item.View.ItemClass;
+			WeaponSkinHelper.ApplyToWeapon(weapon.gameObject, item.View.ID);
 		}
 		else
 		{

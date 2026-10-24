@@ -16,8 +16,8 @@ public class PasswordPopupDialog : BasePopupDialog
 	public PasswordPopupDialog(string title, string text, Action<string> ok, Action cancel)
 	{
 		PasswordPopupDialog passwordPopupDialog = this;
-		Text = text;
-		Title = title;
+		base.Text = text;
+		base.Title = title;
 		_alertType = PopupSystem.AlertType.OKCancel;
 		_actionType = PopupSystem.ActionType.None;
 		_callbackOk = delegate
@@ -41,7 +41,7 @@ public class PasswordPopupDialog : BasePopupDialog
 				_callbackOk();
 			}
 		}
-		GUI.Label(new Rect(17f, 55f, _size.x - 34f, 40f), Text, PopupSkin.label);
+		GUI.Label(new Rect(17f, 55f, _size.x - 34f, 40f), base.Text, PopupSkin.label);
 		GUI.SetNextControlName("JoinPassword");
 		password = GUI.PasswordField(new Rect(25f, 100f, _size.x - 50f, 24f), password, '*', 64, BlueStonez.textField);
 		if (string.IsNullOrEmpty(password))

@@ -8,15 +8,17 @@ public static class TagUtil
 		string result = "Cement";
 		try
 		{
-			if ((bool)c)
+			if (!c)
 			{
-				result = c.tag;
+				return result;
 			}
+			result = c.tag;
+			return result;
 		}
 		catch (Exception ex)
 		{
 			Debug.LogError("Failed to get tag from collider: " + ex.Message);
+			return result;
 		}
-		return result;
 	}
 }

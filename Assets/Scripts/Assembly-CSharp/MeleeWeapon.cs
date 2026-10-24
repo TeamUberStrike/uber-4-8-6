@@ -39,7 +39,7 @@ public class MeleeWeapon : BaseWeaponLogic
 		float distance = 1f;
 		RaycastHit[] array = Physics.SphereCastAll(ray, radius, distance, layerMask);
 		int projectileId = base.Controller.NextProjectileId();
-		if (array != null && array.Length > 0)
+		if (array != null && array.Length != 0)
 		{
 			hits = new CmunePairList<BaseGameProp, ShotPoint>();
 			float num = float.PositiveInfinity;
@@ -95,8 +95,12 @@ public class MeleeWeapon : BaseWeaponLogic
 			hitPoint.y = GameState.Current.Map.WaterPlaneHeight;
 			if (!Mathf.Approximately(ray.direction.y, 0f))
 			{
-				hitPoint.x = (GameState.Current.Map.WaterPlaneHeight - vector.y) / ray.direction.y * ray.direction.x + vector.x;
-				hitPoint.z = (GameState.Current.Map.WaterPlaneHeight - vector.y) / ray.direction.y * ray.direction.z + vector.z;
+				float num = GameState.Current.Map.WaterPlaneHeight - vector.y;
+				float num2 = num / ray.direction.y;
+				hitPoint.x = num2 * ray.direction.x + vector.x;
+				float num3 = GameState.Current.Map.WaterPlaneHeight - vector.y;
+				float num4 = num3 / ray.direction.y;
+				hitPoint.z = num4 * ray.direction.z + vector.z;
 			}
 			MoveTrailrendererObject trailRenderer = Decorator.TrailRenderer;
 			ParticleEffectController.ShowHitEffect(ParticleConfigurationType.MeleeDefault, SurfaceEffectType.WaterEffect, Vector3.up, hitPoint, Vector3.up, origin, 1f, ref trailRenderer, Decorator.transform);

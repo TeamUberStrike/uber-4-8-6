@@ -124,4 +124,12 @@ public class ServerLoadRequest : BaseGamePeer
 	protected override void OnDisconnectAndDisablePhoton(string message)
 	{
 	}
+
+	protected override void OnWeekendChallengeAchivement()
+	{
+	}
+
+	protected override void OnRoomRejoin(GameRoomData data, string password)
+	{
+	}
 }

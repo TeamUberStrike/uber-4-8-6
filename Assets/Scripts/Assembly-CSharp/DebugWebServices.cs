@@ -38,7 +38,9 @@ public class DebugWebServices : IDebugPage
 		GUILayout.Label("IN (" + WebServiceStatistics.TotalBytesIn + ") -  OUT (" + WebServiceStatistics.TotalBytesOut + ")");
 		foreach (KeyValuePair<string, WebServiceStatistics.Statistics> datum in WebServiceStatistics.Data)
 		{
-			GUILayout.Label(datum.Key + ": " + datum.Value);
+			string key = datum.Key;
+			WebServiceStatistics.Statistics value = datum.Value;
+			GUILayout.Label(key + ": " + ((value != null) ? value.ToString() : null));
 		}
 		GUILayout.TextArea(_currentLog);
 		GUILayout.EndScrollView();

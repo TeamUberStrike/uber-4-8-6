@@ -22,7 +22,9 @@ public class TouchController : Singleton<TouchController>
 			{
 				control.FirstUpdate();
 				Touch[] touches = Input.touches;
-				foreach (Touch touch in touches)
+				Touch[] array = touches;
+				Touch[] array2 = array;
+				foreach (Touch touch in array2)
 				{
 					control.UpdateTouches(touch);
 				}

@@ -97,7 +97,8 @@ public class LoginPanelGUI : PanelGuiBase
 			Matrix4x4 matrix = GUI.matrix;
 			GUI.matrix = Matrix4x4.identity;
 			Vector2 vector = BlueStonez.tooltip.CalcSize(new GUIContent(GUI.tooltip));
-			Rect position = new Rect(Mathf.Clamp(Event.current.mousePosition.x, 14f, (float)Screen.width - (vector.x + 14f)), Event.current.mousePosition.y + 24f, vector.x, vector.y + 16f);
+			float left = Mathf.Clamp(Event.current.mousePosition.x, 14f, (float)Screen.width - (vector.x + 14f));
+			Rect position = new Rect(left, Event.current.mousePosition.y + 24f, vector.x, vector.y + 16f);
 			GUI.Label(position, GUI.tooltip, BlueStonez.tooltip);
 			GUI.matrix = matrix;
 		}
@@ -108,28 +109,28 @@ public class LoginPanelGUI : PanelGuiBase
 	{
 		GUI.BeginGroup(_rect, GUIContent.none, BlueStonez.window);
 		GUI.depth = 3;
-		GUI.Label(new Rect(0f, 0f, _rect.width, 23f), "Add an existing UberStrike Account to Steam", BlueStonez.tab_strip);
-		GUI.Label(new Rect(0f, 48f, _rect.width - 10f, 48f), "Your UberStrike account will be permanently associated with your Steam account", BlueStonez.label_interparkbold_11pt);
-		GUI.Label(new Rect(20f, 108f, 100f, 24f), "Email:");
+		GUI.Label(new Rect(0f, 0f, _rect.width, 23f), "Welcome to UberStrike", BlueStonez.tab_strip);
+		GUI.Label(new Rect(0f, 48f, _rect.width - 10f, 48f), "Login with your account. If you haven't got one, click on 'Sign Up'.", BlueStonez.label_interparkbold_11pt);
+		GUI.Label(new Rect(20f, 108f, 100f, 24f), "Email:", BlueStonez.label_interparkbold_13pt_left);
 		_emailAddress = GUI.TextField(new Rect(128f, 108f, _rect.width - 164f, 24f), _emailAddress, 100, BlueStonez.textField);
 		if (string.IsNullOrEmpty(_emailAddress))
 		{
 			GUI.color = Color.white.SetAlpha(0.3f);
 			GUI.color = Color.white;
 		}
-		GUI.Label(new Rect(20f, 144f, 100f, 24f), "Password:");
+		GUI.Label(new Rect(20f, 144f, 100f, 24f), "Password:", BlueStonez.label_interparkbold_13pt_left);
 		_password = GUI.PasswordField(new Rect(128f, 144f, _rect.width - 164f, 24f), _password, '*', 64, BlueStonez.textField);
 		if (string.IsNullOrEmpty(_password))
 		{
 			GUI.color = Color.white.SetAlpha(0.3f);
 			GUI.color = Color.white;
 		}
-		if (GUITools.Button(new Rect(70f, 190f, 100f, 52f), new GUIContent("Cancel"), BlueStonez.buttondark_medium))
+		if (GUITools.Button(new Rect(70f, 190f, 100f, 52f), new GUIContent("Sign Up"), BlueStonez.button_green))
 		{
 			Hide();
-			Singleton<AuthenticationManager>.Instance.LoginByChannel();
+			PanelManager.Instance.OpenPanel(PanelType.Signup);
 		}
-		if (GUITools.Button(new Rect(210f, 190f, 100f, 52f), new GUIContent("Add"), BlueStonez.button_green))
+		if (GUITools.Button(new Rect(210f, 190f, 100f, 52f), new GUIContent("Login"), BlueStonez.button_red))
 		{
 			HideKeyboard();
 			Login(_emailAddress, _password);
@@ -138,12 +139,12 @@ public class LoginPanelGUI : PanelGuiBase
 		if (GUITools.Button(new Rect(20f, 264f, 100f, 40f), new GUIContent("Forgot password?"), BlueStonez.label_interparkbold_11pt_url))
 		{
 			HideKeyboard();
-			ApplicationDataManager.OpenUrl(string.Empty, "http://www.uberstrike.com/#forgot_password");
+			ApplicationDataManager.OpenUrl(string.Empty, "https://discord.gg/hhxZCBamRT");
 		}
-		if (GUITools.Button(new Rect(_rect.width - 118f, 264f, 98f, 40f), new GUIContent("Facebook player?"), BlueStonez.label_interparkbold_11pt_url))
+		if (GUITools.Button(new Rect(_rect.width - 118f, 264f, 98f, 40f), new GUIContent("Our Discord server"), BlueStonez.label_interparkbold_11pt_url))
 		{
 			HideKeyboard();
-			ApplicationDataManager.OpenUrl(string.Empty, "http://www.uberstrike.com/steam");
+			ApplicationDataManager.OpenUrl(string.Empty, "https://discord.gg/hhxZCBamRT");
 		}
 		GUI.enabled = true;
 		GUI.EndGroup();

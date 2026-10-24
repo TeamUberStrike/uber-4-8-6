@@ -1,3 +1,4 @@
+using UberStrike.Core.Models;
 using UnityEngine;
 
 public class DebugGameState : IDebugPage
@@ -17,12 +18,13 @@ public class DebugGameState : IDebugPage
 		if (GameState.Current != null)
 		{
 			v1 = GUILayout.BeginScrollView(v1);
-			GUILayout.Label(string.Concat("Mode:", GameState.Current.RoomData.GameMode, "/", Singleton<GameStateController>.Instance.CurrentGameMode));
+			GUILayout.Label("Mode:" + GameState.Current.RoomData.GameMode.ToString() + "/" + Singleton<GameStateController>.Instance.CurrentGameMode);
 			GUILayout.Label("MatchState:" + GameState.Current.MatchState.CurrentStateId);
 			GUILayout.Label("PlayerState:" + GameState.Current.PlayerState.CurrentStateId);
 			if (GameState.Current.RoomData.Server != null)
 			{
-				GUILayout.Label(string.Concat("Server:", GameState.Current.RoomData.Server, "/", GameState.Current.RoomData.Number));
+				ConnectionAddress server = GameState.Current.RoomData.Server;
+				GUILayout.Label("Server:" + ((server != null) ? server.ToString() : null) + "/" + GameState.Current.RoomData.Number);
 			}
 			GUILayout.Label("IsSpectator:" + GameState.Current.PlayerData.IsSpectator);
 			GUILayout.Label("HasJoinedGame:" + GameState.Current.HasJoinedGame);
@@ -31,7 +33,8 @@ public class DebugGameState : IDebugPage
 			GUILayout.Space(10f);
 			GUILayout.Label("IsInputEnabled:" + AutoMonoBehaviour<InputManager>.Instance.IsInputEnabled);
 			GUILayout.Label("lockCursor:" + Screen.lockCursor);
-			GUILayout.Label(string.Concat("Mouse:", UserInput.Mouse, " ", UserInput.Rotation));
+			Vector2 mouse = UserInputt.Mouse;
+			GUILayout.Label("Mouse:" + mouse.ToString() + " " + UserInputt.Rotation.ToString());
 			GUILayout.Label("KeyState:" + GameState.Current.PlayerData.KeyState);
 			GUILayout.Label("MovementState:" + GameState.Current.PlayerData.MovementState);
 			GUILayout.Label("IsWalkingEnabled:" + GameState.Current.Player.IsWalkingEnabled);

@@ -57,7 +57,9 @@ public class UnityRuntime : AutoMonoBehaviour<UnityRuntime>
 		if (this.OnUpdate != null)
 		{
 			Delegate[] invocationList = this.OnUpdate.GetInvocationList();
-			foreach (Delegate obj in invocationList)
+			Delegate[] array = invocationList;
+			Delegate[] array2 = array;
+			foreach (Delegate obj in array2)
 			{
 				GUILayout.Label("Update: " + obj.Method.DeclaringType.Name + "." + obj.Method.Name);
 			}
@@ -65,7 +67,9 @@ public class UnityRuntime : AutoMonoBehaviour<UnityRuntime>
 		if (this.OnFixedUpdate != null)
 		{
 			Delegate[] invocationList2 = this.OnFixedUpdate.GetInvocationList();
-			foreach (Delegate obj2 in invocationList2)
+			Delegate[] array3 = invocationList2;
+			Delegate[] array4 = array3;
+			foreach (Delegate obj2 in array4)
 			{
 				GUILayout.Label("FixedUpdate: " + obj2.Method.DeclaringType.Name + "." + obj2.Method.Name);
 			}
@@ -73,7 +77,9 @@ public class UnityRuntime : AutoMonoBehaviour<UnityRuntime>
 		if (this.OnAppFocus != null)
 		{
 			Delegate[] invocationList3 = this.OnAppFocus.GetInvocationList();
-			foreach (Delegate obj3 in invocationList3)
+			Delegate[] array5 = invocationList3;
+			Delegate[] array6 = array5;
+			foreach (Delegate obj3 in array6)
 			{
 				GUILayout.Label("OnApplicationFocus: " + obj3.Method.DeclaringType.Name + "." + obj3.Method.Name);
 			}

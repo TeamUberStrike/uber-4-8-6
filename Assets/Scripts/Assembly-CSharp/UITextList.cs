@@ -67,7 +67,11 @@ public class UITextList : MonoBehaviour
 		mParagraphs.Add(paragraph);
 		if (textLabel != null && textLabel.font != null)
 		{
-			paragraph.lines = textLabel.font.WrapText(paragraph.text, maxWidth / textLabel.transform.localScale.y, textLabel.maxLineCount, textLabel.supportEncoding, textLabel.symbolStyle).Split(mSeparator);
+			Paragraph paragraph2 = paragraph;
+			UIFont font = textLabel.font;
+			string text2 = paragraph.text;
+			float num = maxWidth;
+			paragraph2.lines = font.WrapText(text2, num / textLabel.transform.localScale.y, textLabel.maxLineCount, textLabel.supportEncoding, textLabel.symbolStyle).Split(mSeparator);
 			mTotalLines = 0;
 			int i = 0;
 			for (int count = mParagraphs.Count; i < count; i++)
@@ -96,11 +100,13 @@ public class UITextList : MonoBehaviour
 		{
 			if (maxHeight <= 0f)
 			{
-				maxHeight = collider.bounds.size.y / base.transform.lossyScale.y;
+				float y = collider.bounds.size.y;
+				maxHeight = y / base.transform.lossyScale.y;
 			}
 			if (maxWidth <= 0f)
 			{
-				maxWidth = collider.bounds.size.x / base.transform.lossyScale.x;
+				float x = collider.bounds.size.x;
+				maxWidth = x / base.transform.lossyScale.x;
 			}
 		}
 	}
@@ -122,16 +128,26 @@ public class UITextList : MonoBehaviour
 			return;
 		}
 		int num = 0;
-		int num2 = ((!(maxHeight > 0f)) ? 100000 : Mathf.FloorToInt(maxHeight / textLabel.cachedTransform.localScale.y));
-		int num3 = Mathf.RoundToInt(mScroll);
-		if (num2 + num3 > mTotalLines)
+		int num3;
+		if (maxHeight > 0f)
 		{
-			num3 = Mathf.Max(0, mTotalLines - num2);
-			mScroll = num3;
+			float num2 = maxHeight;
+			num3 = Mathf.FloorToInt(num2 / textLabel.cachedTransform.localScale.y);
+		}
+		else
+		{
+			num3 = 100000;
+		}
+		int num4 = num3;
+		int num5 = Mathf.RoundToInt(mScroll);
+		if (num4 + num5 > mTotalLines)
+		{
+			num5 = Mathf.Max(0, mTotalLines - num4);
+			mScroll = num5;
 		}
 		if (style == Style.Chat)
 		{
-			num3 = Mathf.Max(0, mTotalLines - num2 - num3);
+			num5 = Mathf.Max(0, mTotalLines - num4 - num5);
 		}
 		StringBuilder stringBuilder = new StringBuilder();
 		int i = 0;
@@ -139,12 +155,12 @@ public class UITextList : MonoBehaviour
 		{
 			Paragraph paragraph = mParagraphs[i];
 			int j = 0;
-			for (int num4 = paragraph.lines.Length; j < num4; j++)
+			for (int num6 = paragraph.lines.Length; j < num6; j++)
 			{
 				string value = paragraph.lines[j];
-				if (num3 > 0)
+				if (num5 > 0)
 				{
-					num3--;
+					num5--;
 					continue;
 				}
 				if (stringBuilder.Length > 0)
@@ -153,12 +169,12 @@ public class UITextList : MonoBehaviour
 				}
 				stringBuilder.Append(value);
 				num++;
-				if (num >= num2)
+				if (num >= num4)
 				{
 					break;
 				}
 			}
-			if (num >= num2)
+			if (num >= num4)
 			{
 				break;
 			}

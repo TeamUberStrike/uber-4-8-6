@@ -32,7 +32,9 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 			}
 			Collider collider = gameObject.collider;
 			CharacterHitArea[] hitAreas = GameState.Current.Avatar.Decorator.HitAreas;
-			foreach (CharacterHitArea characterHitArea in hitAreas)
+			CharacterHitArea[] array = hitAreas;
+			CharacterHitArea[] array2 = array;
+			foreach (CharacterHitArea characterHitArea in array2)
 			{
 				if (gameObject.activeSelf && characterHitArea.gameObject.activeSelf)
 				{
@@ -75,7 +77,7 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 			}
 			else if (behaviour._config.IsSticky)
 			{
-				if (c.contacts.Length > 0)
+				if (c.contacts.Length != 0)
 				{
 					behaviour.transform.position = c.contacts[0].point + c.contacts[0].normal * behaviour.collider.bounds.extents.sqrMagnitude;
 				}
@@ -103,7 +105,7 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 			{
 				clip = GameAudio.LauncherBounce2;
 			}
-			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, position, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, position);
 		}
 	}
 
@@ -232,7 +234,11 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 	{
 		get
 		{
-			return (!base.transform) ? Vector3.zero : base.transform.position;
+			if ((bool)base.transform)
+			{
+				return base.transform.position;
+			}
+			return Vector3.zero;
 		}
 		private set
 		{
@@ -247,7 +253,11 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 	{
 		get
 		{
-			return (!base.rigidbody) ? Vector3.zero : base.rigidbody.velocity;
+			if ((bool)base.rigidbody)
+			{
+				return base.rigidbody.velocity;
+			}
+			return Vector3.zero;
 		}
 		private set
 		{
@@ -279,7 +289,7 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 			explosiveGrenadeQuickItem.machine.PopAllStates();
 			explosiveGrenadeQuickItem.OnProjectileExploded = (Action<IGrenadeProjectile>)Delegate.Combine(explosiveGrenadeQuickItem.OnProjectileExploded, (Action<IGrenadeProjectile>)delegate(IGrenadeProjectile p)
 			{
-				ProjectileDetonator.Explode(p.Position, p.ID, _config.Damage, Vector3.up, _config.SplashRadius, 5, 5, Configuration.ID, UberstrikeItemClass.WeaponLauncher, DamageEffectType.None, 0f);
+				ProjectileDetonator.Explode(p.Position, p.ID, _config.Damage, Vector3.up, _config.SplashRadius, 5, 5, Configuration.ID, UberstrikeItemClass.WeaponLauncher);
 			});
 			Singleton<ProjectileManager>.Instance.RemoveProjectile(explosiveGrenadeQuickItem.ID);
 			GameState.Current.Actions.RemoveProjectile(explosiveGrenadeQuickItem.ID, true);
@@ -289,7 +299,7 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 			IGrenadeProjectile grenadeProjectile = Throw(position, velocity);
 			grenadeProjectile.OnProjectileExploded += delegate(IGrenadeProjectile p)
 			{
-				ProjectileDetonator.Explode(p.Position, p.ID, _config.Damage, Vector3.up, _config.SplashRadius, 5, 5, Configuration.ID, UberstrikeItemClass.WeaponLauncher, DamageEffectType.None, 0f);
+				ProjectileDetonator.Explode(p.Position, p.ID, _config.Damage, Vector3.up, _config.SplashRadius, 5, 5, Configuration.ID, UberstrikeItemClass.WeaponLauncher);
 			};
 		}
 	}
@@ -362,7 +372,7 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 		{
 			if (_explosionSound != null)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(_explosionSound, base.transform.position, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(_explosionSound, base.transform.position);
 			}
 			if ((bool)_explosionSfx)
 			{
@@ -387,12 +397,13 @@ public class ExplosiveGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProject
 			}
 			result = base.transform.position;
 			Destroy();
+			return result;
 		}
 		catch (Exception exception)
 		{
 			Debug.LogException(exception);
+			return result;
 		}
-		return result;
 	}
 
 	public void Destroy()

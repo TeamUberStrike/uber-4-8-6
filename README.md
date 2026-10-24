@@ -16,8 +16,8 @@ UI) this branch builds on.
 | | State |
 |---|---|
 | **Step 1 — code = plain Steam client** | ✅ Done and proven: `Assembly-CSharp`, `Assembly-CSharp-firstpass`, and the image effects now use the original UnityScript DLL (see below). |
-| **Step 2 — code = team client v4.8.6 + dev server address** | ⏳ Next. |
-| Connecting to the dev server | Not tried yet. Needs the server version the dev server expects (see step 2). |
+| **Step 2 — code = team client v4.8.6 + dev server address** | ✅ Code applied, built and proven against a build of `v4.8.6` (see below). |
+| Connecting to the dev server | Not tried yet — waiting for the owner's go-ahead and HaZard's answer on the version string. |
 | Steam login | Stays as it is — the client logs in with a Steam auth ticket, Steam must be running. Moving the ~5,000 registered players to another login is a separate, later migration. |
 
 ## Step 1 — identical to the plain Steam client
@@ -73,15 +73,41 @@ the version, I'm just changing URLs there. Take the branch 4.8.6 and put your UR
 and `live_steam_version` branches differ from it only in `ApplicationDataManager` (server address, version) and
 `WindowsUpdater`.
 
-**Plan**
+**What was done** (source commit `889d3fc`, "add specific info for IP reputation error")
 
-1. Build `v4.8.6` as the team does (C# 8, .NET 3.5), decompile with `-lv CSharp4`, and apply it to this project the
-   same way as step 1.
-2. Set the server address to the **dev server** (no composite-hash check there, per HaZard) and the version string
-   the dev server expects — to be confirmed with HaZard (`dev_server` uses `4.8.6`, `v4.8.6` now says `4.8.11`).
-3. Proof: the same comparison as step 1, against a build of `v4.8.6`.
-4. Parts that are not code (map bundles, native plugins such as `uberbeat.dll`): reverse-engineer and port
-   separately, as HaZard described.
+1. Built `v4.8.6` the way the team does (`Client.sln`, MSBuild, C# 8, .NET 3.5 — compiled against Unity 4.6.5's own
+   Mono 2.0 libraries), decompiled it with `-lv CSharp4` and applied it file by file: 379 files changed, 32 added
+   (`UberKill`, `UberBeat`, `CustomBundleMapManager`, `WindowsUpdater`, `AvatarConfigAsync`, `UserInputt`, the skin
+   system, weekend-challenge popup, IP-reputation and daily-bonus types), 3 removed (`UserInput`, `DailyPointsView` +
+   proxy). Three decompiler artefacts written back in their source form (`TryGetValue`, an `(int)` cast, a generic
+   `val.Draw(...)` call that ILSpy showed as a C# 7 `ref` local).
+2. **Server address** (the only intended code change): `ApplicationDataManager` → `steam-dev.uberstrike.com/2.0/` and
+   `/images/` — the dev server, no composite-hash check there (HaZard). `Version` stays `"4.8.11"` as in `v4.8.6`;
+   the `dev_server` branch used `"4.8.6"` — **to confirm with HaZard** before connecting.
+3. **Updater:** `WindowsUpdater` downloads and overwrites every file whose MD5 differs from the patcher's list, then
+   restarts — it would replace our build with the patcher's DLLs. HaZard's own developer switch is used: an empty
+   `devx` file next to `UberStrike.exe` makes it skip (`NoUpdate()`). It ships in [`PlayerFiles/`](PlayerFiles).
+4. **Embedded skin art:** `WeaponSkinHelper` reads the Hazardous Shotgun skin from resources inside
+   `Assembly-CSharp.dll`; Unity cannot embed resources when it compiles scripts. The 3 files (byte-identical to the
+   team source) are in [`EmbeddedResources/Assembly-CSharp/`](EmbeddedResources/Assembly-CSharp) and
+   [`tools/EmbedResources.cs`](tools/EmbedResources.cs) adds them after the build (Mono.Cecil from the Unity install,
+   compiled on first use by `tools\build-player.bat`). Embedding changes no code (IL checked before/after).
+5. **Assets and natives:** `PlayerFiles/UberStrike_Data/SeloTron.ogg` (home music loaded by `UberKill`),
+   `Assets/Plugins/uberbeat.dll` (anti-cheat, same file as the patcher's) and `uberheartbeat.dll` (Cmune original,
+   used for the server's heartbeat challenge) are in place.
+
+**Proof** — our build vs the DLLs built from `v4.8.6` (Roslyn vs Mono compiler, so compiler-generated helpers are
+folded into their owning class before comparing):
+
+| Check | Result |
+|---|---|
+| String literals per class (310 + 89 classes) | identical except the server address; Roslyn's `""` vs Mono's `string.Empty` (4 classes); single-letter chat commands (`m`, `g`, `u`, `k`) that Roslyn compares as characters |
+| Float constants per class | identical |
+| Real fields and method signatures (12,716 / 7,541) | identical except access modifiers on compiler-generated generic closure classes and an `[opt]` flag on a delegate |
+| Embedded resources | same 3 names and sizes as the team build |
+
+**Still open:** the map bundles and `sharedassets7` normal/bluebox files the patcher also ships (HaZard: some
+"need to be reverse engineered"); `CustomBundleMapManager` loads its bundles from disk.
 
 ## Rules for this branch
 

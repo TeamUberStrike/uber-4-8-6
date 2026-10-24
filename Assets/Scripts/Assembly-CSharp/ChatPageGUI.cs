@@ -24,10 +24,6 @@ public class ChatPageGUI : PageGUI
 
 	public static bool IsCompleteLobbyLoaded;
 
-	static ChatPageGUI()
-	{
-	}
-
 	private float _nextFullLobbyUpdate;
 
 	private bool autoScroll;
@@ -194,7 +190,11 @@ public class ChatPageGUI : PageGUI
 
 	private bool IsMobileChannel(ChannelType channel)
 	{
-		return channel == ChannelType.Android || channel == ChannelType.IPad || channel == ChannelType.IPhone;
+		if (channel != ChannelType.Android && channel != ChannelType.IPad)
+		{
+			return channel == ChannelType.IPhone;
+		}
+		return true;
 	}
 
 	private int DoModeratorControlPanel(Rect rect, ChatGroupPanel pane)
@@ -265,7 +265,9 @@ public class ChatPageGUI : PageGUI
 		float height = Mathf.Max(pane.WindowHeight, pane.ContentHeight);
 		float num = 0f;
 		pane.Scroll = GUITools.BeginScrollView(new Rect(0f, 0f, rect.width, pane.WindowHeight), pane.Scroll, new Rect(0f, 0f, rect.width - 17f, height), false, true);
-		GUI.BeginGroup(new Rect(0f, 0f, rect.width, pane.WindowHeight + pane.Scroll.y));
+		float width = rect.width;
+		float windowHeight = pane.WindowHeight;
+		GUI.BeginGroup(new Rect(0f, 0f, width, windowHeight + pane.Scroll.y));
 		foreach (ChatGroup group in pane.Groups)
 		{
 			num += DrawPlayerGroup(group, num, rect.width - 17f, pane.SearchText.Trim().ToLower());
@@ -285,7 +287,9 @@ public class ChatPageGUI : PageGUI
 		float height = Mathf.Max(pane.WindowHeight, pane.ContentHeight);
 		float num2 = 0f;
 		pane.Scroll = GUITools.BeginScrollView(new Rect(0f, 0f, rect.width, pane.WindowHeight), pane.Scroll, new Rect(0f, 0f, rect.width - 17f, height), false, true);
-		GUI.BeginGroup(new Rect(0f, 0f, rect.width, pane.WindowHeight + pane.Scroll.y));
+		float width = rect.width;
+		float windowHeight = pane.WindowHeight;
+		GUI.BeginGroup(new Rect(0f, 0f, width, windowHeight + pane.Scroll.y));
 		foreach (ChatGroup group in pane.Groups)
 		{
 			num2 += DrawPlayerGroup(group, num2, rect.width - 17f, pane.SearchText.Trim().ToLower());
@@ -306,11 +310,14 @@ public class ChatPageGUI : PageGUI
 		float height = Mathf.Max(pane.WindowHeight, pane.ContentHeight);
 		float num2 = 0f;
 		pane.Scroll = GUITools.BeginScrollView(new Rect(0f, 0f, rect.width, pane.WindowHeight), pane.Scroll, new Rect(0f, 0f, rect.width - 17f, height), false, true);
-		GUI.BeginGroup(new Rect(0f, 0f, rect.width, pane.WindowHeight + pane.Scroll.y));
+		float width = rect.width;
+		float windowHeight = pane.WindowHeight;
+		GUI.BeginGroup(new Rect(0f, 0f, width, windowHeight + pane.Scroll.y));
 		foreach (ChatGroup group in pane.Groups)
 		{
 			num2 += DrawPlayerGroup(group, num2, rect.width - 17f, pane.SearchText.Trim().ToLower(), true);
-			if (num2 > pane.Scroll.y + pane.WindowHeight)
+			float num3 = num2;
+			if (num3 > pane.Scroll.y + pane.WindowHeight)
 			{
 				break;
 			}
@@ -951,7 +958,7 @@ public class ChatPageGUI : PageGUI
 		{
 			TextEditor textEditor = new TextEditor();
 			DateTime dateTime = msg.ArrivalTime.ToUniversalTime();
-			textEditor.content = new GUIContent(string.Concat("LobbyMessage from <name=", msg.PlayerName, "> <cmid=", msg.Cmid, ">: <", msg.Text, "> <", dateTime, ">"));
+			textEditor.content = new GUIContent("LobbyMessage from <name=" + msg.PlayerName + "> <cmid=" + msg.Cmid + ">: <" + msg.Text + "> <" + dateTime.ToString() + ">");
 			textEditor.SelectAll();
 			textEditor.Copy();
 		}
@@ -1005,36 +1012,64 @@ public class ChatPageGUI : PageGUI
 
 	private bool MenuChkIsModerator(CommUser user)
 	{
-		return user != null && PlayerDataManager.AccessLevel >= MemberAccessLevel.Moderator;
+		if (user != null)
+		{
+			return PlayerDataManager.AccessLevel >= MemberAccessLevel.Moderator;
+		}
+		return false;
 	}
 
 	private bool MenuChkAddFriend(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && user.AccessLevel <= PlayerDataManager.AccessLevel && !PlayerDataManager.IsFriend(user.Cmid) && !PlayerDataManager.IsFacebookFriend(user.Cmid);
+		if (user != null && user.Cmid != PlayerDataManager.Cmid && user.AccessLevel <= PlayerDataManager.AccessLevel && !PlayerDataManager.IsFriend(user.Cmid))
+		{
+			return !PlayerDataManager.IsFacebookFriend(user.Cmid);
+		}
+		return false;
 	}
 
 	private bool MenuChkRemoveFriend(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && PlayerDataManager.IsFriend(user.Cmid);
+		if (user != null && user.Cmid != PlayerDataManager.Cmid)
+		{
+			return PlayerDataManager.IsFriend(user.Cmid);
+		}
+		return false;
 	}
 
 	private bool MenuChkChat(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && user.IsOnline;
+		if (user != null && user.Cmid != PlayerDataManager.Cmid)
+		{
+			return user.IsOnline;
+		}
+		return false;
 	}
 
 	private bool MenuChkSendMessage(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && !GameState.Current.HasJoinedGame;
+		if (user != null && user.Cmid != PlayerDataManager.Cmid)
+		{
+			return !GameState.Current.HasJoinedGame;
+		}
+		return false;
 	}
 
 	private bool MenuChkJoinGame(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && user.IsInGame;
+		if (user != null && user.Cmid != PlayerDataManager.Cmid)
+		{
+			return user.IsInGame;
+		}
+		return false;
 	}
 
 	private bool MenuChkInviteClan(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && (user.AccessLevel <= PlayerDataManager.AccessLevel || PlayerDataManager.IsFriend(user.Cmid) || PlayerDataManager.IsFacebookFriend(user.Cmid)) && PlayerDataManager.IsPlayerInClan && PlayerDataManager.CanInviteToClan && !PlayerDataManager.IsClanMember(user.Cmid);
+		if (user != null && user.Cmid != PlayerDataManager.Cmid && (user.AccessLevel <= PlayerDataManager.AccessLevel || PlayerDataManager.IsFriend(user.Cmid) || PlayerDataManager.IsFacebookFriend(user.Cmid)) && PlayerDataManager.IsPlayerInClan && PlayerDataManager.CanInviteToClan)
+		{
+			return !PlayerDataManager.IsClanMember(user.Cmid);
+		}
+		return false;
 	}
 }

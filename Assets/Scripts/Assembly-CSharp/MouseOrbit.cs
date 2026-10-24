@@ -155,7 +155,11 @@ public class MouseOrbit : MonoBehaviour
 
 	private static bool IsValueWithin(float value, float min, float max)
 	{
-		return value >= min && value <= max;
+		if (value >= min)
+		{
+			return value <= max;
+		}
+		return false;
 	}
 
 	public static float ClampAngle(float angle, float min, float max)

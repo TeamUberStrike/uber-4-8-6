@@ -9,7 +9,7 @@ internal class MatchRunningState : IState
 	public void OnEnter()
 	{
 		Singleton<ProjectileManager>.Instance.Clear();
-		AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Fight, 0uL, 1f, 1f);
+		AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Fight, 0uL);
 		if (GameState.Current.Players.ContainsKey(PlayerDataManager.Cmid) && !GameState.Current.PlayerData.IsSpectator)
 		{
 			GameState.Current.PlayerState.SetState(PlayerStateId.Playing);

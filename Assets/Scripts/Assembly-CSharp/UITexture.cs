@@ -139,7 +139,11 @@ public class UITexture : UIWidget
 	{
 		get
 		{
-			return (!(mTexture != null)) ? base.mainTexture : mTexture;
+			if (mTexture != null)
+			{
+				return mTexture;
+			}
+			return base.mainTexture;
 		}
 		set
 		{

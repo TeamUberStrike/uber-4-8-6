@@ -17,7 +17,11 @@ public class UIButton : UIButtonColor
 		get
 		{
 			Collider collider = base.collider;
-			return (bool)collider && collider.enabled;
+			if ((bool)collider)
+			{
+				return collider.enabled;
+			}
+			return false;
 		}
 		set
 		{

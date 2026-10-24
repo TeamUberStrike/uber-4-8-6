@@ -116,7 +116,11 @@ public class UIPopupList : MonoBehaviour
 		get
 		{
 			UIButtonKeys component = GetComponent<UIButtonKeys>();
-			return component == null || !component.enabled;
+			if (!(component == null))
+			{
+				return !component.enabled;
+			}
+			return true;
 		}
 		set
 		{
@@ -357,8 +361,8 @@ public class UIPopupList : MonoBehaviour
 			}
 			float num = atlasSprite.inner.yMin - atlasSprite.outer.yMin;
 			float num2 = (float)font.size * font.pixelSize * textScale;
-			float a = 0f;
-			float num3 = 0f - padding.y;
+			float num3 = 0f;
+			float num4 = 0f - padding.y;
 			List<UILabel> list = new List<UILabel>();
 			int i = 0;
 			for (int count = items.Count; i < count; i++)
@@ -369,7 +373,7 @@ public class UIPopupList : MonoBehaviour
 				uILabel.font = font;
 				uILabel.text = ((!isLocalized || !(Localization.instance != null)) ? text : Localization.instance.Get(text));
 				uILabel.color = textColor;
-				uILabel.cachedTransform.localPosition = new Vector3(border.x + padding.x, num3, -1f);
+				uILabel.cachedTransform.localPosition = new Vector3(border.x + padding.x, num4, -1f);
 				uILabel.MakePixelPerfect();
 				if (textScale != 1f)
 				{
@@ -377,9 +381,10 @@ public class UIPopupList : MonoBehaviour
 					uILabel.cachedTransform.localScale = localScale * textScale;
 				}
 				list.Add(uILabel);
-				num3 -= num2;
-				num3 -= padding.y;
-				a = Mathf.Max(a, uILabel.relativeSize.x * num2);
+				num4 -= num2;
+				num4 -= padding.y;
+				float a = num3;
+				num3 = Mathf.Max(a, uILabel.relativeSize.x * num2);
 				UIEventListener uIEventListener = UIEventListener.Get(uILabel.gameObject);
 				uIEventListener.onHover = OnItemHover;
 				uIEventListener.onPress = OnItemPress;
@@ -390,9 +395,10 @@ public class UIPopupList : MonoBehaviour
 				}
 				mLabelList.Add(uILabel);
 			}
-			a = Mathf.Max(a, bounds.size.x - (border.x + padding.x) * 2f);
-			Vector3 center = new Vector3(a * 0.5f / num2, -0.5f, 0f);
-			Vector3 size = new Vector3(a / num2, (num2 + padding.y) / num2, 1f);
+			float a2 = num3;
+			num3 = Mathf.Max(a2, bounds.size.x - (border.x + padding.x) * 2f);
+			Vector3 center = new Vector3(num3 * 0.5f / num2, -0.5f, 0f);
+			Vector3 size = new Vector3(num3 / num2, (num2 + padding.y) / num2, 1f);
 			int j = 0;
 			for (int count2 = list.Count; j < count2; j++)
 			{
@@ -402,10 +408,10 @@ public class UIPopupList : MonoBehaviour
 				boxCollider.center = center;
 				boxCollider.size = size;
 			}
-			a += (border.x + padding.x) * 2f;
-			num3 -= border.y;
-			mBackground.cachedTransform.localScale = new Vector3(a, 0f - num3 + border.y, 1f);
-			mHighlight.cachedTransform.localScale = new Vector3(a - (border.x + padding.x) * 2f + (atlasSprite.inner.xMin - atlasSprite.outer.xMin) * 2f, num2 + num * 2f, 1f);
+			num3 += (border.x + padding.x) * 2f;
+			num4 -= border.y;
+			mBackground.cachedTransform.localScale = new Vector3(num3, 0f - num4 + border.y, 1f);
+			mHighlight.cachedTransform.localScale = new Vector3(num3 - (border.x + padding.x) * 2f + (atlasSprite.inner.xMin - atlasSprite.outer.xMin) * 2f, num2 + num * 2f, 1f);
 			bool flag = position == Position.Above;
 			if (position == Position.Auto)
 			{
@@ -417,7 +423,7 @@ public class UIPopupList : MonoBehaviour
 			}
 			if (isAnimated)
 			{
-				float bottom = num3 + num2;
+				float bottom = num4 + num2;
 				Animate(mHighlight, flag, bottom);
 				int k = 0;
 				for (int count3 = list.Count; k < count3; k++)
@@ -429,7 +435,9 @@ public class UIPopupList : MonoBehaviour
 			}
 			if (flag)
 			{
-				transform2.localPosition = new Vector3(bounds.min.x, bounds.max.y - num3 - border.y, bounds.min.z);
+				float x = bounds.min.x;
+				float y = bounds.max.y - num4 - border.y;
+				transform2.localPosition = new Vector3(x, y, bounds.min.z);
 			}
 		}
 		else

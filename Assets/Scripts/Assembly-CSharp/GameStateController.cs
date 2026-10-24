@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UberStrike.Core.Models;
 using UberStrike.Core.Types;
 using UberStrike.Realtime.UnitySdk;
@@ -7,11 +9,19 @@ public class GameStateController : Singleton<GameStateController>
 {
 	private IGameMode currentGameMode;
 
+	public GameRoomData GameRoom;
+
+	public Action Rejoin;
+
 	public GameMode CurrentGameMode
 	{
 		get
 		{
-			return (currentGameMode != null) ? currentGameMode.Type : GameMode.None;
+			if (currentGameMode == null)
+			{
+				return GameMode.None;
+			}
+			return currentGameMode.Type;
 		}
 	}
 
@@ -22,7 +32,7 @@ public class GameStateController : Singleton<GameStateController>
 		Client = new GamePeer();
 	}
 
-	public void CreateNetworkGame(string server, int mapId, GameModeType mode, string name, string password, int timeMinutes, int killLimit, int playerLimit, int minLevel, int maxLevel, GameFlags.GAME_FLAGS flags)
+	public void CreateNetworkGame(string server, int mapId, GameModeType mode, GameBoxType boxType, string name, string password, int timeMinutes, int killLimit, int playerLimit, int minLevel, int maxLevel, GameFlags.GAME_FLAGS flags)
 	{
 		GameRoomData gameRoomData = new GameRoomData();
 		gameRoomData.Name = name;
@@ -35,28 +45,33 @@ public class GameStateController : Singleton<GameStateController>
 		gameRoomData.KillLimit = killLimit;
 		gameRoomData.LevelMin = (byte)Mathf.Clamp(minLevel, 0, 255);
 		gameRoomData.LevelMax = (byte)Mathf.Clamp(maxLevel, 0, 255);
+		gameRoomData.BoxType = boxType;
 		GameRoomData data = gameRoomData;
-		float time = Time.time;
-		ProgressPopupDialog dialog = PopupSystem.ShowProgress("Authentication", "Connecting to Server", () => Mathf.Clamp(Time.time - time, 0f, 3f));
-		dialog.SetCancelable(delegate
-		{
-			PopupSystem.HideMessage(dialog);
-		});
+		UnityRuntime.StartRoutine(BeginGameCreation(data, password));
+	}
+
+	private IEnumerator BeginGameCreation(GameRoomData data, string password)
+	{
+		ProgressPopupDialog popup = new ProgressPopupDialog("Authentication", "Connecting to Server & Syncing Loadout");
+		PopupSystem.Show(popup);
+		yield return AutoMonoBehaviour<UnityRuntime>.Instance.StartCoroutine(Singleton<PlayerDataManager>.Instance.StartSetLoadout());
 		Client.CreateGame(data, password);
+	}
+
+	private IEnumerator BeginJoinGame(GameRoomData data)
+	{
+		ProgressPopupDialog popup = PopupSystem.ShowProgress("Authentication", "Connecting to Server & Syncing Loadout");
+		PopupSystem.Show(popup);
+		yield return AutoMonoBehaviour<UnityRuntime>.Instance.StartCoroutine(Singleton<PlayerDataManager>.Instance.StartSetLoadout());
+		Singleton<ChatManager>.Instance.InGameDialog.Clear();
+		Client.JoinGame(data.Server.ConnectionString, data.Number, string.Empty);
 	}
 
 	public void JoinNetworkGame(GameRoomData data)
 	{
 		if (data.Server != null)
 		{
-			float time = Time.time;
-			ProgressPopupDialog dialog = PopupSystem.ShowProgress("Authentication", "Connecting to Server", () => Mathf.Clamp(Time.time - time, 0f, 3f));
-			dialog.SetCancelable(delegate
-			{
-				PopupSystem.HideMessage(dialog);
-			});
-			Singleton<ChatManager>.Instance.InGameDialog.Clear();
-			Client.JoinGame(data.Server.ConnectionString, data.Number, string.Empty);
+			UnityRuntime.StartRoutine(BeginJoinGame(data));
 		}
 		else
 		{
@@ -64,18 +79,18 @@ public class GameStateController : Singleton<GameStateController>
 		}
 	}
 
+	private IEnumerator BeginJoinGame(GameRoom data)
+	{
+		yield return AutoMonoBehaviour<UnityRuntime>.Instance.StartCoroutine(Singleton<PlayerDataManager>.Instance.StartSetLoadout());
+		Singleton<ChatManager>.Instance.InGameDialog.Clear();
+		Client.JoinGame(data.Server.ConnectionString, data.Number, string.Empty);
+	}
+
 	public void JoinNetworkGame(GameRoom data)
 	{
 		if (data.Server != null)
 		{
-			float time = Time.time;
-			ProgressPopupDialog dialog = PopupSystem.ShowProgress("Authentication", "Connecting to Server", () => Mathf.Clamp(Time.time - time, 0f, 3f));
-			dialog.SetCancelable(delegate
-			{
-				PopupSystem.HideMessage(dialog);
-			});
-			Singleton<ChatManager>.Instance.InGameDialog.Clear();
-			Client.JoinGame(data.Server.ConnectionString, data.Number, string.Empty);
+			UnityRuntime.StartRoutine(BeginJoinGame(data));
 		}
 		else
 		{
@@ -88,6 +103,10 @@ public class GameStateController : Singleton<GameStateController>
 		if (warnBeforeLeaving && GameState.Current.IsMultiplayer && GameState.Current.IsMatchRunning)
 		{
 			PopupSystem.ShowMessage(LocalizedStrings.LeavingGame, LocalizedStrings.LeaveGameWarningMsg, PopupSystem.AlertType.OKCancel, BackToMenu, LocalizedStrings.LeaveCaps, null, LocalizedStrings.CancelCaps, PopupSystem.ActionType.Negative);
+		}
+		else if (Rejoin != null)
+		{
+			Rejoin();
 		}
 		else
 		{

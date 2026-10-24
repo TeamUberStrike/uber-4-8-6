@@ -30,7 +30,11 @@ public class LobbyRoom : BaseLobbyRoom
 
 	public bool TryGetPlayer(int cmid, out CommActorInfo player)
 	{
-		return _actors.TryGetValue(cmid, out player) && player != null;
+		if (_actors.TryGetValue(cmid, out player))
+		{
+			return player != null;
+		}
+		return false;
 	}
 
 	protected override void OnClanChatMessage(int cmid, string name, string message)

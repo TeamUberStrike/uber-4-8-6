@@ -17,7 +17,11 @@ public class StateMachine<T> where T : struct, IConvertible
 	{
 		get
 		{
-			return (stateStack.Count <= 0) ? default(T) : stateStack.Peek();
+			if (stateStack.Count > 0)
+			{
+				return stateStack.Peek();
+			}
+			return default(T);
 		}
 	}
 
@@ -53,7 +57,8 @@ public class StateMachine<T> where T : struct, IConvertible
 			}
 			return;
 		}
-		throw new Exception("Unsupported state of type: " + stateId);
+		T val = stateId;
+		throw new Exception("Unsupported state of type: " + val);
 	}
 
 	public void PushState(T stateId)
@@ -72,7 +77,8 @@ public class StateMachine<T> where T : struct, IConvertible
 		}
 		else
 		{
-			Debug.LogWarning("Unsupported state of type: " + stateId);
+			T val = stateId;
+			Debug.LogWarning("Unsupported state of type: " + val);
 		}
 	}
 
@@ -124,7 +130,8 @@ public class StateMachine<T> where T : struct, IConvertible
 			registeredStates.Add(stateId, state);
 			return;
 		}
-		throw new Exception(string.Concat("StateMachine::RegisterState - state [", stateId, "] already exists in the current registry"));
+		T val = stateId;
+		throw new Exception("StateMachine::RegisterState - state [" + val.ToString() + "] already exists in the current registry");
 	}
 
 	public bool ContainsState(T stateId)

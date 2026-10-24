@@ -15,6 +15,10 @@ public class GameServerPlayerCountComparer : IComparer<PhotonServer>
 		{
 			return string.Compare(b.Name, a.Name);
 		}
-		return (((a.Data.State != PhotonServerLoad.Status.Alive) ? 1000 : a.Data.PlayersConnected) <= ((b.Data.State != PhotonServerLoad.Status.Alive) ? 1000 : b.Data.PlayersConnected)) ? (num * -1) : num;
+		if (((a.Data.State != PhotonServerLoad.Status.Alive) ? 1000 : a.Data.PlayersConnected) > ((b.Data.State != PhotonServerLoad.Status.Alive) ? 1000 : b.Data.PlayersConnected))
+		{
+			return num;
+		}
+		return num * -1;
 	}
 }

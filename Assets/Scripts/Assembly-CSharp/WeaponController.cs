@@ -74,7 +74,9 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		get
 		{
 			WeaponSlot[] weapons = _weapons;
-			foreach (WeaponSlot weaponSlot in weapons)
+			WeaponSlot[] array = weapons;
+			WeaponSlot[] array2 = array;
+			foreach (WeaponSlot weaponSlot in array2)
 			{
 				if (weaponSlot != null)
 				{
@@ -101,7 +103,11 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 	{
 		get
 		{
-			return _currentSlot != null && _currentSlot.Logic != null && _currentSlot.Decorator != null;
+			if (_currentSlot != null && _currentSlot.Logic != null)
+			{
+				return _currentSlot.Decorator != null;
+			}
+			return false;
 		}
 	}
 
@@ -109,7 +115,11 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 	{
 		get
 		{
-			return IsWeaponValid && _currentSlot.InputHandler.FireHandler.CanShoot && _currentSlot.Logic.IsWeaponActive;
+			if (IsWeaponValid && _currentSlot.InputHandler.FireHandler.CanShoot)
+			{
+				return _currentSlot.Logic.IsWeaponActive;
+			}
+			return false;
 		}
 	}
 
@@ -117,7 +127,11 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 	{
 		get
 		{
-			return _currentSlot != null && !_currentSlot.InputHandler.CanChangeWeapon();
+			if (_currentSlot != null)
+			{
+				return !_currentSlot.InputHandler.CanChangeWeapon();
+			}
+			return false;
 		}
 	}
 
@@ -127,7 +141,11 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 	{
 		get
 		{
-			return (_currentSlot == null) ? LoadoutSlotType.None : _currentSlot.Slot;
+			if (_currentSlot != null)
+			{
+				return _currentSlot.Slot;
+			}
+			return LoadoutSlotType.None;
 		}
 	}
 
@@ -283,8 +301,12 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		{
 			if (CheckAmmoCount())
 			{
+				BaseWeaponDecorator._noAmmoSoundPlaying = false;
 				_currentSlot.InputHandler.FireHandler.RegisterShot();
-				_holsterTime = WeaponConfigurationHelper.GetRateOfFire(_currentSlot.View);
+				if (!GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, GameState.Current.RoomData.GameFlags))
+				{
+					_holsterTime = WeaponConfigurationHelper.GetRateOfFire(_currentSlot.View);
+				}
 				Ray ray = new Ray(GameState.Current.PlayerData.ShootingPoint + GameState.Current.Player.EyePosition, GameState.Current.PlayerData.ShootingDirection);
 				CmunePairList<BaseGameProp, ShotPoint> hits;
 				_currentSlot.Logic.Shoot(ray, out hits);
@@ -298,7 +320,7 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 			}
 			else
 			{
-				_currentSlot.Decorator.PlayOutOfAmmoSound();
+				_currentSlot.Decorator.PlayOutOfAmmoSound(_currentSlot.View);
 				GameData.Instance.OnNotificationFull.Fire(string.Empty, "Out of ammo!", 1f);
 			}
 		}
@@ -390,7 +412,9 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 	{
 		int num = 0;
 		WeaponSlot[] weapons = _weapons;
-		foreach (WeaponSlot weaponSlot in weapons)
+		WeaponSlot[] array = weapons;
+		WeaponSlot[] array2 = array;
+		foreach (WeaponSlot weaponSlot in array2)
 		{
 			if (weaponSlot != null)
 			{
@@ -511,7 +535,11 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 
 	private bool CheckPerformShotConditions()
 	{
-		return IsEnabled && GameState.Current.Player != null && GameState.Current.Player.EnableWeaponControl && !GameState.Current.IsPlayerPaused && !GameState.Current.IsPlayerDead;
+		if (IsEnabled && GameState.Current.Player != null && GameState.Current.Player.EnableWeaponControl && !GameState.Current.IsPlayerPaused)
+		{
+			return !GameState.Current.IsPlayerDead;
+		}
+		return false;
 	}
 
 	private IEnumerator StartHidingWeapon(GameObject weapon, bool destroy)

@@ -19,7 +19,11 @@ public class UserInputMap
 			{
 				return "None";
 			}
-			return (_prefix == KeyCode.None) ? Channel.Name : string.Format("{0} + {1}", PrintKeyCode(_prefix), Channel.Name);
+			if (_prefix != KeyCode.None)
+			{
+				return PrintKeyCode(_prefix) + " + " + Channel.Name;
+			}
+			return Channel.Name;
 		}
 	}
 
@@ -33,7 +37,11 @@ public class UserInputMap
 		{
 			if (Channel != null)
 			{
-				return (_prefix != KeyCode.None && !Input.GetKey(_prefix)) ? 0f : Channel.Value;
+				if (_prefix == KeyCode.None || Input.GetKey(_prefix))
+				{
+					return Channel.Value;
+				}
+				return 0f;
 			}
 			return 0f;
 		}

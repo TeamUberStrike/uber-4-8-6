@@ -19,9 +19,9 @@ public class NGUITouchJoystick : MonoBehaviour
 
 	public Action OnJoystickStopped;
 
-	private Rect boundary = default(Rect);
+	private Rect boundary;
 
-	private Rect joystickBoundary = default(Rect);
+	private Rect joystickBoundary;
 
 	private TouchFinger finger = new TouchFinger();
 
@@ -49,14 +49,17 @@ public class NGUITouchJoystick : MonoBehaviour
 			Touch touch = touches[i];
 			if (touch.phase == TouchPhase.Began && boundary.ContainsTouch(touch.position) && finger.FingerId == -1)
 			{
-				finger = new TouchFinger
-				{
-					StartPos = new Vector2(touch.position.x, touch.position.y),
-					StartTouchTime = Time.time,
-					FingerId = touch.fingerId
-				};
-				joystickBoundary = new Rect(touch.position.x - joystickLimits.x / 2f, touch.position.y - joystickLimits.y / 2f, joystickLimits.x, joystickLimits.y);
-				Vector3 vector = UICamera.currentCamera.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, UICamera.currentCamera.nearClipPlane));
+				TouchFinger touchFinger = new TouchFinger();
+				float x = touch.position.x;
+				touchFinger.StartPos = new Vector2(x, touch.position.y);
+				touchFinger.StartTouchTime = Time.time;
+				touchFinger.FingerId = touch.fingerId;
+				finger = touchFinger;
+				float left = touch.position.x - joystickLimits.x / 2f;
+				joystickBoundary = new Rect(left, touch.position.y - joystickLimits.y / 2f, joystickLimits.x, joystickLimits.y);
+				Camera currentCamera = UICamera.currentCamera;
+				float x2 = touch.position.x;
+				Vector3 vector = currentCamera.ScreenToWorldPoint(new Vector3(x2, touch.position.y, UICamera.currentCamera.nearClipPlane));
 				vector = backgroundContainer.transform.parent.InverseTransformPoint(new Vector3(vector.x, vector.y, 0f));
 				backgroundContainer.transform.localPosition = vector;
 				movingStick.transform.localPosition = vector;

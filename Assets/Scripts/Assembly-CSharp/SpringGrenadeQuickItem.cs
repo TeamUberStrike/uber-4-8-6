@@ -33,7 +33,9 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 			}
 			Collider collider = gameObject.collider;
 			CharacterHitArea[] hitAreas = GameState.Current.Avatar.Decorator.HitAreas;
-			foreach (CharacterHitArea characterHitArea in hitAreas)
+			CharacterHitArea[] array = hitAreas;
+			CharacterHitArea[] array2 = array;
+			foreach (CharacterHitArea characterHitArea in array2)
 			{
 				if (gameObject.activeInHierarchy && characterHitArea.gameObject.activeInHierarchy)
 				{
@@ -71,7 +73,7 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 			}
 			else if (!(c.transform.tag == "MovableObject") && behaviour._config.IsSticky)
 			{
-				if (c.contacts.Length > 0)
+				if (c.contacts.Length != 0)
 				{
 					behaviour.transform.position = c.contacts[0].point + c.contacts[0].normal * behaviour.collider.bounds.extents.sqrMagnitude;
 				}
@@ -89,7 +91,7 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 			{
 				clip = GameAudio.LauncherBounce2;
 			}
-			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, position, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, position);
 		}
 	}
 
@@ -141,13 +143,13 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 			{
 				behaviour.machine.PopState();
 				GameState.Current.Player.MoveController.ApplyForce(behaviour._config.JumpDirection.normalized * behaviour._config.Force, CharacterMoveController.ForceType.Additive);
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(behaviour.JumpSound);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(behaviour.JumpSound, 0uL);
 				Singleton<ProjectileManager>.Instance.RemoveProjectile(behaviour.ID);
 				GameState.Current.Actions.RemoveProjectile(behaviour.ID, true);
 			}
 			else if (behaviour.collider.gameObject.layer == 20)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(GameAudio.JumpPad, behaviour.transform.position, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(GameAudio.JumpPad, behaviour.transform.position);
 			}
 		}
 
@@ -232,7 +234,11 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 	{
 		get
 		{
-			return (!base.transform) ? Vector3.zero : base.transform.position;
+			if ((bool)base.transform)
+			{
+				return base.transform.position;
+			}
+			return Vector3.zero;
 		}
 		private set
 		{
@@ -247,7 +253,11 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 	{
 		get
 		{
-			return (!base.rigidbody) ? Vector3.zero : base.rigidbody.velocity;
+			if ((bool)base.rigidbody)
+			{
+				return base.rigidbody.velocity;
+			}
+			return Vector3.zero;
 		}
 		private set
 		{
@@ -280,7 +290,7 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 			SpringGrenadeQuickItem springGrenadeQuickItem = Throw(hitInfo.point, Vector3.zero) as SpringGrenadeQuickItem;
 			springGrenadeQuickItem.machine.PopAllStates();
 			GameState.Current.Player.MoveController.ApplyForce(_config.JumpDirection.normalized * _config.Force, CharacterMoveController.ForceType.Additive);
-			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(JumpSound);
+			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(JumpSound, 0uL);
 			StartCoroutine(DestroyDelayed(springGrenadeQuickItem.ID));
 			return;
 		}
@@ -289,7 +299,9 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 		{
 			Collider[] array = Physics.OverlapSphere(p.Position, 2f, UberstrikeLayerMasks.ExplosionMask);
 			Collider[] array2 = array;
-			foreach (Collider collider in array2)
+			Collider[] array3 = array2;
+			Collider[] array4 = array3;
+			foreach (Collider collider in array4)
 			{
 				CharacterHitArea component = collider.gameObject.GetComponent<CharacterHitArea>();
 				if (component != null && component.RecieveProjectileDamage)
@@ -372,12 +384,13 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 			}
 			result = base.transform.position;
 			Destroy();
+			return result;
 		}
 		catch (Exception exception)
 		{
 			Debug.LogException(exception);
+			return result;
 		}
-		return result;
 	}
 
 	public void Destroy()

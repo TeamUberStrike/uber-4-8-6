@@ -22,11 +22,11 @@ public class ForceField : MonoBehaviour
 		if (collider.tag == "Player")
 		{
 			GameState.Current.Player.MoveController.ApplyForce(_direction.normalized * _force, CharacterMoveController.ForceType.Exclusive);
-			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.JumpPad2D);
+			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.JumpPad2D, 0uL);
 		}
 		else if (collider.gameObject.layer == 20)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(GameAudio.JumpPad, base.transform.position, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(GameAudio.JumpPad, base.transform.position);
 		}
 	}
 

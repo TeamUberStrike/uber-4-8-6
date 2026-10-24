@@ -204,7 +204,7 @@ public abstract class BaseItemGUI : IShopItemGUI
 	{
 		if (Item.View != null)
 		{
-			GUI.Label(new Rect(240f, 26f, 60f, 24f), string.Format("Lv {0}", Item.View.LevelLock.ToString()), BlueStonez.label_interparkbold_11pt_left);
+			GUI.Label(new Rect(240f, 26f, 60f, 24f), "Lv " + Item.View.LevelLock, BlueStonez.label_interparkbold_11pt_left);
 		}
 	}
 
@@ -216,7 +216,8 @@ public abstract class BaseItemGUI : IShopItemGUI
 			string text = string.Format("{0}", (points.Price != 0) ? points.Price.ToString("N0") : "FREE");
 			GUI.DrawTexture(new Rect(rect.x, rect.y, 16f, 16f), ShopUtils.CurrencyIcon(points.Currency));
 			GUI.Label(new Rect(rect.x + 20f, rect.y + 3f, rect.width - 20f, 16f), text, BlueStonez.label_interparkmed_11pt_left);
-			num += 40f + BlueStonez.label_interparkmed_11pt_left.CalcSize(new GUIContent(text)).x;
+			float num2 = num;
+			num = num2 + (40f + BlueStonez.label_interparkmed_11pt_left.CalcSize(new GUIContent(text)).x);
 		}
 		if (credits != null)
 		{

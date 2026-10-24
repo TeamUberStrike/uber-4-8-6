@@ -119,7 +119,7 @@ public class InviteToClanPanelGUI : PanelGuiBase
 						_showReceiverDropdownList = false;
 						GUI.FocusControl("Description");
 					}
-					string text = ((!string.IsNullOrEmpty(mergedFriend.GroupTag)) ? string.Format("[{0}] {1}", mergedFriend.GroupTag, mergedFriend.Name) : mergedFriend.Name);
+					string text = ((!string.IsNullOrEmpty(mergedFriend.GroupTag)) ? ("[" + mergedFriend.GroupTag + "] " + mergedFriend.Name) : mergedFriend.Name);
 					GUI.Label(new Rect(8f, num2 * 24 + 4, rect.width, rect.height), text, BlueStonez.label_interparkmed_11pt_left);
 					if (flag)
 					{

@@ -241,7 +241,8 @@ public class UIScrollBar : MonoBehaviour
 			Bounds bounds2 = NGUIMath.CalculateRelativeInnerBounds(cachedTransform, mFG);
 			if (mDir == Direction.Horizontal)
 			{
-				float num = bounds.size.x - bounds2.size.x;
+				float x = bounds.size.x;
+				float num = x - bounds2.size.x;
 				float num2 = num * 0.5f;
 				float num3 = bounds.center.x - num2;
 				float num4 = ((!(num > 0f)) ? 0f : ((localPos.x - num3) / num));
@@ -249,7 +250,8 @@ public class UIScrollBar : MonoBehaviour
 			}
 			else
 			{
-				float num5 = bounds.size.y - bounds2.size.y;
+				float y = bounds.size.y;
+				float num5 = y - bounds2.size.y;
 				float num6 = num5 * 0.5f;
 				float num7 = bounds.center.y - num6;
 				float num8 = ((!(num5 > 0f)) ? 0f : (1f - (localPos.y - num7) / num5));
@@ -342,7 +344,8 @@ public class UIScrollBar : MonoBehaviour
 		mScroll = Mathf.Clamp01(mScroll);
 		Vector4 border = mBG.border;
 		Vector4 border2 = mFG.border;
-		Vector2 vector = new Vector2(Mathf.Max(0f, mBG.cachedTransform.localScale.x - border.x - border.z), Mathf.Max(0f, mBG.cachedTransform.localScale.y - border.y - border.w));
+		float x = Mathf.Max(0f, mBG.cachedTransform.localScale.x - border.x - border.z);
+		Vector2 vector = new Vector2(x, Mathf.Max(0f, mBG.cachedTransform.localScale.y - border.y - border.w));
 		float num = ((!mInverted) ? mScroll : (1f - mScroll));
 		if (mDir == Direction.Horizontal)
 		{

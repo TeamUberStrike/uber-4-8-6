@@ -36,7 +36,7 @@ namespace Cmune.DataCenter.Common.Entities
 			string text2 = text;
 			text = text2 + "[Item Id: " + ItemId + "]";
 			text2 = text;
-			text = string.Concat(text2, "[Expiration date: ", ExpirationDate, "]");
+			text = text2 + "[Expiration date: " + ExpirationDate.ToString() + "]";
 			text2 = text;
 			text = text2 + "[Amount remaining:" + AmountRemaining + "]";
 			return text + "]";

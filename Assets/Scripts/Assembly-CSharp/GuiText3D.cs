@@ -108,8 +108,8 @@ public class GuiText3D : MonoBehaviour
 			}
 			else
 			{
-				float dist = Mathf.Clamp01(_viewportPosition.z / mMaxDistance);
-				_material.color = Color.Lerp(startColor, finalColor, dist);
+				float t = Mathf.Clamp01(_viewportPosition.z / mMaxDistance);
+				_material.color = Color.Lerp(startColor, finalColor, t);
 			}
 			fadeDir += Time.deltaTime * mFadeDirection;
 			_transform.localPosition = _viewportPosition + fadeDir;

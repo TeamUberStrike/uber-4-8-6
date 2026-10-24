@@ -80,7 +80,7 @@ public class SplashScreen : MonoBehaviour
 		else if (!PopupSystem.IsAnyPopupOpen)
 		{
 			label_loading.normal.textColor = label_loading.normal.textColor.SetAlpha(1f);
-			if (GUI.Button(new Rect(0f, 0f, Screen.width, Screen.height), "There was a problem loading UberStrike. Try reloading or visit support.uberstrike.com if the problem persists.", label_loading))
+			if (GUI.Button(new Rect(0f, 0f, Screen.width, Screen.height), "There was a problem loading UberStrike. Please try again later or contact us at https://discord.gg/hhxZCBamRT if the problem persists.", label_loading))
 			{
 				Application.Quit();
 			}

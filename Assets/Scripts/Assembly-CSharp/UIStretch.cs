@@ -84,8 +84,10 @@ public class UIStretch : MonoBehaviour
 			Vector3 vector = widgetContainer.relativeSize;
 			Vector3 vector2 = widgetContainer.pivotOffset;
 			vector2.y -= 1f;
-			vector2.x *= widgetContainer.relativeSize.x * localScale.x;
-			vector2.y *= widgetContainer.relativeSize.y * localScale.y;
+			float x = vector2.x;
+			vector2.x = x * (widgetContainer.relativeSize.x * localScale.x);
+			float y = vector2.y;
+			vector2.y = y * (widgetContainer.relativeSize.y * localScale.y);
 			mRect.x = localPosition.x + vector2.x;
 			mRect.y = localPosition.y + vector2.y;
 			mRect.width = vector.x * localScale.x;

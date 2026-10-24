@@ -86,7 +86,7 @@ public class OptionsPanelGUI : PanelGuiBase
 		{
 			if (++num == ScreenResolutionManager.Resolutions.Count)
 			{
-				arg = string.Format("({0})", LocalizedStrings.FullscreenOnly);
+				arg = "(" + LocalizedStrings.FullscreenOnly + ")";
 			}
 			list.Add(string.Format("{0} X {1} {2}", resolution.width, resolution.height, arg));
 		}
@@ -167,7 +167,7 @@ public class OptionsPanelGUI : PanelGuiBase
 		if (GUI.changed)
 		{
 			GUI.changed = false;
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		GUI.BeginGroup(new Rect(16f, 55f, _rect.width - 32f, _rect.height - 56f - 44f), string.Empty, BlueStonez.window_standard_grey38);
 		switch (_selectedOptionsTab)
@@ -313,7 +313,7 @@ public class OptionsPanelGUI : PanelGuiBase
 		if (num4 != _currentQuality)
 		{
 			SetCurrentQuality(num4);
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		if (HorizontalScrollbar(new Rect(8f, 30f, width, 30f), LocalizedStrings.TextureQuality, ref _textureQuality, 0f, 5f))
 		{
@@ -341,7 +341,8 @@ public class OptionsPanelGUI : PanelGuiBase
 			}
 			num5 += 30;
 		}
-		bool flag = GUI.Toggle(new Rect(8f, num5, width, 30f), ApplicationDataManager.ApplicationOptions.VideoShowFps, LocalizedStrings.ShowFPS, BlueStonez.toggle);
+		bool flag = GUI.Toggle(new Rect(8f, num5, 130f, 30f), ApplicationDataManager.ApplicationOptions.VideoShowFps, LocalizedStrings.ShowFPS, BlueStonez.toggle);
+		ApplicationDataManager.ApplicationOptions.FOVMode = GUI.Toggle(new Rect(140f, num5, width, 30f), ApplicationDataManager.ApplicationOptions.FOVMode, "FOV Mode", BlueStonez.toggle);
 		if (flag != ApplicationDataManager.ApplicationOptions.VideoShowFps)
 		{
 			ApplicationDataManager.ApplicationOptions.VideoShowFps = flag;
@@ -424,7 +425,7 @@ public class OptionsPanelGUI : PanelGuiBase
 		DrawGroupControl(new Rect(8f, 20f, _rect.width - 65f, 65f), LocalizedStrings.Mouse, BlueStonez.label_group_interparkbold_18pt);
 		GUI.BeginGroup(new Rect(8f, 20f, _rect.width - 65f, 65f));
 		GUI.Label(new Rect(15f, 10f, 130f, 30f), LocalizedStrings.MouseSensitivity, BlueStonez.label_interparkbold_11pt_left);
-		float num = GUI.HorizontalSlider(new Rect(155f, 17f, 200f, 30f), ApplicationDataManager.ApplicationOptions.InputXMouseSensitivity, 1f, 10f, BlueStonez.horizontalSlider, BlueStonez.horizontalSliderThumb);
+		float num = GUI.HorizontalSlider(new Rect(155f, 17f, 200f, 30f), ApplicationDataManager.ApplicationOptions.InputXMouseSensitivity, 0.1f, 10f, BlueStonez.horizontalSlider, BlueStonez.horizontalSliderThumb);
 		GUI.Label(new Rect(370f, 10f, 100f, 30f), ApplicationDataManager.ApplicationOptions.InputXMouseSensitivity.ToString("N1"), BlueStonez.label_interparkbold_11pt_left);
 		if (num != ApplicationDataManager.ApplicationOptions.InputXMouseSensitivity)
 		{
@@ -437,7 +438,7 @@ public class OptionsPanelGUI : PanelGuiBase
 		}
 		GUI.EndGroup();
 		int num2 = 105;
-		if (Input.GetJoystickNames().Length > 0)
+		if (Input.GetJoystickNames().Length != 0)
 		{
 			DrawGroupControl(new Rect(8f, 105f, _rect.width - 65f, 50f), LocalizedStrings.Gamepad, BlueStonez.label_group_interparkbold_18pt);
 			GUI.BeginGroup(new Rect(8f, 105f, _rect.width - 65f, 50f));

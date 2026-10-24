@@ -103,9 +103,16 @@ public class EndOfMatchStats
 		{
 			GainedXp = 0;
 			string text = (TotalXp = "0");
-			text = (BoostXp = text);
-			text = (SkillBonusXp = text);
-			PlayTimeXp = text;
+			string text3 = text;
+			string text4 = text3;
+			text = (BoostXp = text4);
+			text3 = text;
+			text4 = text3;
+			text = (SkillBonusXp = text4);
+			string text7 = text;
+			text = (PlayTimeXp = text7);
+			text3 = text;
+			text4 = text3;
 		}
 	}
 

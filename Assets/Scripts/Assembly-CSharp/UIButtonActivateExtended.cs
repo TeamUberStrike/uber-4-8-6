@@ -19,7 +19,9 @@ public class UIButtonActivateExtended : MonoBehaviour
 			return;
 		}
 		GameObject[] targets = _targets;
-		foreach (GameObject gameObject in targets)
+		GameObject[] array = targets;
+		GameObject[] array2 = array;
+		foreach (GameObject gameObject in array2)
 		{
 			if (gameObject != null)
 			{

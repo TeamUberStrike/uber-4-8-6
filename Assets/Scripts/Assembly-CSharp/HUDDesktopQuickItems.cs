@@ -17,7 +17,7 @@ public class HUDDesktopQuickItems : MonoBehaviour
 		{
 			QuickItem[] quickItems = Singleton<QuickItemController>.Instance.QuickItems;
 			int currentSlotIndex = Singleton<QuickItemController>.Instance.CurrentSlotIndex;
-			item0.SetQuickItem((quickItems.Length <= 0) ? null : quickItems[0], 0 == currentSlotIndex);
+			item0.SetQuickItem((quickItems.Length == 0) ? null : quickItems[0], currentSlotIndex == 0);
 			item1.SetQuickItem((quickItems.Length <= 1) ? null : quickItems[1], 1 == currentSlotIndex);
 			item2.SetQuickItem((quickItems.Length <= 2) ? null : quickItems[2], 2 == currentSlotIndex);
 		}, this);
@@ -27,7 +27,7 @@ public class HUDDesktopQuickItems : MonoBehaviour
 			switch (index)
 			{
 			case 0:
-				item0.SetCooldown(progress, 0 == currentSlotIndex);
+				item0.SetCooldown(progress, currentSlotIndex == 0);
 				break;
 			case 1:
 				item1.SetCooldown(progress, 1 == currentSlotIndex);

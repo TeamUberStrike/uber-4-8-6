@@ -38,7 +38,9 @@ public class MenuPageManager : MonoBehaviour
 	private void Start()
 	{
 		PageScene[] componentsInChildren = GetComponentsInChildren<PageScene>(true);
-		foreach (PageScene pageScene in componentsInChildren)
+		PageScene[] array = componentsInChildren;
+		PageScene[] array2 = array;
+		foreach (PageScene pageScene in array2)
 		{
 			_pageByPageType.Add(pageScene.PageType, pageScene);
 		}

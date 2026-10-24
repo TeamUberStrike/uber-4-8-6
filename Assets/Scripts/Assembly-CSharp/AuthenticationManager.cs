@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class AuthenticationManager : Singleton<AuthenticationManager>
 {
-	private ProgressPopupDialog _progress;
+	public static ProgressPopupDialog _progress;
 
 	private Callback<GetAuthSessionTicketResponse_t> m_GetAuthSessionTicketResponse;
 
@@ -20,6 +20,12 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 	private AuthenticationManager()
 	{
 		_progress = new ProgressPopupDialog(LocalizedStrings.SettingUp, LocalizedStrings.ProcessingLogin);
+		GameObject gameObject = new GameObject("Plugin Holder");
+		gameObject.AddComponent<UberKill>();
+		gameObject.AddComponent<UberBeat>();
+		gameObject.AddComponent<AvatarConfigAsync>();
+		gameObject.AddComponent<CustomBundleMapManager>();
+		UnityEngine.Object.DontDestroyOnLoad(gameObject);
 	}
 
 	public void SetAuthComplete(bool enabled)
@@ -29,66 +35,55 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 
 	public void LoginByChannel()
 	{
-		string text = PlayerPrefs.GetString("CurrentSteamUser", string.Empty);
-		Debug.Log(string.Format("SteamWorks SteamID:{0}, PlayerPrefs SteamID:{1}", PlayerDataManager.SteamId, text));
-		if (string.IsNullOrEmpty(text) || text != PlayerDataManager.SteamId)
+		UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
+	}
+
+	private IEnumerator CheckIpReputation(Action<bool> onComplete)
+	{
+		bool isMaliciousIp = false;
+		yield return ApplicationWebServiceClient.CheckIpReputation(delegate(IpReputationView view)
 		{
-			Debug.Log(string.Format("No SteamID saved. Using SteamWorks SteamID:{0}", PlayerDataManager.SteamId));
-			PopupSystem.ShowMessage(string.Empty, "Have you played UberStrike before?", PopupSystem.AlertType.OKCancel, delegate
+			if (view != null && view.IsMalicious)
 			{
-				UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
-			}, "No", delegate
-			{
-				PopupSystem.ShowMessage(string.Empty, "Do you want to upgrade an UberStrike.com or Facebook account?\n\nNOTE: This will permenantly link your UberStrike account to this Steam ID", PopupSystem.AlertType.OKCancel, delegate
+				isMaliciousIp = true;
+				string text = "Your IP " + view.IpAddress + " has been blocked.";
+				if (!string.IsNullOrEmpty(view.Reason))
 				{
-					UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
-				}, "No", delegate
+					text = text + "\nReason: " + view.Reason;
+				}
+				if (view.IsDisplayHelpText)
 				{
-					UnityRuntime.StartRoutine(StartLoginMemberSteam(false));
-				}, "Yes");
-			}, "Yes");
-		}
-		else
+					text += "\nCheck your network and change your public IP.";
+				}
+				ApplicationDataManager.LockApplication(text);
+			}
+		}, delegate(Exception ex)
 		{
-			Debug.Log(string.Format("Login using saved SteamID:{0}", text));
-			UnityRuntime.StartRoutine(StartLoginMemberSteam(true));
-		}
+			Debug.LogWarning("IP reputation check failed: " + ((ex != null) ? ex.ToString() : null));
+		});
+		onComplete(isMaliciousIp);
 	}
 
 	public IEnumerator StartLoginMemberEmail(string emailAddress, string password)
 	{
 		if (string.IsNullOrEmpty(emailAddress) || string.IsNullOrEmpty(password))
 		{
-			ShowLoginErrorPopup(LocalizedStrings.Error, "Your login credentials are not correct. Please try to login again.");
+			ApplicationDataManager.LockApplication("Your login credentials are not correct. Please try to login again.");
 			yield break;
 		}
 		_progress.Text = "Authenticating Account";
 		_progress.Progress = 0.1f;
 		PopupSystem.Show(_progress);
 		MemberAuthenticationResultView authenticationView = null;
-		if (ApplicationDataManager.Channel == ChannelType.Steam)
+		yield return AuthenticationWebServiceClient.LoginMemberEmail(emailAddress, password, ApplicationDataManager.Channel, SystemInfo.deviceUniqueIdentifier, delegate(MemberAuthenticationResultView ev)
 		{
-			yield return AuthenticationWebServiceClient.LinkSteamMember(emailAddress, password, PlayerDataManager.SteamId, SystemInfo.deviceUniqueIdentifier, delegate(MemberAuthenticationResultView ev)
-			{
-				authenticationView = ev;
-				PlayerPrefs.SetString("CurrentSteamUser", PlayerDataManager.SteamId);
-				PlayerPrefs.Save();
-			}, delegate
-			{
-			});
-		}
-		else
+			authenticationView = ev;
+		}, delegate
 		{
-			yield return AuthenticationWebServiceClient.LoginMemberEmail(emailAddress, password, ApplicationDataManager.Channel, SystemInfo.deviceUniqueIdentifier, delegate(MemberAuthenticationResultView ev)
-			{
-				authenticationView = ev;
-			}, delegate
-			{
-			});
-		}
+		});
 		if (authenticationView == null)
 		{
-			ShowLoginErrorPopup(LocalizedStrings.Error, "The login could not be processed. Please check your internet connection and try again.");
+			ApplicationDataManager.LockApplication("The login could not be processed. Please check your internet connection and try again.");
 		}
 		else
 		{
@@ -100,28 +95,64 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 	{
 		if (directSteamLogin)
 		{
+			PopupSystem.Show(_progress);
+			yield return UnityRuntime.StartRoutine(WindowsUpdater.Updater());
+			if (!WindowsUpdater.IsUpdateRoutineComplete)
+			{
+				PopupSystem.HideMessage(_progress);
+				yield break;
+			}
+			_progress.Text = "Checking IP";
+			_progress.Progress = 0f;
+			bool isMaliciousIp = false;
+			yield return UnityRuntime.StartRoutine(CheckIpReputation(delegate(bool result)
+			{
+				isMaliciousIp = result;
+			}));
+			if (isMaliciousIp)
+			{
+				yield break;
+			}
+			_progress.Text = "Checking Client";
+			_progress.Progress = 0f;
+			bool Success = false;
+			yield return UnityRuntime.StartRoutine(GlobalSceneLoader.BeginAuthenticateApplication(delegate(bool OnSuccess)
+			{
+				Success = OnSuccess;
+			}));
+			if (!Success)
+			{
+				PopupSystem.HideMessage(_progress);
+				yield break;
+			}
+			_progress.Text = "Collecting Hardware ID";
+			_progress.Progress = 0f;
+			UberBeat.Instance.Run();
+			while (string.IsNullOrEmpty(ApplicationDataManager.HWID))
+			{
+				yield return new WaitForSeconds(0.05f);
+			}
 			_progress.Text = "Authenticating with Steam";
 			_progress.Progress = 0.05f;
-			PopupSystem.Show(_progress);
 			m_GetAuthSessionTicketResponse = Callback<GetAuthSessionTicketResponse_t>.Create(OnGetAuthSessionTicketResponse);
-			byte[] ticket = new byte[1024];
+			byte[] pTicket = new byte[1024];
 			uint pcbTicket;
-			HAuthTicket authTicket = SteamUser.GetAuthSessionTicket(ticket, 1024, out pcbTicket);
+			SteamUser.GetAuthSessionTicket(pTicket, 1024, out pcbTicket);
 			int num = (int)pcbTicket;
 			string authToken = num.ToString();
-			string machineId = SystemInfo.deviceUniqueIdentifier;
+			string deviceUniqueIdentifier = SystemInfo.deviceUniqueIdentifier;
 			MemberAuthenticationResultView authenticationView = null;
 			_progress.Text = "Authenticating with UberStrike";
 			_progress.Progress = 0.1f;
-			yield return AuthenticationWebServiceClient.LoginSteam(PlayerDataManager.SteamId, authToken, machineId, delegate(MemberAuthenticationResultView result)
+			yield return AuthenticationWebServiceClient.LoginSteam(ApplicationDataManager.Version, PlayerDataManager.SteamId, authToken, deviceUniqueIdentifier, ApplicationDataManager.HWID, ApplicationDataManager.IsMac, delegate(MemberAuthenticationResultView result)
 			{
 				authenticationView = result;
 				PlayerPrefs.SetString("CurrentSteamUser", PlayerDataManager.SteamId);
 				PlayerPrefs.Save();
 			}, delegate(Exception error)
 			{
-				Debug.LogError("Account authentication error: " + error);
-				ShowLoginErrorPopup(LocalizedStrings.Error, "There was an error logging you in. Please try again or contact us at http://support.cmune.com");
+				Debug.LogError("Account authentication error: " + ((error != null) ? error.ToString() : null));
+				ApplicationDataManager.LockApplication("There was an error logging you in. Please try again later or contact us at https://discord.gg/hhxZCBamRT");
 			});
 			yield return UnityRuntime.StartRoutine(CompleteAuthentication(authenticationView));
 		}
@@ -134,7 +165,20 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 
 	private void OnGetAuthSessionTicketResponse(GetAuthSessionTicketResponse_t pCallback)
 	{
-		Debug.Log(string.Concat("[", 163, " - GetAuthSessionTicketResponse] - ", pCallback.m_hAuthTicket, " -- ", pCallback.m_eResult));
+		string[] array = new string[6]
+		{
+			"[",
+			163.ToString(),
+			" - GetAuthSessionTicketResponse] - ",
+			null,
+			null,
+			null
+		};
+		HAuthTicket hAuthTicket = pCallback.m_hAuthTicket;
+		array[3] = hAuthTicket.ToString();
+		array[4] = " -- ";
+		array[5] = pCallback.m_eResult.ToString();
+		Debug.Log(string.Concat(array));
 	}
 
 	private IEnumerator CompleteAuthentication(MemberAuthenticationResultView authView, bool isRegistrationLogin = false)
@@ -142,24 +186,34 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		if (authView == null)
 		{
 			Debug.LogError("Account authentication error: MemberAuthenticationResultView was null, isRegistrationLogin: " + isRegistrationLogin);
-			ShowLoginErrorPopup(LocalizedStrings.Error, "There was an error logging you in. Please try again or contact us at http://support.cmune.com");
+			ApplicationDataManager.LockApplication("There was an error logging you in. Please try again later or contact us at https://discord.gg/hhxZCBamRT");
 			yield break;
 		}
 		if (authView.MemberAuthenticationResult == MemberAuthenticationResult.IsBanned || authView.MemberAuthenticationResult == MemberAuthenticationResult.IsIpBanned)
 		{
-			ApplicationDataManager.LockApplication(LocalizedStrings.YourAccountHasBeenBanned);
+			if (authView.BanDuration == -1)
+			{
+				ApplicationDataManager.LockApplication("Your account has been banned permanently!");
+				yield break;
+			}
+			ApplicationDataManager.LockApplication("Your account has been temporarily banned!" + Environment.NewLine + "Duration left: " + authView.BanDuration / 60 + " hours " + authView.BanDuration % 60 + " minutes.");
+			yield break;
+		}
+		if (authView.MemberAuthenticationResult == MemberAuthenticationResult.NewUpdate)
+		{
+			ApplicationDataManager.LockApplication(string.Format(LocalizedStrings.UberStrikeIsOutOfDateVisitWebsite, ApplicationDataManager.Version, authView.ServerGameVersion));
 			yield break;
 		}
 		if (authView.MemberAuthenticationResult == MemberAuthenticationResult.InvalidEsns)
 		{
 			Debug.Log("Result: " + authView.MemberAuthenticationResult);
-			ShowLoginErrorPopup(LocalizedStrings.Error, "Sorry this account is linked already.");
+			ApplicationDataManager.LockApplication("Sorry this account is linked already.");
 			yield break;
 		}
 		if (authView.MemberAuthenticationResult != MemberAuthenticationResult.Ok)
 		{
 			Debug.Log("Result: " + authView.MemberAuthenticationResult);
-			ShowLoginErrorPopup(LocalizedStrings.Error, "Your login credentials are not correct. Please try to login again.");
+			ApplicationDataManager.LockApplication("Your login credentials are not correct. Please try to login again.");
 			yield break;
 		}
 		Singleton<PlayerDataManager>.Instance.SetLocalPlayerMemberView(authView.MemberView);
@@ -176,7 +230,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		yield return UnityRuntime.StartRoutine(Singleton<CommsManager>.Instance.GetContactsByGroups());
 		_progress.Text = LocalizedStrings.LoadingCharacterData;
 		_progress.Progress = 0.3f;
-		yield return ApplicationWebServiceClient.GetConfigurationData("4.7.1", delegate(ApplicationConfigurationView appConfigView)
+		yield return ApplicationWebServiceClient.GetConfigurationData(ApplicationDataManager.Version, delegate(ApplicationConfigurationView appConfigView)
 		{
 			XpPointsUtil.Config = appConfigView;
 		}, delegate
@@ -187,7 +241,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		_progress.Text = LocalizedStrings.LoadingMapData;
 		_progress.Progress = 0.5f;
 		bool mapsLoadedSuccessfully = false;
-		yield return ApplicationWebServiceClient.GetMaps("4.7.1", DefinitionType.StandardDefinition, delegate(List<MapView> callback)
+		yield return ApplicationWebServiceClient.GetMaps(ApplicationDataManager.Version, DefinitionType.StandardDefinition, delegate(List<MapView> callback)
 		{
 			mapsLoadedSuccessfully = Singleton<MapManager>.Instance.InitializeMapsToLoad(callback);
 		}, delegate
@@ -196,7 +250,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		});
 		if (!mapsLoadedSuccessfully)
 		{
-			ShowLoginErrorPopup(LocalizedStrings.Error, LocalizedStrings.ErrorLoadingMapsSupport);
+			ApplicationDataManager.LockApplication(LocalizedStrings.ErrorLoadingMapsSupport);
 			PopupSystem.HideMessage(_progress);
 			yield break;
 		}
@@ -216,7 +270,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		yield return UnityRuntime.StartRoutine(Singleton<PlayerDataManager>.Instance.StartGetLoadout());
 		if (!Singleton<LoadoutManager>.Instance.ValidateLoadout())
 		{
-			ShowLoginErrorPopup(LocalizedStrings.ErrorGettingPlayerLoadout, LocalizedStrings.ErrorGettingPlayerLoadoutSupport);
+			ApplicationDataManager.LockApplication(LocalizedStrings.ErrorGettingPlayerLoadoutSupport);
 			yield break;
 		}
 		_progress.Progress = 0.85f;
@@ -224,7 +278,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 		yield return UnityRuntime.StartRoutine(Singleton<PlayerDataManager>.Instance.StartGetMember());
 		if (!Singleton<PlayerDataManager>.Instance.ValidateMemberData())
 		{
-			ShowLoginErrorPopup(LocalizedStrings.ErrorGettingPlayerStatistics, LocalizedStrings.ErrorPlayerStatisticsSupport);
+			ApplicationDataManager.LockApplication(LocalizedStrings.ErrorPlayerStatisticsSupport);
 			yield break;
 		}
 		_progress.Progress = 0.9f;
@@ -261,7 +315,7 @@ public class AuthenticationManager : Singleton<AuthenticationManager>
 			MenuPageManager.Instance.LoadPage(PageType.Home);
 			IsAuthComplete = true;
 		}
-		Debug.LogWarning(string.Format("AuthToken:{0}, MagicHash:{1}", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash));
+		GlobalUIRibbon.Instance.Show();
 	}
 
 	public void StartLogout()

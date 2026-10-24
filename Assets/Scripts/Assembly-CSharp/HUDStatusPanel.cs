@@ -1,4 +1,5 @@
 using UberStrike.Core.Models;
+using UberStrike.Core.Types;
 using UnityEngine;
 
 public class HUDStatusPanel : MonoBehaviour
@@ -70,7 +71,7 @@ public class HUDStatusPanel : MonoBehaviour
 			if (remainingKillsRounds != num)
 			{
 				remainingKillsRounds = value;
-				statusLabel.text = GetRemainingKillString(value);
+				statusLabel.text = ((GameState.Current.GameMode == GameModeType.EliminationMode) ? GetRemainingRoundsString(value) : GetRemainingKillString(value));
 			}
 		}
 	}
@@ -83,6 +84,7 @@ public class HUDStatusPanel : MonoBehaviour
 
 	private void OnDisable()
 	{
+		statusLabel.text = ((GameState.Current.GameMode == GameModeType.EliminationMode) ? GetRemainingRoundsString(remainingKillsRounds) : GetRemainingKillString(remainingKillsRounds));
 		EventHandler.Global.RemoveListener<GameEvents.MatchCountdown>(OnMatchStartCountdownEvent);
 	}
 
@@ -145,19 +147,19 @@ public class HUDStatusPanel : MonoBehaviour
 		switch (RemainingSeconds)
 		{
 		case 5:
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown5, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown5, 0uL);
 			break;
 		case 4:
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown4, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown4, 0uL);
 			break;
 		case 3:
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown3, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown3, 0uL);
 			break;
 		case 2:
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown2, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown2, 0uL);
 			break;
 		case 1:
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown1, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MatchEndingCountdown1, 0uL);
 			break;
 		}
 	}

@@ -32,9 +32,7 @@ public class BulletImpactTrail : BaseWeaponEffect
 
 	public override void OnShoot()
 	{
-		if (!_trailRenderer)
-		{
-		}
+		bool flag = (bool)_trailRenderer;
 	}
 
 	public override void OnPostShoot()

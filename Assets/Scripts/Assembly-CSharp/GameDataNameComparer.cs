@@ -9,6 +9,10 @@ public class GameDataNameComparer : GameDataBaseComparer
 
 	public static int StaticCompare(GameRoomData a, GameRoomData b)
 	{
-		return (!GameDataComparer.SortAscending) ? string.Compare(a.Name, b.Name) : string.Compare(b.Name, a.Name);
+		if (GameDataComparer.SortAscending)
+		{
+			return string.Compare(b.Name, a.Name);
+		}
+		return string.Compare(a.Name, b.Name);
 	}
 }

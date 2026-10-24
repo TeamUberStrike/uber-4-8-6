@@ -85,7 +85,11 @@ namespace UberStrike.Core.Models
 		{
 			get
 			{
-				return (Weapons != null && Weapons.Count > CurrentWeaponSlot) ? Weapons[CurrentWeaponSlot] : 0;
+				if (Weapons == null || Weapons.Count <= CurrentWeaponSlot)
+				{
+					return 0;
+				}
+				return Weapons[CurrentWeaponSlot];
 			}
 		}
 

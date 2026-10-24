@@ -135,18 +135,24 @@ public class InputManager : AutoMonoBehaviour<InputManager>
 		{
 			if (Event.current.delta.x > 0f)
 			{
-				EventHandler.Global.Fire(new GlobalEvents.InputChanged(GameInputKey.PrevWeapon, Event.current.delta.x));
+				EventHandler global = EventHandler.Global;
+				global.Fire(new GlobalEvents.InputChanged(GameInputKey.PrevWeapon, Event.current.delta.x));
 			}
 			if (Event.current.delta.x < 0f)
 			{
-				EventHandler.Global.Fire(new GlobalEvents.InputChanged(GameInputKey.NextWeapon, Event.current.delta.x));
+				EventHandler global2 = EventHandler.Global;
+				global2.Fire(new GlobalEvents.InputChanged(GameInputKey.NextWeapon, Event.current.delta.x));
 			}
 		}
 	}
 
 	public static bool GetMouseButtonDown(int button)
 	{
-		return (Event.current == null || Event.current.type == EventType.Layout) && Input.GetMouseButtonDown(button);
+		if (Event.current == null || Event.current.type == EventType.Layout)
+		{
+			return Input.GetMouseButtonDown(button);
+		}
+		return false;
 	}
 
 	public bool ListenForNewKeyAssignment(UserInputMap map)
@@ -390,8 +396,7 @@ public class InputManager : AutoMonoBehaviour<InputManager>
 		{
 			if (value.Channel.Equals(channel))
 			{
-				result = true;
-				break;
+				return true;
 			}
 		}
 		return result;

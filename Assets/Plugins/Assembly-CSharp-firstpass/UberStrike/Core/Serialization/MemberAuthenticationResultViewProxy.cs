@@ -46,7 +46,9 @@ namespace UberStrike.Core.Serialization
 					num |= 8;
 				}
 				DateTimeProxy.Serialize(memoryStream, instance.ServerTime);
+				StringProxy.Serialize(memoryStream, instance.ServerGameVersion);
 				Int32Proxy.Serialize(stream, ~num);
+				Int32Proxy.Serialize(stream, instance.MuteDuration);
 				memoryStream.WriteTo(stream);
 			}
 		}
@@ -74,6 +76,9 @@ namespace UberStrike.Core.Serialization
 				memberAuthenticationResultView.PlayerStatisticsView = PlayerStatisticsViewProxy.Deserialize(bytes);
 			}
 			memberAuthenticationResultView.ServerTime = DateTimeProxy.Deserialize(bytes);
+			memberAuthenticationResultView.ServerGameVersion = StringProxy.Deserialize(bytes);
+			memberAuthenticationResultView.BanDuration = Int32Proxy.Deserialize(bytes);
+			memberAuthenticationResultView.MuteDuration = Int32Proxy.Deserialize(bytes);
 			return memberAuthenticationResultView;
 		}
 	}

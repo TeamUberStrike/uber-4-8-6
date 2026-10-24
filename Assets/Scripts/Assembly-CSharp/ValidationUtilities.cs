@@ -42,15 +42,7 @@ public static class ValidationUtilities
 			if (memberName.Equals(TextUtilities.CompleteTrim(memberName)))
 			{
 				string empty = string.Empty;
-				switch (locale)
-				{
-				case "ko-KR":
-					empty = "\\p{IsHangulSyllables}";
-					break;
-				default:
-					empty = string.Empty;
-					break;
-				}
+				empty = ((locale == null || !(locale == "ko-KR")) ? string.Empty : "\\p{IsHangulSyllables}");
 				result = Regex.IsMatch(memberName, "^[a-zA-Z0-9 .!_\\-<>{}~@#$%^&*()=+|:?" + empty + "]{" + 3 + "," + 18 + "}$");
 			}
 			if (!memberName.ToLower().IndexOf("admin").Equals(-1) || !memberName.ToLower().IndexOf("cmune").Equals(-1))

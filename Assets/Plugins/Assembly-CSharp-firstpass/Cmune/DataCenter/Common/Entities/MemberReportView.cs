@@ -36,7 +36,7 @@ namespace Cmune.DataCenter.Common.Entities
 
 		public override string ToString()
 		{
-			return string.Concat("[Member report: [Source CMID: ", SourceCmid, "][Target CMID: ", TargetCmid, "][Type: ", ReportType, "][Reason: ", Reason, "][Context: ", Context, "][Application ID: ", ApplicationId, "][IP: ", IP, "]]");
+			return "[Member report: [Source CMID: " + SourceCmid + "][Target CMID: " + TargetCmid + "][Type: " + ReportType.ToString() + "][Reason: " + Reason + "][Context: " + Context + "][Application ID: " + ApplicationId + "][IP: " + IP + "]]";
 		}
 	}
 }

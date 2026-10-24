@@ -46,7 +46,8 @@ public class ExplosionDebug : AutoMonoBehaviour<ExplosionDebug>
 		for (int j = 0; j < Protections.Count; j++)
 		{
 			Gizmos.color = Color.green;
-			Gizmos.DrawLine(Protections[j].Start, Protections[j].End);
+			Vector3 start = Protections[j].Start;
+			Gizmos.DrawLine(start, Protections[j].End);
 		}
 	}
 }

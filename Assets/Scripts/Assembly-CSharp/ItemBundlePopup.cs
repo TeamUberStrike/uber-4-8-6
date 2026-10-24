@@ -9,8 +9,8 @@ public class ItemBundlePopup : LotteryPopupDialog
 	public ItemBundlePopup(BundleUnityView bundleUnityView)
 	{
 		_bundleUnityView = bundleUnityView;
-		Title = bundleUnityView.BundleView.Name;
-		Text = bundleUnityView.BundleView.Description;
+		base.Title = bundleUnityView.BundleView.Name;
+		base.Text = bundleUnityView.BundleView.Description;
 		Width = 388;
 		Height = 560 - GlobalUIRibbon.Instance.Height() - 10;
 		_lotteryItemGrid = new ShopItemGrid(bundleUnityView.BundleView.BundleItemViews);
@@ -19,11 +19,11 @@ public class ItemBundlePopup : LotteryPopupDialog
 	protected override void DrawPlayGUI(Rect rect)
 	{
 		GUI.color = ColorScheme.HudTeamBlue;
-		float num = BlueStonez.label_interparkbold_18pt.CalcSize(new GUIContent(Title)).x * 2.5f;
+		float num = BlueStonez.label_interparkbold_18pt.CalcSize(new GUIContent(base.Title)).x * 2.5f;
 		GUI.DrawTexture(new Rect((rect.width - num) * 0.5f, -29f, num, 100f), HudTextures.WhiteBlur128);
 		GUI.color = Color.white;
-		GUITools.OutlineLabel(new Rect(0f, 10f, rect.width, 30f), Title, BlueStonez.label_interparkbold_18pt, 1, Color.white, ColorScheme.GuiTeamBlue.SetAlpha(0.5f));
-		GUI.Label(new Rect(30f, 35f, rect.width - 60f, 40f), Text, BlueStonez.label_interparkbold_13pt);
+		GUITools.OutlineLabel(new Rect(0f, 10f, rect.width, 30f), base.Title, BlueStonez.label_interparkbold_18pt, 1, Color.white, ColorScheme.GuiTeamBlue.SetAlpha(0.5f));
+		GUI.Label(new Rect(30f, 35f, rect.width - 60f, 40f), base.Text, BlueStonez.label_interparkbold_13pt);
 		int num2 = 288;
 		int num3 = (Width - num2 - 6) / 2;
 		int num4 = 323;
@@ -35,7 +35,7 @@ public class ItemBundlePopup : LotteryPopupDialog
 		GUI.EndGroup();
 		if (GUI.Button(new Rect(rect.width * 0.5f - 95f, rect.height - 42f, 20f, 20f), GUIContent.none, BlueStonez.button_left))
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 			PopupSystem.HideMessage(this);
 			BundleUnityView previousItem = Singleton<BundleManager>.Instance.GetPreviousItem(_bundleUnityView);
 			if (previousItem != null)
@@ -45,7 +45,7 @@ public class ItemBundlePopup : LotteryPopupDialog
 		}
 		if (GUI.Button(new Rect(rect.width * 0.5f + 75f, rect.height - 42f, 20f, 20f), GUIContent.none, BlueStonez.button_right))
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 			PopupSystem.HideMessage(this);
 			BundleUnityView nextItem = Singleton<BundleManager>.Instance.GetNextItem(_bundleUnityView);
 			if (nextItem != null)

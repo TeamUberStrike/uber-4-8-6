@@ -16,9 +16,11 @@ public class AvatarDecoratorConfig : MonoBehaviour
 
 	private void Awake()
 	{
-		_skinColor = Color.magenta;
+		_skinColor = PlayerDataManager.SkinColor;
 		AvatarBone[] avatarBones = _avatarBones;
-		foreach (AvatarBone avatarBone in avatarBones)
+		AvatarBone[] array = avatarBones;
+		AvatarBone[] array2 = array;
+		foreach (AvatarBone avatarBone in array2)
 		{
 			avatarBone.Collider = avatarBone.Transform.GetComponent<Collider>();
 			avatarBone.Rigidbody = avatarBone.Transform.GetComponent<Rigidbody>();
@@ -30,7 +32,9 @@ public class AvatarDecoratorConfig : MonoBehaviour
 	private void SetGravity(bool enabled)
 	{
 		AvatarBone[] avatarBones = _avatarBones;
-		foreach (AvatarBone avatarBone in avatarBones)
+		AvatarBone[] array = avatarBones;
+		AvatarBone[] array2 = array;
+		foreach (AvatarBone avatarBone in array2)
 		{
 			if (avatarBone != null && (bool)avatarBone.Rigidbody)
 			{
@@ -68,7 +72,7 @@ public class AvatarDecoratorConfig : MonoBehaviour
 		}
 		else
 		{
-			Debug.LogError(string.Concat("Bone GameObject ", damageInfo.BodyPart, " was not found."));
+			Debug.LogError("Bone GameObject " + damageInfo.BodyPart.ToString() + " was not found.");
 		}
 	}
 
@@ -105,7 +109,9 @@ public class AvatarDecoratorConfig : MonoBehaviour
 		}
 		_skinColor = skinColor;
 		Material[] materials = componentInChildren.materials;
-		foreach (Material material in materials)
+		Material[] array = materials;
+		Material[] array2 = array;
+		foreach (Material material in array2)
 		{
 			if (material.name.Contains("Skin"))
 			{
@@ -117,7 +123,9 @@ public class AvatarDecoratorConfig : MonoBehaviour
 	public Transform GetBone(BoneIndex bone)
 	{
 		AvatarBone[] avatarBones = _avatarBones;
-		foreach (AvatarBone avatarBone in avatarBones)
+		AvatarBone[] array = avatarBones;
+		AvatarBone[] array2 = array;
+		foreach (AvatarBone avatarBone in array2)
 		{
 			if (avatarBone.Bone == bone)
 			{
@@ -135,7 +143,9 @@ public class AvatarDecoratorConfig : MonoBehaviour
 	public static void CopyBones(AvatarDecoratorConfig srcAvatar, AvatarDecoratorConfig dstAvatar)
 	{
 		AvatarBone[] avatarBones = srcAvatar._avatarBones;
-		foreach (AvatarBone avatarBone in avatarBones)
+		AvatarBone[] array = avatarBones;
+		AvatarBone[] array2 = array;
+		foreach (AvatarBone avatarBone in array2)
 		{
 			Transform bone = dstAvatar.GetBone(avatarBone.Bone);
 			if ((bool)bone)

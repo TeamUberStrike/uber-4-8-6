@@ -78,7 +78,11 @@ public class PlayerData : ICharacterState
 	{
 		get
 		{
-			return (!(GameState.Current.Player != null)) ? Vector3.zero : GameState.Current.Player.transform.position;
+			if (GameState.Current.Player != null)
+			{
+				return GameState.Current.Player.transform.position;
+			}
+			return Vector3.zero;
 		}
 	}
 
@@ -86,7 +90,7 @@ public class PlayerData : ICharacterState
 	{
 		get
 		{
-			return UserInput.HorizontalRotation;
+			return UserInputt.HorizontalRotation;
 		}
 	}
 
@@ -94,7 +98,7 @@ public class PlayerData : ICharacterState
 	{
 		get
 		{
-			return UserInput.VerticalRotation.eulerAngles.x;
+			return UserInputt.VerticalRotation.eulerAngles.x;
 		}
 	}
 
@@ -134,7 +138,11 @@ public class PlayerData : ICharacterState
 	{
 		get
 		{
-			return ((MovementState & MoveStates.Ducked) != MoveStates.None) ? CrouchingOffset : StandingOffset;
+			if ((MovementState & MoveStates.Ducked) == 0)
+			{
+				return StandingOffset;
+			}
+			return CrouchingOffset;
 		}
 	}
 
@@ -150,7 +158,7 @@ public class PlayerData : ICharacterState
 	{
 		get
 		{
-			return UserInput.Rotation * Vector3.forward;
+			return UserInputt.Rotation * Vector3.forward;
 		}
 	}
 
@@ -295,7 +303,7 @@ public class PlayerData : ICharacterState
 		}
 		else if (!on && Is(state))
 		{
-			KeyState = (KeyState)((uint)KeyState & (uint)(byte)(~(int)state));
+			KeyState &= (KeyState)(byte)(~(int)state);
 			Actions.UpdateKeyState((byte)KeyState);
 		}
 	}
@@ -353,7 +361,10 @@ public class PlayerData : ICharacterState
 	{
 		posSyncFrame = Time.realtimeSinceStartup + 0.05f;
 		byte arg = (byte)(MovementState | MoveStates.Landed | MoveStates.Grounded);
-		this.SendMovementUpdate(GameState.Current.Player.transform.position, GameState.Current.Player.MoveController.Velocity, Conversion.Angle2Byte(HorizontalRotation.eulerAngles.y), Conversion.Angle2Byte(VerticalRotation), arg);
+		Action<ShortVector3, ShortVector3, byte, byte, byte> action = this.SendMovementUpdate;
+		ShortVector3 arg2 = GameState.Current.Player.transform.position;
+		ShortVector3 arg3 = GameState.Current.Player.MoveController.Velocity;
+		action(arg2, arg3, Conversion.Angle2Byte(HorizontalRotation.eulerAngles.y), Conversion.Angle2Byte(VerticalRotation), arg);
 	}
 
 	public void JumpingUpdate()
@@ -370,7 +381,9 @@ public class PlayerData : ICharacterState
 		if (GameState.Current.IsInGame && IsAlive && posSyncFrame <= Time.realtimeSinceStartup && this.SendMovementUpdate != null)
 		{
 			posSyncFrame = Time.realtimeSinceStartup + 0.05f;
-			if (cache.Update(GameState.Current.Player.transform.position, Conversion.Angle2Byte(HorizontalRotation.eulerAngles.y), Conversion.Angle2Byte(VerticalRotation), (byte)MovementState))
+			MovementUpdateCache movementUpdateCache = cache;
+			Vector3 position = GameState.Current.Player.transform.position;
+			if (movementUpdateCache.Update(position, Conversion.Angle2Byte(HorizontalRotation.eulerAngles.y), Conversion.Angle2Byte(VerticalRotation), (byte)MovementState))
 			{
 				this.SendMovementUpdate(cache.Position, GameState.Current.Player.MoveController.Velocity, cache.HRotation, cache.VRotation, cache.MovementState);
 				Singleton<GameStateController>.Instance.Client.Peer.SendOutgoingCommands();

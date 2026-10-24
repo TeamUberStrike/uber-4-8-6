@@ -89,7 +89,7 @@ public class Vector2Anim
 	public void AnimBy(Vector2 deltaPosition, float time = 0f, EaseType easeType = EaseType.None)
 	{
 		Vector2 destPosition = Vec2 + deltaPosition;
-		AnimTo(destPosition, time, easeType, 0f);
+		AnimTo(destPosition, time, easeType);
 	}
 
 	public void StopAnim()

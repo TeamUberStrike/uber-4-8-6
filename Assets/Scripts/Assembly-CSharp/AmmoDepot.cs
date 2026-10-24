@@ -142,8 +142,16 @@ public static class AmmoDepot
 
 	public static bool HasAmmoOfClass(UberstrikeItemClass t)
 	{
-		AmmoType t2;
-		return t == UberstrikeItemClass.WeaponMelee || (TryGetAmmoType(t, out t2) && HasAmmoOfType(t2));
+		if (t != UberstrikeItemClass.WeaponMelee)
+		{
+			AmmoType t2;
+			if (TryGetAmmoType(t, out t2))
+			{
+				return HasAmmoOfType(t2);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	public static int AmmoOfType(AmmoType t)

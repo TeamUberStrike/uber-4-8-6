@@ -28,7 +28,11 @@ public class UIAtlas : MonoBehaviour
 		{
 			get
 			{
-				return paddingLeft != 0f || paddingRight != 0f || paddingTop != 0f || paddingBottom != 0f;
+				if (paddingLeft == 0f && paddingRight == 0f && paddingTop == 0f)
+				{
+					return paddingBottom != 0f;
+				}
+				return true;
 			}
 		}
 	}
@@ -65,7 +69,11 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? material : mReplacement.spriteMaterial;
+			if (mReplacement != null)
+			{
+				return mReplacement.spriteMaterial;
+			}
+			return material;
 		}
 		set
 		{
@@ -108,7 +116,11 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? sprites : mReplacement.spriteList;
+			if (mReplacement != null)
+			{
+				return mReplacement.spriteList;
+			}
+			return sprites;
 		}
 		set
 		{
@@ -127,7 +139,15 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.texture : ((!(material != null)) ? null : material.mainTexture);
+			if (!(mReplacement != null))
+			{
+				if (material != null)
+				{
+					return material.mainTexture;
+				}
+				return null;
+			}
+			return mReplacement.texture;
 		}
 	}
 
@@ -135,7 +155,11 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mCoordinates : mReplacement.coordinates;
+			if (mReplacement != null)
+			{
+				return mReplacement.coordinates;
+			}
+			return mCoordinates;
 		}
 		set
 		{
@@ -179,7 +203,11 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return (!(mReplacement != null)) ? mPixelSize : mReplacement.pixelSize;
+			if (mReplacement != null)
+			{
+				return mReplacement.pixelSize;
+			}
+			return mPixelSize;
 		}
 		set
 		{
@@ -332,7 +360,11 @@ public class UIAtlas : MonoBehaviour
 		{
 			return true;
 		}
-		return mReplacement != null && mReplacement.References(atlas);
+		if (mReplacement != null)
+		{
+			return mReplacement.References(atlas);
+		}
+		return false;
 	}
 
 	public static bool CheckIfRelated(UIAtlas a, UIAtlas b)
@@ -341,7 +373,11 @@ public class UIAtlas : MonoBehaviour
 		{
 			return false;
 		}
-		return a == b || a.References(b) || b.References(a);
+		if (!(a == b) && !a.References(b))
+		{
+			return b.References(a);
+		}
+		return true;
 	}
 
 	public void MarkAsDirty()

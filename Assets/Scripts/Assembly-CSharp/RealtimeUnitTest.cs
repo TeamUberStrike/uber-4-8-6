@@ -25,7 +25,9 @@ public class RealtimeUnitTest : AutoMonoBehaviour<RealtimeUnitTest>
 			stringBuilder.Append(method.Name).Append("(");
 			List<object> list = new List<object>();
 			ParameterInfo[] parameters = method.GetParameters();
-			foreach (ParameterInfo parameterInfo in parameters)
+			ParameterInfo[] array = parameters;
+			ParameterInfo[] array2 = array;
+			foreach (ParameterInfo parameterInfo in array2)
 			{
 				list.Add(CreateArgument(parameterInfo.ParameterType));
 				stringBuilder.Append(parameterInfo.ParameterType.Name).Append(":").Append(CreateArgument(parameterInfo.ParameterType))
@@ -96,7 +98,9 @@ public class RealtimeUnitTest : AutoMonoBehaviour<RealtimeUnitTest>
 		}
 		MethodInfo[] methods = target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public);
 		MethodInfo[] array = methods;
-		foreach (MethodInfo methodInfo in array)
+		MethodInfo[] array2 = array;
+		MethodInfo[] array3 = array2;
+		foreach (MethodInfo methodInfo in array3)
 		{
 			if (methodInfo.Name.StartsWith("Send"))
 			{
@@ -115,7 +119,9 @@ public class RealtimeUnitTest : AutoMonoBehaviour<RealtimeUnitTest>
 		}
 		MethodInfo[] methods = target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic);
 		MethodInfo[] array = methods;
-		foreach (MethodInfo methodInfo in array)
+		MethodInfo[] array2 = array;
+		MethodInfo[] array3 = array2;
+		foreach (MethodInfo methodInfo in array3)
 		{
 			if (methodInfo.Name.StartsWith("On"))
 			{

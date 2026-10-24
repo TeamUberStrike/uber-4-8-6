@@ -20,7 +20,11 @@ public class GuiDropDown
 		{
 			get
 			{
-				return (isOn != null && !isOn()) ? offContent : onContent;
+				if (isOn == null || isOn())
+				{
+					return onContent;
+				}
+				return offContent;
 			}
 		}
 
@@ -89,7 +93,7 @@ public class GuiDropDown
 			return;
 		}
 		MouseOrbit.Disable = true;
-		Rect position = ((!ShowRightAligned) ? new Rect(_rect.x, _rect.yMax, ButtonWidth, ButtonHeight * (float)_data.Count) : new Rect(_rect.xMax - ButtonWidth, _rect.yMax, ButtonWidth, ButtonHeight * (float)_data.Count));
+		Rect position = (ShowRightAligned ? new Rect(_rect.xMax - ButtonWidth, _rect.yMax, ButtonWidth, ButtonHeight * (float)_data.Count) : new Rect(_rect.x, _rect.yMax, ButtonWidth, ButtonHeight * (float)_data.Count));
 		if (!position.Contains(Event.current.mousePosition) && !_rect.Contains(Event.current.mousePosition) && (Event.current.type == EventType.MouseUp || Event.current.type == EventType.Used))
 		{
 			_isDown = false;

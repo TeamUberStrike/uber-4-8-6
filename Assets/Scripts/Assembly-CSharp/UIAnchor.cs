@@ -37,7 +37,7 @@ public class UIAnchor : MonoBehaviour
 
 	private Animation mAnim;
 
-	private Rect mRect = default(Rect);
+	private Rect mRect;
 
 	private UIRoot mRoot;
 
@@ -115,8 +115,10 @@ public class UIAnchor : MonoBehaviour
 			Vector3 vector = widgetContainer.relativeSize;
 			Vector3 vector2 = widgetContainer.pivotOffset;
 			vector2.y -= 1f;
-			vector2.x *= widgetContainer.relativeSize.x * localScale.x;
-			vector2.y *= widgetContainer.relativeSize.y * localScale.y;
+			float x = vector2.x;
+			vector2.x = x * (widgetContainer.relativeSize.x * localScale.x);
+			float y = vector2.y;
+			vector2.y = y * (widgetContainer.relativeSize.y * localScale.y);
 			mRect.x = localPosition.x + vector2.x;
 			mRect.y = localPosition.y + vector2.y;
 			mRect.width = vector.x * localScale.x;
@@ -131,9 +133,9 @@ public class UIAnchor : MonoBehaviour
 			flag = true;
 			mRect = uiCamera.pixelRect;
 		}
-		float x = (mRect.xMin + mRect.xMax) * 0.5f;
-		float y = (mRect.yMin + mRect.yMax) * 0.5f;
-		Vector3 vector3 = new Vector3(x, y, 0f);
+		float x2 = (mRect.xMin + mRect.xMax) * 0.5f;
+		float y2 = (mRect.yMin + mRect.yMax) * 0.5f;
+		Vector3 vector3 = new Vector3(x2, y2, 0f);
 		if (side != Side.Center)
 		{
 			if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
@@ -142,7 +144,7 @@ public class UIAnchor : MonoBehaviour
 			}
 			else if (side == Side.Top || side == Side.Center || side == Side.Bottom)
 			{
-				vector3.x = x;
+				vector3.x = x2;
 			}
 			else
 			{
@@ -154,7 +156,7 @@ public class UIAnchor : MonoBehaviour
 			}
 			else if (side == Side.Left || side == Side.Center || side == Side.Right)
 			{
-				vector3.y = y;
+				vector3.y = y2;
 			}
 			else
 			{

@@ -22,7 +22,7 @@ namespace UberStrike.Realtime.Client
 
 		protected BaseGameRoom()
 		{
-			Operations = new GameRoomOperations();
+			Operations = new GameRoomOperations(0);
 		}
 
 		public void OnEvent(byte id, byte[] data)

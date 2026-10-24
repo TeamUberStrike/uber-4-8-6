@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -267,7 +268,13 @@ public class SfxManager : AutoMonoBehaviour<SfxManager>
 		};
 	}
 
-	public void PlayInGameAudioClip(AudioClip audioClip, ulong delay = 0)
+	private IEnumerator CoPlayDelayedClip(AudioClip _clip, float _secondsDelay)
+	{
+		yield return new WaitForSeconds(_secondsDelay);
+		AutoMonoBehaviour<SfxManager>.Instance.uiAudioSource.PlayOneShot(_clip);
+	}
+
+	public void PlayInGameAudioClip(AudioClip audioClip, ulong delay = 0uL)
 	{
 		if (audioClip != null)
 		{
@@ -280,14 +287,13 @@ public class SfxManager : AutoMonoBehaviour<SfxManager>
 		Play2dAudioClip(sound.Clip, 0uL, sound.Volume, sound.Pitch);
 	}
 
-	public void Play2dAudioClip(AudioClip audioClip, ulong delay = 0, float volume = 1f, float pitch = 1f)
+	public void Play2dAudioClip(AudioClip audioClip, ulong delay = 0uL, float volume = 1f, float pitch = 1f)
 	{
 		if (!(audioClip == null))
 		{
-			if (delay != 0)
+			if (delay != 0L)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.uiAudioSource.clip = audioClip;
-				AutoMonoBehaviour<SfxManager>.Instance.uiAudioSource.PlayDelayed(delay);
+				StartCoroutine(CoPlayDelayedClip(audioClip, (float)(double)delay / 1000f));
 			}
 			else
 			{
@@ -336,7 +342,7 @@ public class SfxManager : AutoMonoBehaviour<SfxManager>
 
 	public AudioClip GetFootStepAudioClip(FootStepSoundType footStep)
 	{
-		AudioClip[] array = null;
+		AudioClip[] array;
 		switch (footStep)
 		{
 		case FootStepSoundType.Grass:
@@ -344,9 +350,6 @@ public class SfxManager : AutoMonoBehaviour<SfxManager>
 			break;
 		case FootStepSoundType.Metal:
 			array = _footStepMetal;
-			break;
-		case FootStepSoundType.HeavyMetal:
-			array = _footStepHeavyMetal;
 			break;
 		case FootStepSoundType.Rock:
 			array = _footStepRock;
@@ -369,6 +372,9 @@ public class SfxManager : AutoMonoBehaviour<SfxManager>
 		case FootStepSoundType.Snow:
 			array = _footStepSnow;
 			break;
+		case FootStepSoundType.HeavyMetal:
+			array = _footStepHeavyMetal;
+			break;
 		case FootStepSoundType.Glass:
 			array = _footStepGlass;
 			break;
@@ -388,7 +394,7 @@ public class SfxManager : AutoMonoBehaviour<SfxManager>
 		AudioClip[] value = null;
 		if (_surfaceImpactSoundMap.TryGetValue(surfaceType, out value))
 		{
-			Play3dAudioClip(value[Random.Range(0, value.Length)], position, 1f);
+			Play3dAudioClip(value[Random.Range(0, value.Length)], position);
 		}
 	}
 

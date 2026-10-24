@@ -27,9 +27,9 @@ public class XPBarView : MonoBehaviour
 		float fullWidth = bgr.transform.localScale.x;
 		while (Mathf.Abs(tr.localScale.x / fullWidth - percentage01) > 0.01f)
 		{
-			Vector3 scale = tr.localScale;
-			scale.x = Mathf.MoveTowards(scale.x, fullWidth * percentage01, Time.deltaTime * animageSpeed * fullWidth);
-			tr.localScale = scale;
+			Vector3 localScale = tr.localScale;
+			localScale.x = Mathf.MoveTowards(localScale.x, fullWidth * percentage01, Time.deltaTime * animageSpeed * fullWidth);
+			tr.localScale = localScale;
 			yield return 0;
 		}
 	}

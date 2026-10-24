@@ -17,6 +17,10 @@ public class GameServerLatencyComparer : IComparer<PhotonServer>
 		{
 			return string.Compare(b.Name, a.Name);
 		}
-		return (num2 <= num3) ? (num * -1) : num;
+		if (num2 > num3)
+		{
+			return num;
+		}
+		return num * -1;
 	}
 }

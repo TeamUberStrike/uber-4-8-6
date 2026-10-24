@@ -49,7 +49,9 @@ public class ProjectileDetonator
 	{
 		Collider[] array = Physics.OverlapSphere(position, radius, UberstrikeLayerMasks.ExplosionMask);
 		Collider[] array2 = array;
-		foreach (Collider collider in array2)
+		Collider[] array3 = array2;
+		Collider[] array4 = array3;
+		foreach (Collider collider in array4)
 		{
 			BaseGameProp component = collider.transform.GetComponent<BaseGameProp>();
 			if (component != null && component.RecieveProjectileDamage)

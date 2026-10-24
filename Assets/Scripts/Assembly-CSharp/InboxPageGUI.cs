@@ -75,7 +75,7 @@ public class InboxPageGUI : MonoBehaviour
 		{
 			float num = Mathf.Max(Singleton<InboxManager>.Instance.NextRequestRefresh - Time.time, 0f);
 			GUITools.PushGUIState();
-			GUI.enabled &= num == 0f;
+			GUI.enabled = GUI.enabled && num == 0f;
 			if (GUITools.Button(new Rect(rect.width - 131f, 80f, 123f, 24f), new GUIContent(string.Format(LocalizedStrings.Refresh + " {0}", (!(num > 0f)) ? string.Empty : ("(" + num.ToString("N0") + ")"))), BlueStonez.buttondark_medium))
 			{
 				Singleton<InboxManager>.Instance.RefreshAllRequests();
@@ -94,7 +94,7 @@ public class InboxPageGUI : MonoBehaviour
 		if (GUI.changed)
 		{
 			GUI.changed = false;
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		if (num != _selectedTab)
 		{
@@ -134,7 +134,7 @@ public class InboxPageGUI : MonoBehaviour
 		}
 		float num = Mathf.Max(Singleton<InboxManager>.Instance.NextInboxRefresh - Time.time, 0f);
 		GUITools.PushGUIState();
-		GUI.enabled &= num == 0f;
+		GUI.enabled = GUI.enabled && num == 0f;
 		if (GUITools.Button(new Rect(rect.width - 114f, 8f, 106f, 24f), new GUIContent(string.Format(LocalizedStrings.CheckMail + " {0}", (!(num > 0f)) ? string.Empty : ("(" + num.ToString("N0") + ")"))), BlueStonez.buttondark_medium))
 		{
 			Singleton<InboxManager>.Instance.LoadNextPageThreads();
@@ -332,7 +332,7 @@ public class InboxPageGUI : MonoBehaviour
 		{
 			GUI.Box(position2, GUIContent.none, BlueStonez.box_grey50);
 		}
-		GUI.Label(new Rect(80f, 5f, position.width - 250f, 20f), string.Format("{0}: {1}", LocalizedStrings.FriendRequest, request.InitiatorName), BlueStonez.label_interparkbold_13pt_left);
+		GUI.Label(new Rect(80f, 5f, position.width - 250f, 20f), LocalizedStrings.FriendRequest + ": " + request.InitiatorName, BlueStonez.label_interparkbold_13pt_left);
 		GUI.Label(new Rect(80f, 30f, position.width - 250f, 20f), "> " + request.InitiatorMessage, BlueStonez.label_interparkmed_11pt_left);
 		if (GUITools.Button(new Rect(position.width - 120f - 18f, 5f, 60f, 20f), new GUIContent(LocalizedStrings.Accept), BlueStonez.buttondark_medium))
 		{
@@ -355,7 +355,7 @@ public class InboxPageGUI : MonoBehaviour
 		{
 			GUI.Box(position2, GUIContent.none, BlueStonez.box_grey50);
 		}
-		GUI.Label(new Rect(80f, 5f, position.width - 250f, 20f), string.Format("{0}: {1}", LocalizedStrings.ClanInvite, view.GroupName), BlueStonez.label_interparkbold_13pt_left);
+		GUI.Label(new Rect(80f, 5f, position.width - 250f, 20f), LocalizedStrings.ClanInvite + ": " + view.GroupName, BlueStonez.label_interparkbold_13pt_left);
 		GUI.Label(new Rect(80f, 30f, position.width - 250f, 20f), "> " + view.Message, BlueStonez.label_interparkmed_11pt_left);
 		if (GUITools.Button(new Rect(position.width - 120f - 18f, 5f, 60f, 20f), new GUIContent(LocalizedStrings.Accept), BlueStonez.buttondark_medium))
 		{
@@ -389,7 +389,7 @@ public class InboxPageGUI : MonoBehaviour
 		{
 			GUI.Box(position2, GUIContent.none, BlueStonez.box_grey50);
 		}
-		GUI.Label(new Rect(80f, 5f, position.width - 250f, 20f), string.Format("You invited: {0}", view.InviteeName), BlueStonez.label_interparkbold_13pt_left);
+		GUI.Label(new Rect(80f, 5f, position.width - 250f, 20f), "You invited: " + view.InviteeName, BlueStonez.label_interparkbold_13pt_left);
 		GUI.Label(new Rect(80f, 30f, position.width - 250f, 20f), "> " + view.Message, BlueStonez.label_interparkmed_11pt_left);
 		if (GUITools.Button(new Rect(position.width - 140f, 5f, 120f, 20f), new GUIContent(LocalizedStrings.CancelInvite), BlueStonez.buttondark_medium))
 		{

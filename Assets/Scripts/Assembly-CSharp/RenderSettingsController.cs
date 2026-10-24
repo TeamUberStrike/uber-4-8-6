@@ -60,7 +60,7 @@ public class RenderSettingsController : MonoBehaviour
 						ConstructorInfo constructor = typeof(RenderSettingsController).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[0], null);
 						if (constructor == null || constructor.IsAssembly)
 						{
-							throw new Exception(string.Format("A private or protected constructor is missing for '{0}'.", typeof(RenderSettingsController).Name));
+							throw new Exception("A private or protected constructor is missing for '" + typeof(RenderSettingsController).Name + "'.");
 						}
 						_instance = (RenderSettingsController)constructor.Invoke(null);
 					}
@@ -120,12 +120,16 @@ public class RenderSettingsController : MonoBehaviour
 	public void EnableImageEffects()
 	{
 		MonoBehaviour[] array = simpleImageEffects;
-		foreach (MonoBehaviour monoBehaviour in array)
+		MonoBehaviour[] array2 = array;
+		MonoBehaviour[] array3 = array2;
+		foreach (MonoBehaviour monoBehaviour in array3)
 		{
 			monoBehaviour.enabled = ApplicationDataManager.IsMobile;
 		}
-		PostEffectsBase[] array2 = advancedImageEffects;
-		foreach (PostEffectsBase postEffectsBase in array2)
+		PostEffectsBase[] array4 = advancedImageEffects;
+		PostEffectsBase[] array5 = array4;
+		PostEffectsBase[] array6 = array5;
+		foreach (PostEffectsBase postEffectsBase in array6)
 		{
 			postEffectsBase.enabled = !ApplicationDataManager.IsMobile && ApplicationDataManager.ApplicationOptions.VideoPostProcessing;
 		}
@@ -134,12 +138,16 @@ public class RenderSettingsController : MonoBehaviour
 	public void DisableImageEffects()
 	{
 		MonoBehaviour[] array = simpleImageEffects;
-		foreach (MonoBehaviour monoBehaviour in array)
+		MonoBehaviour[] array2 = array;
+		MonoBehaviour[] array3 = array2;
+		foreach (MonoBehaviour monoBehaviour in array3)
 		{
 			monoBehaviour.enabled = false;
 		}
-		PostEffectsBase[] array2 = advancedImageEffects;
-		foreach (PostEffectsBase postEffectsBase in array2)
+		PostEffectsBase[] array4 = advancedImageEffects;
+		PostEffectsBase[] array5 = array4;
+		PostEffectsBase[] array6 = array5;
+		foreach (PostEffectsBase postEffectsBase in array6)
 		{
 			postEffectsBase.enabled = false;
 		}
@@ -176,7 +184,7 @@ public class RenderSettingsController : MonoBehaviour
 	private void UpdateSettings(float value)
 	{
 		float num = Mathf.Clamp01(value * 3f);
-		bool flag = ((0f < value) ? true : false);
+		bool flag = 0f < value;
 		if ((bool)underWaterEffect)
 		{
 			underWaterEffect.enabled = flag;

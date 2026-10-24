@@ -44,7 +44,7 @@ public class KeyInputChannel : IInputChannel
 		}
 		set
 		{
-			_isDown = (_wasDown = ((value != 0f) ? true : false));
+			_isDown = (_wasDown = value != 0f);
 		}
 	}
 

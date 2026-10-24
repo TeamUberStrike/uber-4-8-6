@@ -100,9 +100,11 @@ public class ItemManager : Singleton<ItemManager>
 			if (!string.IsNullOrEmpty(item.PrefabName))
 			{
 				_shopItemsById[item.ID] = new ProxyItem(item);
-				continue;
 			}
-			Debug.LogWarning("PrefabName is empty: " + item.Name + " " + item.ID);
+			else
+			{
+				Debug.LogWarning("PrefabName is empty: " + item.Name + " " + item.ID);
+			}
 		}
 		foreach (UberStrikeItemFunctionalView functionalItem in shopView.FunctionalItems)
 		{
@@ -176,7 +178,11 @@ public class ItemManager : Singleton<ItemManager>
 			break;
 		}
 		GearItem gearItem = UnityItemConfiguration.Instance.UnityItemsDefaultGears.Find((GearItem item) => item.name.Equals(defaultGearPrefabName));
-		return (!(gearItem != null)) ? null : gearItem.gameObject;
+		if (gearItem != null)
+		{
+			return gearItem.gameObject;
+		}
+		return null;
 	}
 
 	public GameObject GetDefaultWeaponItem(UberstrikeItemClass itemClass)
@@ -207,7 +213,11 @@ public class ItemManager : Singleton<ItemManager>
 			break;
 		}
 		WeaponItem weaponItem = UnityItemConfiguration.Instance.UnityItemsDefaultWeapons.Find((WeaponItem item) => item.name.Equals(defaultWeaponPrefabName));
-		return (!(weaponItem != null)) ? null : weaponItem.gameObject;
+		if (weaponItem != null)
+		{
+			return weaponItem.gameObject;
+		}
+		return null;
 	}
 
 	public List<IUnityItem> GetShopItems(UberstrikeItemType itemType, BuyingMarketType marketType)
@@ -236,6 +246,41 @@ public class ItemManager : Singleton<ItemManager>
 	public bool ValidateItemMall()
 	{
 		return _shopItemsById.Count > 0;
+	}
+
+	public IEnumerator UpdateShopItem(UberStrikeItemShopClientView shopView)
+	{
+		List<BaseUberStrikeItemView> list = new List<BaseUberStrikeItemView>(shopView.GearItems.ToArray());
+		list.AddRange(shopView.WeaponItems.ToArray());
+		list.AddRange(shopView.QuickItems.ToArray());
+		int count = 0;
+		foreach (BaseUberStrikeItemView item in list)
+		{
+			count++;
+			if (count == 10)
+			{
+				count = 0;
+				yield return null;
+			}
+			if (!string.IsNullOrEmpty(item.PrefabName))
+			{
+				_shopItemsById[item.ID] = new ProxyItem(item);
+			}
+			else
+			{
+				Debug.LogWarning("PrefabName is empty: " + item.Name + " " + item.ID);
+			}
+		}
+		foreach (UberStrikeItemFunctionalView functionalItem in shopView.FunctionalItems)
+		{
+			count++;
+			if (count == 10)
+			{
+				count = 0;
+				yield return null;
+			}
+			_shopItemsById[functionalItem.ID] = new FunctionalItem(functionalItem);
+		}
 	}
 
 	public IEnumerator StartGetShop()

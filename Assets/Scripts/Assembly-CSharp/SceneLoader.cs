@@ -41,10 +41,10 @@ public class SceneLoader : Singleton<SceneLoader>
 		CurrentScene = level;
 		AutoMonoBehaviour<BackgroundMusicPlayer>.Instance.Stop();
 		AutoMonoBehaviour<UnityRuntime>.Instance.OnGui += OnGUI;
-		for (float f = _color.a * 1f; f < 1f; f += Time.deltaTime)
+		for (float f3 = _color.a * 1f; f3 < 1f; f3 += Time.deltaTime)
 		{
 			yield return new WaitForEndOfFrame();
-			_color.a = f / 1f;
+			_color.a = f3 / 1f;
 		}
 		_color.a = 1f;
 		Application.LoadLevel(level);
@@ -58,10 +58,10 @@ public class SceneLoader : Singleton<SceneLoader>
 		{
 			Application.LoadLevelAdditive("DesktopHUD");
 		}
-		for (float f2 = 0f; f2 < 1f; f2 += Time.deltaTime)
+		for (float f3 = 0f; f3 < 1f; f3 += Time.deltaTime)
 		{
 			yield return new WaitForEndOfFrame();
-			_color.a = 1f - f2 / 1f;
+			_color.a = 1f - f3 / 1f;
 		}
 		AutoMonoBehaviour<UnityRuntime>.Instance.OnGui -= OnGUI;
 		IsLoading = false;
@@ -69,6 +69,7 @@ public class SceneLoader : Singleton<SceneLoader>
 		{
 			onSuccess();
 		}
+		PopupSystem.ClearAll();
 	}
 
 	private void OnGUI()

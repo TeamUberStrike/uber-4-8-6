@@ -12,7 +12,9 @@ public static class ApplicationDataManager
 
 	public const string StandaloneFilename = "UberStrike";
 
-	public const string Version = "4.7.1";
+	public static string Version;
+
+	public static bool IsMac;
 
 	public const int MinimalWidth = 989;
 
@@ -27,6 +29,8 @@ public static class ApplicationDataManager
 	private static float applicationDateTime;
 
 	private static DateTime serverDateTime;
+
+	public static string HWID;
 
 	public static bool WebPlayerHasResult;
 
@@ -46,7 +50,11 @@ public static class ApplicationDataManager
 	{
 		get
 		{
-			return Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android;
+			if (Application.platform != RuntimePlatform.IPhonePlayer)
+			{
+				return Application.platform == RuntimePlatform.Android;
+			}
+			return true;
 		}
 	}
 
@@ -54,7 +62,11 @@ public static class ApplicationDataManager
 	{
 		get
 		{
-			return Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer;
+			if (Application.platform != RuntimePlatform.OSXPlayer)
+			{
+				return Application.platform == RuntimePlatform.WindowsPlayer;
+			}
+			return true;
 		}
 	}
 
@@ -84,9 +96,18 @@ public static class ApplicationDataManager
 
 	static ApplicationDataManager()
 	{
-		WebServiceBaseUrl = "https://ws.uberstrike.com/2.0/";
-		ImagePath = "http://static.uberstrike.com/images/";
-		IsDebug = true;
+		if (!IsDebug)
+		{
+			WebServiceBaseUrl = "steam-dev.uberstrike.com/2.0/";
+			ImagePath = "steam-dev.uberstrike.com/images/";
+		}
+		else
+		{
+			WebServiceBaseUrl = "steam-dev.uberstrike.com/2.0/";
+			ImagePath = "steam-dev.uberstrike.com/images/";
+		}
+		Version = "4.8.11";
+		IsMac = Application.platform == RuntimePlatform.OSXPlayer;
 		applicationDateTime = 0f;
 		serverDateTime = DateTime.Now;
 		WebPlayerHasResult = false;
@@ -120,8 +141,7 @@ public static class ApplicationDataManager
 
 	public static void OpenBuyCredits()
 	{
-		ChannelType channel = Channel;
-		if (channel == ChannelType.Steam)
+		if (Channel == ChannelType.Steam)
 		{
 			LoadBuyCreditsPage();
 			return;

@@ -87,7 +87,11 @@ public class UIDrawCall : MonoBehaviour
 		get
 		{
 			Mesh mesh = ((!mEven) ? mMesh1 : mMesh0);
-			return (mesh != null) ? (mesh.vertexCount >> 1) : 0;
+			if (!(mesh != null))
+			{
+				return 0;
+			}
+			return mesh.vertexCount >> 1;
 		}
 	}
 

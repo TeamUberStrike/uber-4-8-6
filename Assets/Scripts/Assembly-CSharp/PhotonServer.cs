@@ -138,6 +138,10 @@ public class PhotonServer
 
 	internal bool CheckLatency()
 	{
-		return MinLatency <= 0 || MinLatency > Latency;
+		if (MinLatency > 0)
+		{
+			return MinLatency > Latency;
+		}
+		return true;
 	}
 }

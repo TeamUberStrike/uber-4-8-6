@@ -13,7 +13,11 @@ public class ByteReader
 	{
 		get
 		{
-			return mBuffer != null && mOffset < mBuffer.Length;
+			if (mBuffer != null)
+			{
+				return mOffset < mBuffer.Length;
+			}
+			return false;
 		}
 	}
 
@@ -79,8 +83,9 @@ public class ByteReader
 				if (array.Length == 2)
 				{
 					string key = array[0].Trim();
-					string value = array[1].Trim().Replace("\\n", "\n");
-					dictionary[key] = value;
+					string text2 = (dictionary[key] = array[1].Trim().Replace("\\n", "\n"));
+					string text4 = text2;
+					string text5 = text4;
 				}
 			}
 		}

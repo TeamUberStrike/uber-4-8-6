@@ -1,3 +1,4 @@
+using Cmune.DataCenter.Common.Entities;
 using ExitGames.Client.Photon;
 using UberStrike.Core.Models;
 using UberStrike.Core.ViewModel;
@@ -15,11 +16,16 @@ public class CommPeer : BaseCommPeer
 		AddRoomLogic(Lobby, Lobby.Operations);
 	}
 
+	public CommPeer(int syncFrequency, bool monitorTraffic = false)
+		: base(syncFrequency, monitorTraffic)
+	{
+	}
+
 	protected override void OnConnected()
 	{
 		if (PlayerDataManager.IsPlayerLoggedIn)
 		{
-			base.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			Singleton<ChatManager>.Instance.UpdateFriendSection();
 		}
 	}
@@ -58,6 +64,13 @@ public class CommPeer : BaseCommPeer
 	protected override void OnHeartbeatChallenge(string challengeHash)
 	{
 		string responseHash = Heartbeat.Instance.CheckHeartbeat(challengeHash);
+		UberBeat.ChildThreadWait.Set();
 		base.Operations.SendSendHeartbeatResponse(PlayerDataManager.AuthToken, responseHash);
+	}
+
+	protected override void OnLoadoutUpdateResult(MemberOperationResult result)
+	{
+		PlayerDataManager.result = result;
+		PlayerDataManager.IsLoadoutUpdating = false;
 	}
 }

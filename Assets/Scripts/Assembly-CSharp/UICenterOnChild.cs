@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [AddComponentMenu("NGUI/Interaction/Center On Child")]
@@ -39,7 +40,10 @@ public class UICenterOnChild : MonoBehaviour
 			mDrag = NGUITools.FindInParents<UIDraggablePanel>(base.gameObject);
 			if (mDrag == null)
 			{
-				Debug.LogWarning(string.Concat(GetType(), " requires ", typeof(UIDraggablePanel), " on a parent object in order to work"), this);
+				Type type = GetType();
+				string obj = ((type != null) ? type.ToString() : null);
+				Type typeFromHandle = typeof(UIDraggablePanel);
+				Debug.LogWarning(obj + " requires " + ((typeFromHandle != null) ? typeFromHandle.ToString() : null) + " on a parent object in order to work", this);
 				base.enabled = false;
 				return;
 			}

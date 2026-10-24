@@ -63,8 +63,8 @@ public class TeamDeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 		};
 		GameState.Current.Actions.DirectHitDamage = delegate(int targetCmid, ushort damage, BodyPart part, Vector3 force, byte slot, byte bullets)
 		{
-			base.Operations.SendDirectHitDamage(targetCmid, (byte)part, bullets);
-			if (PlayerDataManager.Cmid == targetCmid)
+			base.Operations.SendDirectHitDamage(targetCmid, (byte)part, bullets, slot);
+			if (PlayerDataManager.Cmid == targetCmid && GameState.Current.IsMatchRunning)
 			{
 				GameStateHelper.PlayerHit(targetCmid, damage, part, force);
 			}
@@ -72,7 +72,7 @@ public class TeamDeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 		GameState.Current.Actions.ExplosionHitDamage = delegate(int targetCmid, ushort damage, Vector3 force, byte slot, byte distance)
 		{
 			base.Operations.SendExplosionDamage(targetCmid, slot, distance, force);
-			if (PlayerDataManager.Cmid == targetCmid)
+			if (PlayerDataManager.Cmid == targetCmid && GameState.Current.IsMatchRunning)
 			{
 				GameStateHelper.PlayerHit(targetCmid, damage, BodyPart.Body, force);
 			}
@@ -162,7 +162,12 @@ public class TeamDeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 
 	protected override void OnJoinGameFailed(string message)
 	{
-		PopupSystem.ShowError("Join failed", message, PopupSystem.AlertType.OK);
+		Debug.LogError("OnJoinGameFailed " + message);
+		PopupSystem.ClearAll();
+		PopupSystem.ShowMessage("Join Game failed", message, PopupSystem.AlertType.OK, delegate
+		{
+			GameState.Current.MatchState.SetState(GameStateId.PregameLoadout);
+		});
 	}
 
 	protected override void OnJoinedAsSpectator()
@@ -232,15 +237,15 @@ public class TeamDeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 		{
 		case TeamID.BLUE:
 			GameData.Instance.OnNotification.Fire("Blue Team Wins");
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.BlueWins, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.BlueWins, 0uL);
 			break;
 		case TeamID.RED:
 			GameData.Instance.OnNotification.Fire("Red Team Wins");
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.RedWins, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.RedWins, 0uL);
 			break;
 		default:
 			GameData.Instance.OnNotification.Fire("Draw!");
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Draw, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Draw, 0uL);
 			break;
 		}
 	}

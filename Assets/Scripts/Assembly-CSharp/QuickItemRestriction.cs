@@ -105,7 +105,9 @@ public class QuickItemRestriction
 	public void RenewGameUses()
 	{
 		RestrictedUsage[] quickItemRestrictions = _quickItemRestrictions;
-		foreach (RestrictedUsage restrictedUsage in quickItemRestrictions)
+		RestrictedUsage[] array = quickItemRestrictions;
+		RestrictedUsage[] array2 = array;
+		foreach (RestrictedUsage restrictedUsage in array2)
 		{
 			restrictedUsage.RenewGameUses();
 		}
@@ -114,7 +116,9 @@ public class QuickItemRestriction
 	public void RenewRoundUses()
 	{
 		RestrictedUsage[] quickItemRestrictions = _quickItemRestrictions;
-		foreach (RestrictedUsage restrictedUsage in quickItemRestrictions)
+		RestrictedUsage[] array = quickItemRestrictions;
+		RestrictedUsage[] array2 = array;
+		foreach (RestrictedUsage restrictedUsage in array2)
 		{
 			restrictedUsage.RenewRoundUses();
 		}
@@ -123,7 +127,9 @@ public class QuickItemRestriction
 	public void RenewLifeUses()
 	{
 		RestrictedUsage[] quickItemRestrictions = _quickItemRestrictions;
-		foreach (RestrictedUsage restrictedUsage in quickItemRestrictions)
+		RestrictedUsage[] array = quickItemRestrictions;
+		RestrictedUsage[] array2 = array;
+		foreach (RestrictedUsage restrictedUsage in array2)
 		{
 			restrictedUsage.RenewLifeUses();
 		}

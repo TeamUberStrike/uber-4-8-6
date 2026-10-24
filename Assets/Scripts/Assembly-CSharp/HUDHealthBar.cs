@@ -60,10 +60,6 @@ public class HUDHealthBar : MonoBehaviour
 
 	public void OnHealthPoints(int value, int oldValue)
 	{
-		if ((GameStateId)GameData.Instance.GameState != GameStateId.None && oldValue > 0 && oldValue <= 100 && value > 100)
-		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(SoundEffects.Instance.Health_100_200_Increase.Interpolate(value, 100f, 200f));
-		}
 		StopAllCoroutines();
 		if (value != oldValue)
 		{
@@ -75,9 +71,10 @@ public class HUDHealthBar : MonoBehaviour
 	private IEnumerator AnimateCrt(int value)
 	{
 		panel.alpha = 1f;
+		float fvalue = ((value == 0) ? 0.01f : ((float)value));
 		while ((float)value != oldValue)
 		{
-			oldValue = Mathf.MoveTowards(oldValue, value, Time.deltaTime * animateSpeed);
+			oldValue = Mathf.MoveTowards(oldValue, fvalue, Time.deltaTime * animateSpeed);
 			bgr.transform.localScale = bgr.transform.localScale.SetX(Mathf.Max(NORMAL_MAX, oldValue) / NORMAL_MAX * baseWidth);
 			bar.transform.localScale = bgr.transform.localScale.SetX(oldValue / NORMAL_MAX * baseWidth);
 			bar.color = ((!(oldValue > CRITICAL_VALUE)) ? new Color(1f, 0.23529412f, 16f / 85f) : normalBarColor);
@@ -92,14 +89,13 @@ public class HUDHealthBar : MonoBehaviour
 		{
 			yield break;
 		}
-		AutoMonoBehaviour<SfxManager>.Instance.PlayLoopedAudioClip(SoundEffects.Instance.HealthNoise_0_25.Interpolate(oldValue, 0f, CRITICAL_VALUE));
 		while (true)
 		{
-			float time = Time.time * criticalBlinkingSpeed;
-			panel.alpha = Mathf.Clamp01(Mathf.Sin(time) + 1f);
-			if (time % ((float)Math.PI * 2f) >= (float)Math.PI && criticalHealthLastTime != (int)(time / ((float)Math.PI * 2f)))
+			float num = Time.time * criticalBlinkingSpeed;
+			panel.alpha = Mathf.Clamp01(Mathf.Sin(num) + 1f);
+			if (num % ((float)Math.PI * 2f) >= (float)Math.PI && criticalHealthLastTime != (int)(num / ((float)Math.PI * 2f)))
 			{
-				criticalHealthLastTime = (int)(time / ((float)Math.PI * 2f));
+				criticalHealthLastTime = (int)(num / ((float)Math.PI * 2f));
 				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(SoundEffects.Instance.HealthHeartbeat_0_25.Interpolate(oldValue, 0f, CRITICAL_VALUE));
 			}
 			yield return 0;
@@ -112,13 +108,14 @@ public class HUDHealthBar : MonoBehaviour
 		while (true)
 		{
 			time = Mathf.Min(time + Time.deltaTime * PulseSpeed, (float)Math.PI);
-			float pulse = Mathf.Sin(time) * PulseScale;
-			text.transform.localScale = (Vector3.one * (baseScale + pulse * (float)(up ? 1 : (-1)))).SetZ(1f);
-			if (time >= (float)Math.PI)
+			float num = Mathf.Sin(time) * PulseScale;
+			text.transform.localScale = (Vector3.one * (baseScale + num * (float)(up ? 1 : (-1)))).SetZ(1f);
+			if (!(time >= (float)Math.PI))
 			{
-				break;
+				yield return 0;
+				continue;
 			}
-			yield return 0;
+			break;
 		}
 	}
 }

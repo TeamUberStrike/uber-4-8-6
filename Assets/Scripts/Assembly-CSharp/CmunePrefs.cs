@@ -4,6 +4,7 @@ public static class CmunePrefs
 {
 	public enum Key
 	{
+		Options_FOVMode = 0,
 		Player_Name = 50,
 		Player_Email = 51,
 		Player_Password = 52,

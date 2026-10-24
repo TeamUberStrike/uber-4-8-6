@@ -254,7 +254,11 @@ public class UICamera : MonoBehaviour
 		get
 		{
 			UICamera uICamera = eventHandler;
-			return (!(uICamera != null)) ? null : uICamera.cachedCamera;
+			if (uICamera != null)
+			{
+				return uICamera.cachedCamera;
+			}
+			return null;
 		}
 	}
 
