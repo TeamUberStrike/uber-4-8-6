@@ -1,101 +1,87 @@
-# UberStrike 4.7.1 — Unity 4.6.5 reconstruction
+# UberStrike 4.7.1 — `patcher` branch
 
-A rebuild of Cmune's **UberStrike 4.7.1 Steam client** (2014) in its original engine, **Unity 4.6.5f1**, made from
-the Steam client's own files. The goal is a project that builds a player **identical to the Steam client** — same
-maps, shaders, UI and code — that we can maintain and extend.
+The Unity 4.6.5 reconstruction of the UberStrike 4.7.1 Steam client, taken through **HaZard's two-step plan** so that
+a player built from this project can replace the patcher and join the team's **dev server**:
 
-**Status:** release candidate **RC6** (`rc/4.7.1-rc6-2026-10-24`). Side-by-side playtests against the Steam client
-found no visible differences on any map, in the lobby, shop or HUD, except the deliberate ones listed below.
+> **Step 1** — Steam client and Unity project identical.
+> **Step 2** — apply the patcher's changes as code changes.
+> *"First step must work first. If you can prove the first step, then go with the second step."*
 
----
+Setup (Unity 4.6.5, server, build scripts): see [SETUP.md](SETUP.md) — the same guide as on
+[`uber471-unity465`](../../tree/uber471-unity465), whose README describes the visual reconstruction (maps, shaders,
+UI) this branch builds on.
 
-## Branches in this repository
+## Status
 
-| Branch | What it is |
+| | State |
 |---|---|
-| **`uber471-unity465`** (this one) | The Unity 4.6.5 reconstruction, release line. Fast-forwarded from `dev/tour`. |
-| `dev/tour` | Day-to-day work on the same project; local verification tooling lives beside it (not committed). |
-| [`patcher`](../../tree/patcher) | Code made identical to the plain Steam client, then to the team's v4.8.6 client for the **dev server** (HaZard's two-step plan). |
-| `save/rc6-parity-2026-10-24` | Frozen copy of RC6 before the `patcher` work started. |
-| `main` | The earlier **Unity 6** port (ForgeRipper import). Separate history; continued in `TeamUberStrike/uber-4-8-6`. |
-| `finalize/*`, `holos/*` | Older finalize and holo-avatar work, kept for reference. |
+| **Step 1 — code = plain Steam client** | ✅ Done for `Assembly-CSharp` and `Assembly-CSharp-firstpass` (commit `f17b9431`), proven below. Open item: image effects (see "Step 1 open item"). |
+| **Step 2 — code = team client v4.8.6 + dev server address** | ⏳ Next. |
+| Connecting to the dev server | Not tried yet. Needs the server version the dev server expects (see step 2). |
+| Steam login | Stays as it is — the client logs in with a Steam auth ticket, Steam must be running. Moving the ~5,000 registered players to another login is a separate, later migration. |
 
-## Requirements
+## Step 1 — identical to the plain Steam client
 
-> **Setting up a new PC?** [SETUP.md](SETUP.md) walks through everything step by step — installing and activating
-> Unity 4.6.5, the local server, building, playing and the optional ForgeRipper MCP — with double-click scripts in
-> [`tools/`](tools) (`setup-unity-4.6.5.bat`, `open-project.bat`, `build-player.bat`, `start-proxy.bat`,
-> `launch-client.bat`, `setup-mcp.bat`). The summary below is for people who know the stack.
+**Reference:** the 2016 Steam client as installed from Steam, before any patcher:
+`Assembly-CSharp.dll` (sha256 `9aef3003…`) and `Assembly-CSharp-firstpass.dll` (`f6a393d3…`).
 
-* **Windows** and **Unity 4.6.5f1**. The editor needs a licence; open the project with the GUI editor.
-* **Steam** running, logged into an account that owns UberStrike (`steam_appid.txt` = 291210 is in the repo root).
-* A **local UberStrike server stack** — the community UberStrok v4.8.6 server (`xavgru12/UberServer`):
-  web services on `127.0.0.1:5000`, Photon realtime **CommServer `:5055`** and **GameServer `:5056`**, MongoDB.
-  Without the CommServer the client logs in but loadout changes go out of sync.
-* **Node.js** for `svc_proxy.js`.
+**Method**
 
-## Open, build and run
+1. Decompile both DLLs with ILSpy (`ilspycmd -lv CSharp4`, C# 4 so Unity 4.6.5's compiler can build it).
+2. Apply them to the project file by file, keeping every script's `.meta` GUID (scenes and prefabs stay linked):
+   306 files replaced, 1,168 were already identical.
+3. Remove what the original does not have: weapon skins, holo/Uberverse effects, `UberKill`, `ManualArmIK`,
+   `MapTextureVariant`, a test harness, daily-bonus/box-type types and `PlayerFiles/SeloTron.ogg`. All of it is kept
+   on [`save/rc6-parity-2026-10-24`](../../tree/save/rc6-parity-2026-10-24).
+4. Fix the few places where ILSpy wrote C# that means the same IL but does not compile under .NET 3.5
+   (`Dictionary.GetValueOrDefault` → `TryGetValue`, a missing `(int)` cast) and restore two empty static
+   constructors ILSpy dropped.
 
-1. Open the project folder in Unity 4.6.5f1 and let it import (first import takes a while).
-2. Build with `tools\build-player.bat` (steps 3 and 4 are then done for you), or by hand: **File > Build Settings**,
-   `Assets/Scenes/GlobalScene.unity` must stay scene **0**, then `Menu`, `DesktopHUD` and the maps; target
-   **PC, Windows, x86**; Build.
-3. Next to the built `UberStrike.exe`, copy `steam_api.dll` and `steam_appid.txt` from the repo root, and
-   `uberdaemon.exe` from your Steam UberStrike folder.
-4. Copy everything under `PlayerFiles/` into the build, keeping the folder layout
-   (`PlayerFiles/UberStrike_Data/SeloTron.ogg` -> `<build>/UberStrike_Data/SeloTron.ogg`, the home-screen music).
-5. Start the server stack, then the proxy: `node svc_proxy.js` (listens on `127.0.0.1:8888`, forwards to `:5000` and
-   rewrites the original Cmune service paths). The client's `ApplicationDataManager` points at
-   `http://127.0.0.1:8888/2.0/`, version `4.8.6`.
-6. Launch `UberStrike.exe` with Steam running (`tools\launch-client.bat`). Launch it from Explorer, PowerShell or cmd — **not from Git Bash**:
-   its MSYS environment leaks into Steam's helper and the login hangs.
+**Proof** — build the player, decompile its DLLs and compare with the 2016 DLLs:
 
-The client shares its settings (Windows registry, `Cmune` key) with the Steam install.
-
-## How "identical" was checked
-
-* **Screenshots:** a scripted tour flies both clients to the same spots on every map, the lobby, shop and HUD,
-  with the same settings (post-processing pinned), and compares the captures pixel by pixel.
-* **Shaders:** every project shader was compared with the Steam client's own ShaderLab text. 22 hand
-  reconstructions were replaced by the original compiled text (Temple of the Raven went from 32 to 3 brightness
-  levels off). Three water shaders stay reconstructed on purpose; they were verified separately.
-* **Code:** the built `Assembly-CSharp.dll` was decompiled and compared with the 2016 Steam DLL, the team client and
-  HaZard's production patcher DLL. The code is not byte-identical (the team builds use a newer compiler), but it
-  matches in behaviour apart from the list below.
-* **Maps:** materials, lightmap offsets and scene objects were compared with the original level files (for example
-  Space Port Alpha's floor and Sky Garden's pickups).
-
-## Deliberate differences from the Steam client
-
-* **Kept from the team / production client:** end-of-round input lock, empty-gun click on full-auto weapons, muzzle
-  effect resets, chat backtick filter, faster Comm reconnect, FOV Mode tick box, knockback room flag, shop tooltip
-  values with green stat bars, armor bar 0 guard, Steam icon for old portal accounts, `SeloTron.ogg` home music.
-* **Kept because ours is better:** the post-processing setting is applied at launch (the lobby used to show
-  effects with the option off); Temple of the Raven's torch flames animate; Sky Garden stays the original level
-  (the patcher's rebuilt bundle has no pickups and different lighting).
-* **Not included (need the team's server or native parts):** UberBeat anti-cheat, the updater, the IP-reputation
-  login check, the team's own login screen, daily-bonus and weekend-challenge popups, custom bundle maps.
-  These belong to the [`patcher`](../../tree/patcher) work.
-
-## Release candidates
-
-| Tag | Adds |
+| Check (built player vs 2016 Steam DLL) | Result |
 |---|---|
-| `rc/4.7.1-rc1-2026-10-24` | Premultiplied UI atlases (text and XP bar brightness), original crosshair path, scope parity |
-| `rc/4.7.1-rc2-2026-10-24` | FOV Mode tick box, Space Port Alpha floor, Monkey Island terrain, 22 original shader texts |
-| `rc/4.7.1-rc3-2026-10-24` | Underwater colour ramp back where the original keeps it (no blue bloom) |
-| `rc/4.7.1-rc4-2026-10-24` | Post-processing setting applied to the lobby at launch |
-| `rc/4.7.1-rc5-2026-10-24` | Shop tooltip values and green bars, armor bar guard, portal icon |
-| `rc/4.7.1-rc6-2026-10-24` | `SeloTron.ogg` home music |
+| String literals, per type | identical (all 322 types in `Assembly-CSharp`) |
+| Float constants, per type | identical, except fields our compiler initialises with an explicit `0` |
+| Types, fields (type, name, attributes) and method signatures | identical outside compiler-generated closure/iterator helpers, and except the image-effect references below |
+| Decompiled source files | `Assembly-CSharp` 496/726 and firstpass 713/748 text-identical; the rest differ only in how the two compilers lay out the same code (flipped `?:`, `foreach` temporaries, written-out default arguments, attribute order, object initialisers) |
 
-## Still open
+Byte-identical DLLs are not possible: Cmune compiled with Microsoft's C# compiler, Unity 4.6.5 compiles with Mono's.
 
-* A two-client multiplayer test on this build.
-* Default knockback values (waiting on the server owner).
-* The team-only features above, through the `patcher` branch.
+### Step 1 open item — image effects
+
+The original ships its camera image effects (Bloom, SunShafts, ColorCorrectionCurves, GlobalFog, Vignetting, …) in a
+separate **UnityScript** assembly, `Assembly-UnityScript-firstpass.dll`. This project has them as **37 C# rebuilds**
+compiled into `Assembly-CSharp-firstpass`, so `RenderSettingsController` references them from a different assembly.
+Their output was verified by screenshots against the Steam client on `uber471-unity465`. Making this part
+identical means using the original DLL as a precompiled plugin and re-pointing the scene references to it.
+
+## Step 2 — the team client v4.8.6 for the dev server
+
+**Source:** [`xavgru12/UberClient`](https://github.com/xavgru12/UberClient), branch **`v4.8.6`** — the C# source the
+patcher's DLLs are built from (team client v4.8.3 → v4.8.6 on top of the 2016 code: anti-cheat, IP-reputation
+check, updater, custom bundle maps, knockback/low-gravity flags, `SeloTron.ogg` home music, …). HaZard: *"v4.8.6 is
+the version, I'm just changing URLs there. Take the branch 4.8.6 and put your URL in."* The `dev_server`, `qa_server`
+and `live_steam_version` branches differ from it only in `ApplicationDataManager` (server address, version) and
+`WindowsUpdater`.
+
+**Plan**
+
+1. Build `v4.8.6` as the team does (C# 8, .NET 3.5), decompile with `-lv CSharp4`, and apply it to this project the
+   same way as step 1.
+2. Set the server address to the **dev server** (no composite-hash check there, per HaZard) and the version string
+   the dev server expects — to be confirmed with HaZard (`dev_server` uses `4.8.6`, `v4.8.6` now says `4.8.11`).
+3. Proof: the same comparison as step 1, against a build of `v4.8.6`.
+4. Parts that are not code (map bundles, native plugins such as `uberbeat.dll`): reverse-engineer and port
+   separately, as HaZard described.
+
+## Rules for this branch
+
+* No connection to any live or production UberStrike server without the owner's explicit go-ahead.
+* Step 1 builds point at the original `ws.uberstrike.com` address and are not launched.
+* Steam login stays.
 
 ## Credits and disclaimer
 
-UberStrike and all of its art, audio, levels and original code are © Cmune. This repository is a private
-preservation and restoration project for the community server; it does not grant any licence to Cmune's content.
-Built with help from the TeamUberStrike community (HaZard, xavgru12 and others).
+UberStrike and all of its art, audio, levels and original code are © Cmune. Team client code by xavgru12, HaZard and
+the TeamUberStrike community. Private preservation and restoration project; no licence to Cmune's content is granted.
