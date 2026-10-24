@@ -1,7 +1,7 @@
 # UberStrike 4.7.1 — `patcher` branch
 
 The Unity 4.6.5 reconstruction of the UberStrike 4.7.1 Steam client, taken through **HaZard's two-step plan** so that
-a player built from this project can replace the patcher and join the team's **dev server**:
+a player built from this project can replace the patcher and join the team's **QA server**:
 
 > **Step 1** — Steam client and Unity project identical.
 > **Step 2** — apply the patcher's changes as code changes.
@@ -16,8 +16,8 @@ UI) this branch builds on.
 | | State |
 |---|---|
 | **Step 1 — code = plain Steam client** | ✅ Done and proven: `Assembly-CSharp`, `Assembly-CSharp-firstpass`, and the image effects now use the original UnityScript DLL (see below). |
-| **Step 2 — code = team client v4.8.6 + dev server address** | ✅ Code applied, built and proven against a build of `v4.8.6` (see below). |
-| Connecting to the dev server | Not tried yet — waiting for the owner's go-ahead and HaZard's answer on the version string. |
+| **Step 2 — code = team client v4.8.6 + QA server address** | ✅ Code applied, built and proven against a build of `v4.8.6` (see below). |
+| Connecting to the QA server | Waiting: steam-qa (and steam-dev) answer Cloudflare 522, origin not responding (2026-10-24 night). Steam login to lobby verified against our local server. |
 | Steam login | Stays as it is — the client logs in with a Steam auth ticket, Steam must be running. Moving the ~5,000 registered players to another login is a separate, later migration. |
 
 ## Step 1 — identical to the plain Steam client
@@ -64,7 +64,7 @@ classes) in a separate **UnityScript** assembly. Our 37 C# rebuilds are gone; th
   (e.g. Bloom → `Hidden/LensFlareCreate`, `Hidden/BlendForBloom`, `VignetteMask`). `Assembly-CSharp-firstpass` now
   has exactly the original's classes and fields (881 / 3,755).
 
-## Step 2 — the team client v4.8.6 for the dev server
+## Step 2 — the team client v4.8.6 for the QA server
 
 **Source:** [`xavgru12/UberClient`](https://github.com/xavgru12/UberClient), branch **`v4.8.6`** — the C# source the
 patcher's DLLs are built from (team client v4.8.3 → v4.8.6 on top of the 2016 code: anti-cheat, IP-reputation
@@ -81,9 +81,9 @@ and `live_steam_version` branches differ from it only in `ApplicationDataManager
    system, weekend-challenge popup, IP-reputation and daily-bonus types), 3 removed (`UserInput`, `DailyPointsView` +
    proxy). Three decompiler artefacts written back in their source form (`TryGetValue`, an `(int)` cast, a generic
    `val.Draw(...)` call that ILSpy showed as a C# 7 `ref` local).
-2. **Server address** (the only intended code change): `ApplicationDataManager` → `steam-dev.uberstrike.com/2.0/` and
-   `/images/` — the dev server, no composite-hash check there (HaZard). `Version` stays `"4.8.11"` as in `v4.8.6`;
-   the `dev_server` branch used `"4.8.6"` — **to confirm with HaZard** before connecting.
+2. **Server address** (the only intended code change): `ApplicationDataManager` → `steam-qa.uberstrike.com/2.0/` and
+   `/images/` — the QA server (HaZard: "use qa"; the dev server returned Cloudflare 522). `Version` stays `"4.8.11"` as in `v4.8.6`;
+   which matches the `qa_server` branch (`"4.8.11"`).
 3. **Updater:** `WindowsUpdater` downloads and overwrites every file whose MD5 differs from the patcher's list, then
    restarts — it would replace our build with the patcher's DLLs. HaZard's own developer switch is used: an empty
    `devx` file next to `UberStrike.exe` makes it skip (`NoUpdate()`). It ships in [`PlayerFiles/`](PlayerFiles).

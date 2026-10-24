@@ -98,13 +98,13 @@ public static class ApplicationDataManager
 	{
 		if (!IsDebug)
 		{
-			WebServiceBaseUrl = "steam-dev.uberstrike.com/2.0/";
-			ImagePath = "steam-dev.uberstrike.com/images/";
+			WebServiceBaseUrl = "steam-qa.uberstrike.com/2.0/";
+			ImagePath = "steam-qa.uberstrike.com/images/";
 		}
 		else
 		{
-			WebServiceBaseUrl = "steam-dev.uberstrike.com/2.0/";
-			ImagePath = "steam-dev.uberstrike.com/images/";
+			WebServiceBaseUrl = "steam-qa.uberstrike.com/2.0/";
+			ImagePath = "steam-qa.uberstrike.com/images/";
 		}
 		Version = "4.8.11";
 		IsMac = Application.platform == RuntimePlatform.OSXPlayer;
