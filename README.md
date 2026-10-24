@@ -15,7 +15,7 @@ UI) this branch builds on.
 
 | | State |
 |---|---|
-| **Step 1 — code = plain Steam client** | ✅ Done for `Assembly-CSharp` and `Assembly-CSharp-firstpass` (commit `f17b9431`), proven below. Open item: image effects (see "Step 1 open item"). |
+| **Step 1 — code = plain Steam client** | ✅ Done and proven: `Assembly-CSharp`, `Assembly-CSharp-firstpass`, and the image effects now use the original UnityScript DLL (see below). |
 | **Step 2 — code = team client v4.8.6 + dev server address** | ⏳ Next. |
 | Connecting to the dev server | Not tried yet. Needs the server version the dev server expects (see step 2). |
 | Steam login | Stays as it is — the client logs in with a Steam auth ticket, Steam must be running. Moving the ~5,000 registered players to another login is a separate, later migration. |
@@ -48,13 +48,21 @@ UI) this branch builds on.
 
 Byte-identical DLLs are not possible: Cmune compiled with Microsoft's C# compiler, Unity 4.6.5 compiles with Mono's.
 
-### Step 1 open item — image effects
+### Image effects — the original DLL itself
 
-The original ships its camera image effects (Bloom, SunShafts, ColorCorrectionCurves, GlobalFog, Vignetting, …) in a
-separate **UnityScript** assembly, `Assembly-UnityScript-firstpass.dll`. This project has them as **37 C# rebuilds**
-compiled into `Assembly-CSharp-firstpass`, so `RenderSettingsController` references them from a different assembly.
-Their output was verified by screenshots against the Steam client on `uber471-unity465`. Making this part
-identical means using the original DLL as a precompiled plugin and re-pointing the scene references to it.
+The original ships its camera image effects (Bloom, SunShafts, ColorCorrectionCurves, GlobalFog, Vignetting, … 37
+classes) in a separate **UnityScript** assembly. Our 37 C# rebuilds are gone; the project now uses the **original
+`Assembly-UnityScript-firstpass.dll` itself** (byte-identical, sha256 `8a5ae8b6`) as a precompiled plugin:
+
+* The file is named `Assets/Plugins/UnityScriptFirstpass.dll`: under its original file name Unity 4.6.5 mistakes it for
+  its own UnityScript compile target and stops compiling. The assembly inside keeps its original identity.
+* The 28 scene references (15 scenes) were re-pointed from the old script GUIDs to the DLL classes
+  (`fileID` = Unity's MD4 hash of namespace + class name; the algorithm was checked against Unity 4.6's known
+  `UnityEngine.UI` IDs). All 37 classes have the same serialized fields as our rebuilds had.
+* **Proof:** in the built player, all 28 image-effect components on every map have the same class, enabled state and
+  settings bytes as the 2016 original, and all 109 shader/texture references resolve to the same objects
+  (e.g. Bloom → `Hidden/LensFlareCreate`, `Hidden/BlendForBloom`, `VignetteMask`). `Assembly-CSharp-firstpass` now
+  has exactly the original's classes and fields (881 / 3,755).
 
 ## Step 2 — the team client v4.8.6 for the dev server
 

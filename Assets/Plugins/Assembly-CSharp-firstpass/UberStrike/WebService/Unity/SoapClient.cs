@@ -11,6 +11,10 @@ namespace UberStrike.WebService.Unity
 	{
 		private static int _requestId;
 
+		static SoapClient()
+		{
+		}
+
 		private static void LogRequest(int id, float time, int sizeBytes, string interfaceName, string serviceName, string methodName)
 		{
 			if (Configuration.RequestLogger != null)
