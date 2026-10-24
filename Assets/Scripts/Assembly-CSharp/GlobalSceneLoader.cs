@@ -110,6 +110,11 @@ public class GlobalSceneLoader : MonoBehaviour
 	{
 		ApplicationDataManager.CurrentLocale = LocaleType.en_US;
 		ApplicationDataManager.ApplicationOptions.Initialize();
+		RenderSettingsController renderSettings = (RenderSettingsController)UnityEngine.Object.FindObjectOfType(typeof(RenderSettingsController));
+		if (renderSettings != null)
+		{
+			renderSettings.EnableImageEffects();
+		}
 		StartCoroutine(GUITools.StartScreenSizeListener(1f));
 		if (ApplicationDataManager.ApplicationOptions.IsUsingCustom)
 		{
