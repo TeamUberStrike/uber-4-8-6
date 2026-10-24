@@ -6,6 +6,7 @@ using ExitGames.Client.Photon;
 using UberStrike.Core.Models;
 using UberStrike.Core.Types;
 using UberStrike.Realtime.Client;
+using UberStrike.Realtime.UnitySdk;
 using UnityEngine;
 
 public class GamePeer : BaseGamePeer
@@ -154,6 +155,7 @@ public class GamePeer : BaseGamePeer
 		lastRoomJoined = data.Number;
 		GameState.Current.ResetRoundStartTime();
 		base.Peer.FetchServerTimestamp();
+		UberKill.KnockBack = GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.KnockBack, data.GameFlags);
 		switch (data.GameMode)
 		{
 		case GameModeType.DeathMatch:

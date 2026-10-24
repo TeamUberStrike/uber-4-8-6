@@ -1141,24 +1141,37 @@ public class PlayPageGUI : MonoBehaviour
 
 	public static string GetGameFlagText(GameRoomData data)
 	{
-		string result = "None";
+		string text = "";
 		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.NoArmor, data.GameFlags))
 		{
-			result = "No Armor";
+			string text2 = "No Armor";
+			text = ((!(text == "")) ? (text + " , " + text2) : text2);
 		}
-		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, data.GameFlags))
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, data.GameFlags))
 		{
-			result = "Low Gravity";
+			string text3 = "Low Gravity";
+			text = ((!(text == "")) ? (text + " , " + text3) : text3);
 		}
-		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, data.GameFlags))
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, data.GameFlags))
 		{
-			result = "Quick Switching";
+			string text4 = "Quick Switching";
+			text = ((!(text == "")) ? (text + " , " + text4) : text4);
 		}
-		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.MeleeOnly, data.GameFlags))
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.MeleeOnly, data.GameFlags))
 		{
-			result = "Melee Only";
+			string text5 = "Melee Only";
+			text = ((!(text == "")) ? (text + " , " + text5) : text5);
 		}
-		return result;
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.KnockBack, data.GameFlags))
+		{
+			string text6 = "Knockback";
+			text = ((!(text == "")) ? (text + " , " + text6) : text6);
+		}
+		if (text == "")
+		{
+			text = "None";
+		}
+		return text;
 	}
 
 	private string LevelRestrictionText(GameRoomData m)
