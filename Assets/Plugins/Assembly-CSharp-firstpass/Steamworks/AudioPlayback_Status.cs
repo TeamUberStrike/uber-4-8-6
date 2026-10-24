@@ -2,9 +2,9 @@ namespace Steamworks
 {
 	public enum AudioPlayback_Status
 	{
-		AudioPlayback_Undefined = 0,
-		AudioPlayback_Playing = 1,
-		AudioPlayback_Paused = 2,
-		AudioPlayback_Idle = 3
+		AudioPlayback_Undefined,
+		AudioPlayback_Playing,
+		AudioPlayback_Paused,
+		AudioPlayback_Idle
 	}
 }

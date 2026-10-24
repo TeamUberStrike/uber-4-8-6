@@ -6,13 +6,13 @@ public class UIStretch : MonoBehaviour
 {
 	public enum Style
 	{
-		None = 0,
-		Horizontal = 1,
-		Vertical = 2,
-		Both = 3,
-		BasedOnHeight = 4,
-		FillKeepingRatio = 5,
-		FitInternalKeepingRatio = 6
+		None,
+		Horizontal,
+		Vertical,
+		Both,
+		BasedOnHeight,
+		FillKeepingRatio,
+		FitInternalKeepingRatio
 	}
 
 	public Camera uiCamera;

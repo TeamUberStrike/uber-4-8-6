@@ -16,23 +16,23 @@ public class PlayPageGUI : MonoBehaviour
 
 	private enum GameListColumns
 	{
-		None = 0,
-		Lock = 1,
-		Star = 2,
-		GameName = 3,
-		GameMap = 4,
-		GameMode = 5,
-		PlayerCount = 6,
-		GameServerPing = 7,
-		GameTime = 8
+		None,
+		Lock,
+		Star,
+		GameName,
+		GameMap,
+		GameMode,
+		PlayerCount,
+		GameServerPing,
+		GameTime
 	}
 
 	private enum ServerListColumns
 	{
-		None = 0,
-		ServerName = 1,
-		ServerCapacity = 2,
-		ServerSpeed = 3
+		None,
+		ServerName,
+		ServerCapacity,
+		ServerSpeed
 	}
 
 	private class FilterSavedData
@@ -1141,37 +1141,24 @@ public class PlayPageGUI : MonoBehaviour
 
 	public static string GetGameFlagText(GameRoomData data)
 	{
-		string text = "";
+		string result = "None";
 		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.NoArmor, data.GameFlags))
 		{
-			string text2 = "No Armor";
-			text = ((!(text == "")) ? (text + " , " + text2) : text2);
+			result = "No Armor";
 		}
-		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, data.GameFlags))
+		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, data.GameFlags))
 		{
-			string text3 = "Low Gravity";
-			text = ((!(text == "")) ? (text + " , " + text3) : text3);
+			result = "Low Gravity";
 		}
-		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, data.GameFlags))
+		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, data.GameFlags))
 		{
-			string text4 = "Quick Switching";
-			text = ((!(text == "")) ? (text + " , " + text4) : text4);
+			result = "Quick Switching";
 		}
-		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.MeleeOnly, data.GameFlags))
+		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.MeleeOnly, data.GameFlags))
 		{
-			string text5 = "Melee Only";
-			text = ((!(text == "")) ? (text + " , " + text5) : text5);
+			result = "Melee Only";
 		}
-		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.KnockBack, data.GameFlags))
-		{
-			string text6 = "Knockback";
-			text = ((!(text == "")) ? (text + " , " + text6) : text6);
-		}
-		if (text == "")
-		{
-			text = "None";
-		}
-		return text;
+		return result;
 	}
 
 	private string LevelRestrictionText(GameRoomData m)

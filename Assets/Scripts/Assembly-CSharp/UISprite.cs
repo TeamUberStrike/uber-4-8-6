@@ -7,19 +7,19 @@ public class UISprite : UIWidget
 {
 	public enum Type
 	{
-		Simple = 0,
-		Sliced = 1,
-		Tiled = 2,
-		Filled = 3
+		Simple,
+		Sliced,
+		Tiled,
+		Filled
 	}
 
 	public enum FillDirection
 	{
-		Horizontal = 0,
-		Vertical = 1,
-		Radial90 = 2,
-		Radial180 = 3,
-		Radial360 = 4
+		Horizontal,
+		Vertical,
+		Radial90,
+		Radial180,
+		Radial360
 	}
 
 	[SerializeField]

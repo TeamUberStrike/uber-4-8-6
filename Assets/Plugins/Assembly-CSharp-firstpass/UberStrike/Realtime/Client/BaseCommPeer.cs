@@ -1,5 +1,4 @@
 using System.IO;
-using Cmune.DataCenter.Common.Entities;
 using UberStrike.Core.Serialization;
 using UberStrike.Core.ViewModel;
 
@@ -31,9 +30,6 @@ namespace UberStrike.Realtime.Client
 				break;
 			case 4:
 				DisconnectAndDisablePhoton(data);
-				break;
-			case 5:
-				LoadoutUpdateResult(data);
 				break;
 			}
 		}
@@ -78,19 +74,6 @@ namespace UberStrike.Realtime.Client
 			{
 				string message = StringProxy.Deserialize(bytes);
 				OnDisconnectAndDisablePhoton(message);
-			}
-		}
-
-		protected virtual void OnLoadoutUpdateResult(MemberOperationResult result)
-		{
-		}
-
-		private void LoadoutUpdateResult(byte[] _bytes)
-		{
-			using (MemoryStream bytes = new MemoryStream(_bytes))
-			{
-				MemberOperationResult result = EnumProxy<MemberOperationResult>.Deserialize(bytes);
-				OnLoadoutUpdateResult(result);
 			}
 		}
 	}

@@ -51,8 +51,8 @@ public class HUDArmorBar : MonoBehaviour
 
 	private void Update()
 	{
-		float value = ((GameState.Current.PlayerData.ArmorPoints.Value == 0) ? 0.01f : ((float)GameState.Current.PlayerData.ArmorPoints.Value));
-		if (value != oldValue)
+		int value = GameState.Current.PlayerData.ArmorPoints.Value;
+		if ((float)value != oldValue)
 		{
 			oldValue = Mathf.MoveTowards(oldValue, value, Time.deltaTime * animateSpeed);
 			bgr.transform.localScale = bgr.transform.localScale.SetX(Mathf.Max(NORMAL_MAX, oldValue) / NORMAL_MAX * baseWidth);

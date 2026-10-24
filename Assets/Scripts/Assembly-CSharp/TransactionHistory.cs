@@ -9,16 +9,16 @@ public class TransactionHistory : Singleton<TransactionHistory>
 {
 	private enum TransactionType
 	{
-		Item = 0,
-		Point = 1,
-		Credit = 2
+		Item,
+		Point,
+		Credit
 	}
 
 	private enum AccountArea
 	{
-		Items = 0,
-		Points = 1,
-		Credits = 2
+		Items,
+		Points,
+		Credits
 	}
 
 	public class TransactionCache<T>

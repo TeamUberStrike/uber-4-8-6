@@ -30,8 +30,6 @@ public class ApplicationOptions
 
 	public bool VideoPostProcessing = true;
 
-	public bool FOVMode;
-
 	public float InputXMouseSensitivity = 3f;
 
 	public float InputYMouseSensitivity = 3f;
@@ -72,12 +70,12 @@ public class ApplicationOptions
 	{
 		string text = PlayerPrefs.GetString("Version", "Invalid");
 		bool flag = false;
-		if (ApplicationDataManager.Version != text)
+		if ("4.7.1" != text)
 		{
 			flag = true;
 			CmunePrefs.Reset();
 			QualitySettings.SetQualityLevel(2, true);
-			PlayerPrefs.SetString("Version", ApplicationDataManager.Version);
+			PlayerPrefs.SetString("Version", "4.7.1");
 		}
 		Application.targetFrameRate = -1;
 		QualitySettings.maxQueuedFrames = -1;
@@ -96,7 +94,6 @@ public class ApplicationOptions
 		VideoMotionBlur = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoMotionBlur, VideoMotionBlur);
 		VideoShowFps = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoShowFps, VideoShowFps);
 		VideoPostProcessing = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoPostProcessing, VideoPostProcessing);
-		FOVMode = CmunePrefs.ReadKey(CmunePrefs.Key.Options_FOVMode, FOVMode);
 		IsFullscreen = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoIsFullscreen, true);
 		ScreenResolution = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoScreenRes, ScreenResolutionManager.CurrentResolutionIndex);
 		InputXMouseSensitivity = Mathf.Clamp(CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputXMouseSensitivity, 3f), 1f, 10f);
@@ -135,7 +132,6 @@ public class ApplicationOptions
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_VideoIsFullscreen, IsFullscreen);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_VideoShowFps, VideoShowFps);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_VideoPostProcessing, VideoPostProcessing);
-		CmunePrefs.WriteKey(CmunePrefs.Key.Options_FOVMode, FOVMode);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_InputXMouseSensitivity, InputXMouseSensitivity);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_InputYMouseSensitivity, InputYMouseSensitivity);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_InputMouseRotationMaxX, InputMouseRotationMaxX);

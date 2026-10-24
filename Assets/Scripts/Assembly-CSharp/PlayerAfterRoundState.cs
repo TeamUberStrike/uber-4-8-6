@@ -1,4 +1,3 @@
-using UberStrike.Core.Models;
 using UnityEngine;
 
 internal class PlayerAfterRoundState : IState
@@ -9,10 +8,6 @@ internal class PlayerAfterRoundState : IState
 
 	public void OnEnter()
 	{
-		AutoMonoBehaviour<InputManager>.Instance.IsInputEnabled = false;
-		Singleton<QuickItemController>.Instance.IsEnabled = false;
-		GameState.Current.PlayerData.Set(PlayerStates.Shooting, false);
-		GameState.Current.Player.EnableWeaponControl = false;
 		AutoMonoBehaviour<UnityRuntime>.Instance.OnFixedUpdate += GameState.Current.Player.MoveController.UpdatePlayerMovement;
 	}
 

@@ -6,7 +6,6 @@ using ExitGames.Client.Photon;
 using UberStrike.Core.Models;
 using UberStrike.Core.Types;
 using UberStrike.Realtime.Client;
-using UberStrike.Realtime.UnitySdk;
 using UnityEngine;
 
 public class GamePeer : BaseGamePeer
@@ -155,7 +154,6 @@ public class GamePeer : BaseGamePeer
 		lastRoomJoined = data.Number;
 		GameState.Current.ResetRoundStartTime();
 		base.Peer.FetchServerTimestamp();
-		UberKill.KnockBack = GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.KnockBack, data.GameFlags);
 		switch (data.GameMode)
 		{
 		case GameModeType.DeathMatch:
@@ -281,12 +279,12 @@ public class GamePeer : BaseGamePeer
 	{
 		if (base.IsConnected)
 		{
-			base.Operations.SendCreateRoom(data, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendCreateRoom(data, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
 		};
 		Connect(data.Server.ConnectionString);
 	}
@@ -296,12 +294,12 @@ public class GamePeer : BaseGamePeer
 		Debug.Log("JoinGame " + server + ":" + roomId + "[current:" + base.Peer.ServerAddress + "]");
 		if (base.IsConnected)
 		{
-			base.Operations.SendEnterRoom(roomId, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendEnterRoom(roomId, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendEnterRoom(roomId, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
+			base.Operations.SendEnterRoom(roomId, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
 		};
 		Connect(server);
 	}
@@ -335,12 +333,12 @@ public class GamePeer : BaseGamePeer
 		Connect(serverAddress);
 	}
 
-	private void ReconnectToCurrentGame(string password = "")
+	private void ReconnectToCurrentGame()
 	{
 		if (lastRoomJoined != 0)
 		{
 			Singleton<GameStateController>.Instance.UnloadGameMode();
-			JoinGame(base.Peer.ServerAddress, lastRoomJoined, password);
+			JoinGame(base.Peer.ServerAddress, lastRoomJoined, string.Empty);
 		}
 		else
 		{
@@ -359,10 +357,5 @@ public class GamePeer : BaseGamePeer
 		{
 			Debug.LogError("Failed to reconnect because GameRoom is null!");
 		}
-	}
-
-	protected override void OnRoomRejoin(GameRoomData data, string password)
-	{
-		ReconnectToCurrentGame(password);
 	}
 }

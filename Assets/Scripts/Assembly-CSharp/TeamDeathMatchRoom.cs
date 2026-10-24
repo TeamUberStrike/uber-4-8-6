@@ -63,7 +63,7 @@ public class TeamDeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 		};
 		GameState.Current.Actions.DirectHitDamage = delegate(int targetCmid, ushort damage, BodyPart part, Vector3 force, byte slot, byte bullets)
 		{
-			base.Operations.SendDirectHitDamage(targetCmid, (byte)part, bullets, slot);
+			base.Operations.SendDirectHitDamage(targetCmid, (byte)part, bullets);
 			if (PlayerDataManager.Cmid == targetCmid)
 			{
 				GameStateHelper.PlayerHit(targetCmid, damage, part, force);

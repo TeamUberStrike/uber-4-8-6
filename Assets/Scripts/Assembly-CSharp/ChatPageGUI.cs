@@ -24,6 +24,10 @@ public class ChatPageGUI : PageGUI
 
 	public static bool IsCompleteLobbyLoaded;
 
+	static ChatPageGUI()
+	{
+	}
+
 	private float _nextFullLobbyUpdate;
 
 	private bool autoScroll;

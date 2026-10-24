@@ -27,16 +27,16 @@ public class GUIPageBase : MonoBehaviour
 
 	public IEnumerator AnimateAlpha(float to, float duration, params UIPanel[] buttons)
 	{
-		// AssetRipper decomp bug: original lambda captured outer `to` and `duration`,
-		// but emitted code wrote `default(float)` (=0) for both. Result: every UIPanel
-		// tween starts with duration=0, target=0 -> all page widgets instantly become
-		// invisible the moment OnBringIn fires (lobby Play/Shop/Chat/Quit buttons,
-		// every panel animation in the menu). Restore the outer-scope captures.
 		TweenAlpha[] tweens = Array.ConvertAll(buttons, (UIPanel uIPanel) =>
-			TweenAlpha.Begin(uIPanel.gameObject, duration, to));
-		foreach (TweenAlpha el in tweens)
 		{
-			while (el != null && el.enabled)
+			float duration2 = default(float);
+			float to2 = default(float);
+			return TweenAlpha.Begin(uIPanel.gameObject, duration2, to2);
+		});
+		TweenAlpha[] array = tweens;
+		foreach (TweenAlpha el in array)
+		{
+			while (el.enabled)
 			{
 				yield return 0;
 			}

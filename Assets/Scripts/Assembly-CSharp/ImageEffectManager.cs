@@ -5,10 +5,10 @@ public class ImageEffectManager
 {
 	public enum ImageEffectType
 	{
-		None = 0,
-		ColorCorrectionCurves = 1,
-		BloomAndLensFlares = 2,
-		MotionBlur = 3
+		None,
+		ColorCorrectionCurves,
+		BloomAndLensFlares,
+		MotionBlur
 	}
 
 	private class ImageEffectParameters

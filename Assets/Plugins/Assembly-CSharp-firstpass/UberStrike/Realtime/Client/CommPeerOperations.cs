@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UberStrike.Core.Serialization;
-using UberStrike.DataCenter.Common.Entities;
 
 namespace UberStrike.Realtime.Client
 {
@@ -29,13 +28,12 @@ namespace UberStrike.Realtime.Client
 			__id = id;
 		}
 
-		public void SendAuthenticationRequest(string authToken, string magicHash, bool isMac)
+		public void SendAuthenticationRequest(string authToken, string magicHash)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, magicHash);
-				BooleanProxy.Serialize(memoryStream, isMac);
 				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
 				dictionary.Add(__id, memoryStream.ToArray());
 				Dictionary<byte, object> customOpParameters = dictionary;
@@ -58,22 +56,6 @@ namespace UberStrike.Realtime.Client
 				if (sendOperation != null)
 				{
 					sendOperation(2, customOpParameters);
-				}
-			}
-		}
-
-		public void SendUpdateLoadout(string authToken, LoadoutView view)
-		{
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				StringProxy.Serialize(memoryStream, authToken);
-				LoadoutViewProxy.Serialize(memoryStream, view);
-				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
-				dictionary.Add(__id, memoryStream.ToArray());
-				Dictionary<byte, object> customOpParameters = dictionary;
-				if (sendOperation != null)
-				{
-					sendOperation(3, customOpParameters);
 				}
 			}
 		}

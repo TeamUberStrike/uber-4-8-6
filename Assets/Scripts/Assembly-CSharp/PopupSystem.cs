@@ -6,17 +6,17 @@ public class PopupSystem : AutoMonoBehaviour<PopupSystem>
 {
 	public enum AlertType
 	{
-		OK = 0,
-		OKCancel = 1,
-		Cancel = 2,
-		None = 3
+		OK,
+		OKCancel,
+		Cancel,
+		None
 	}
 
 	public enum ActionType
 	{
-		None = 0,
-		Negative = 1,
-		Positive = 2
+		None,
+		Negative,
+		Positive
 	}
 
 	private GuiDepth _lastLockDepth;

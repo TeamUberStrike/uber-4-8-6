@@ -8,16 +8,16 @@ public class UIFont : MonoBehaviour
 {
 	public enum Alignment
 	{
-		Left = 0,
-		Center = 1,
-		Right = 2
+		Left,
+		Center,
+		Right
 	}
 
 	public enum SymbolStyle
 	{
-		None = 0,
-		Uncolored = 1,
-		Colored = 2
+		None,
+		Uncolored,
+		Colored
 	}
 
 	[SerializeField]

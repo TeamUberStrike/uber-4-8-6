@@ -31,11 +31,6 @@ public class MuzzleLight : BaseWeaponEffect
 		{
 			_shootAnimation.Stop();
 		}
-		// stop keeps last key. switch mid flash = light stuck on
-		if ((bool)base.light)
-		{
-			base.light.intensity = 0f;
-		}
 	}
 
 	public override void OnHits(RaycastHit[] hits)

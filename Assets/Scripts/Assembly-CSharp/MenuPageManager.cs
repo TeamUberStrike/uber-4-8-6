@@ -37,28 +37,9 @@ public class MenuPageManager : MonoBehaviour
 
 	private void Start()
 	{
-		// Diagnostic: scan children for PageScene MBs. If 0, the GameObject
-		// hierarchy under MenuPageManager isn't what AssetRipper emitted.
 		PageScene[] componentsInChildren = GetComponentsInChildren<PageScene>(true);
-		Debug.LogWarning("[MenuPageManager] Start() — found " + componentsInChildren.Length + " PageScene component(s) under '" + base.name + "' (Application.loadedLevelName='" + Application.loadedLevelName + "')");
-
-		if (componentsInChildren.Length == 0)
-		{
-			// Fall back to a scene-wide scan (FindObjectsOfType) so PageScene
-			// MBs placed under sibling GameObjects still register.
-			PageScene[] sceneWide = (PageScene[])Resources.FindObjectsOfTypeAll(typeof(PageScene));
-			Debug.LogWarning("[MenuPageManager] No children found; scene-wide scan returned " + sceneWide.Length + " PageScene(s).");
-			componentsInChildren = sceneWide;
-		}
-
 		foreach (PageScene pageScene in componentsInChildren)
 		{
-			if (_pageByPageType.ContainsKey(pageScene.PageType))
-			{
-				Debug.LogWarning("[MenuPageManager] Skipping duplicate PageScene for type " + pageScene.PageType + " on '" + pageScene.name + "'");
-				continue;
-			}
-			Debug.LogWarning("[MenuPageManager]   registered PageType." + pageScene.PageType + " -> GameObject '" + pageScene.name + "' (active=" + pageScene.gameObject.activeSelf + ")");
 			_pageByPageType.Add(pageScene.PageType, pageScene);
 		}
 		if ((bool)GlobalUIRibbon.Instance)
@@ -161,7 +142,6 @@ public class MenuPageManager : MonoBehaviour
 
 	public void LoadPage(PageType pageType, bool forceReload = false)
 	{
-		Debug.LogWarning("[MenuPageManager] LoadPage(" + pageType + ", forceReload=" + forceReload + ") — dict has " + _pageByPageType.Count + " entries, current=" + _currentPageType);
 		LeftAreaGUIOffset = 0f;
 		if ((bool)PanelManager.Instance)
 		{
@@ -173,13 +153,11 @@ public class MenuPageManager : MonoBehaviour
 		}
 		if (pageType == _currentPageType && !forceReload)
 		{
-			Debug.LogWarning("[MenuPageManager]   short-circuit: already on " + pageType);
 			return;
 		}
 		PageScene value = null;
 		if (_pageByPageType.TryGetValue(pageType, out value))
 		{
-			Debug.LogWarning("[MenuPageManager]   activating PageScene '" + value.name + "' (was active=" + value.gameObject.activeSelf + ")");
 			PageScene value2 = null;
 			_pageByPageType.TryGetValue(_currentPageType, out value2);
 			if ((bool)value2 && !forceReload)
@@ -191,12 +169,6 @@ public class MenuPageManager : MonoBehaviour
 			StartCoroutine(AnimateCameraPixelRect(value.PageType, 0.25f, !flag));
 			MouseOrbit.Instance.enabled = false;
 			Instance.StartCoroutine(StartPageTransition(value, 1f));
-		}
-		else
-		{
-			string keys = "";
-			foreach (PageType k in _pageByPageType.Keys) { keys += k + ","; }
-			Debug.LogError("[MenuPageManager] LoadPage(" + pageType + ") FAILED — no entry. Dict keys: [" + keys + "]");
 		}
 	}
 

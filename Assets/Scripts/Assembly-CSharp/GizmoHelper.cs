@@ -7,9 +7,9 @@ public class GizmoHelper : AutoMonoBehaviour<GizmoHelper>
 {
 	public enum GizmoType
 	{
-		Cube = 0,
-		Sphere = 1,
-		WiredSphere = 2
+		Cube,
+		Sphere,
+		WiredSphere
 	}
 
 	[Serializable]

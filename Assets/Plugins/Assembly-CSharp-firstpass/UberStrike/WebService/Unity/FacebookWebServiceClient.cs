@@ -15,7 +15,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, facebookRequestObjectId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "FacebookWebService", "ClaimFacebookGift", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "UberStrike.DataCenter.WebService.CWS.FacebookWebServiceContract.svc", "ClaimFacebookGift", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -31,7 +31,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, facebookId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "FacebookWebService", "AttachFacebookAccountToCmuneAccount", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "UberStrike.DataCenter.WebService.CWS.FacebookWebServiceContract.svc", "AttachFacebookAccountToCmuneAccount", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -47,7 +47,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, cmuneAuthToken);
 				StringProxy.Serialize(memoryStream, facebookIDString);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "FacebookWebService", "CheckFacebookSession", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "UberStrike.DataCenter.WebService.CWS.FacebookWebServiceContract.svc", "CheckFacebookSession", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -62,7 +62,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				ListProxy<string>.Serialize(memoryStream, facebookIds, StringProxy.Serialize);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "FacebookWebService", "GetFacebookFriendsList", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IFacebookWebServiceContract", "UberStrike.DataCenter.WebService.CWS.FacebookWebServiceContract.svc", "GetFacebookFriendsList", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{

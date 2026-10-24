@@ -101,11 +101,6 @@ public class ParticleEffectController : MonoBehaviour
 
 	public static void ShowHitEffect(ParticleConfigurationType effectType, SurfaceEffectType surface, Vector3 direction, Vector3 hitPoint, Vector3 hitNormal, Vector3 muzzlePosition, float distance, ref MoveTrailrendererObject trailRenderer, Transform parent, int damage)
 	{
-		ShowHitEffect(effectType, surface, direction, hitPoint, hitNormal, muzzlePosition, distance, ref trailRenderer, parent, damage, null);
-	}
-
-	public static void ShowHitEffect(ParticleConfigurationType effectType, SurfaceEffectType surface, Vector3 direction, Vector3 hitPoint, Vector3 hitNormal, Vector3 muzzlePosition, float distance, ref MoveTrailrendererObject trailRenderer, Transform parent, int damage, WeaponTracerTinter tracerTinter)
-	{
 		if (Exists)
 		{
 			ParticleConfigurationPerWeapon particleConfigurationPerWeapon = Instance._allConfigurations[effectType];
@@ -113,7 +108,7 @@ public class ParticleEffectController : MonoBehaviour
 			{
 				return;
 			}
-			ShowTrailEffect(particleConfigurationPerWeapon, trailRenderer, parent, hitPoint, muzzlePosition, distance, direction, tracerTinter);
+			ShowTrailEffect(particleConfigurationPerWeapon, trailRenderer, parent, hitPoint, muzzlePosition, distance, direction);
 			switch (surface)
 			{
 			case SurfaceEffectType.WoodEffect:
@@ -177,7 +172,7 @@ public class ParticleEffectController : MonoBehaviour
 		}
 	}
 
-	private static void ShowTrailEffect(ParticleConfigurationPerWeapon effect, MoveTrailrendererObject trailRenderer, Transform parent, Vector3 hitPoint, Vector3 muzzlePosition, float distance, Vector3 direction, WeaponTracerTinter tracerTinter)
+	private static void ShowTrailEffect(ParticleConfigurationPerWeapon effect, MoveTrailrendererObject trailRenderer, Transform parent, Vector3 hitPoint, Vector3 muzzlePosition, float distance, Vector3 direction)
 	{
 		if (effect.WeaponImpactEffectConfiguration.UseTrailrendererForTrail)
 		{
@@ -187,10 +182,6 @@ public class ParticleEffectController : MonoBehaviour
 				{
 					trailRenderer = UnityEngine.Object.Instantiate(effect.WeaponImpactEffectConfiguration.TrailrendererTrailPrefab, muzzlePosition, Quaternion.identity) as MoveTrailrendererObject;
 					trailRenderer.gameObject.transform.parent = parent;
-					if (tracerTinter != null)
-					{
-						tracerTinter.Tint(trailRenderer);
-					}
 				}
 				trailRenderer.MoveTrail(hitPoint, muzzlePosition, distance);
 			}

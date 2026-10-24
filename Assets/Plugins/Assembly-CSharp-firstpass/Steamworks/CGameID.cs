@@ -6,10 +6,10 @@ namespace Steamworks
 	{
 		public enum EGameIDType
 		{
-			k_EGameIDTypeApp = 0,
-			k_EGameIDTypeGameMod = 1,
-			k_EGameIDTypeShortcut = 2,
-			k_EGameIDTypeP2P = 3
+			k_EGameIDTypeApp,
+			k_EGameIDTypeGameMod,
+			k_EGameIDTypeShortcut,
+			k_EGameIDTypeP2P
 		}
 
 		public ulong m_GameID;

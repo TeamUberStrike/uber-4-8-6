@@ -6,8 +6,8 @@ public class UISlider : IgnoreTimeScale
 {
 	public enum Direction
 	{
-		Horizontal = 0,
-		Vertical = 1
+		Horizontal,
+		Vertical
 	}
 
 	public delegate void OnValueChange(float val);

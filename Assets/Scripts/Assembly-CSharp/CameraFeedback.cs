@@ -6,9 +6,9 @@ public class CameraFeedback : MonoBehaviour
 {
 	public enum FeedbackType
 	{
-		Land = 0,
-		Damage = 1,
-		Weapon = 2
+		Land,
+		Damage,
+		Weapon
 	}
 
 	[Serializable]

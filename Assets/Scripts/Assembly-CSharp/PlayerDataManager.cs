@@ -52,35 +52,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 		}
 	}
 
-	// Editor sentinel: when SteamManager couldn't init (no native DLL, Free
-	// license blocks plugin in Editor, Steam not running, no app id),
-	// AuthenticationManager.LoginByChannel detects this exact string and
-	// routes to StartOfflineLogin instead of LoginSteam.
-	public const string OFFLINE_STEAMID = "76561197960287930";
-
 	public static string SteamId
 	{
 		get
 		{
-			if (!SteamManager.Initialized)
-			{
-				Debug.Log("[PlayerDataManager.SteamId] SteamManager not initialized — returning offline sentinel");
-				return OFFLINE_STEAMID;
-			}
-			try
-			{
-				return SteamUser.GetSteamID().m_SteamID.ToString();
-			}
-			catch (DllNotFoundException ex)
-			{
-				Debug.LogWarning("[PlayerDataManager.SteamId] DllNotFoundException: " + ex.Message + " — returning offline sentinel");
-				return OFFLINE_STEAMID;
-			}
-			catch (InvalidOperationException ex)
-			{
-				Debug.LogWarning("[PlayerDataManager.SteamId] InvalidOperationException: " + ex.Message + " — returning offline sentinel");
-				return OFFLINE_STEAMID;
-			}
+			return SteamUser.GetSteamID().ToString();
 		}
 	}
 
@@ -379,7 +355,7 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		if (_updateLoadoutTime == 0f)
 		{
-			_updateLoadoutTime = Time.time + 0.5f;
+			_updateLoadoutTime = Time.time + 5f;
 			while (_updateLoadoutTime > Time.time)
 			{
 				yield return new WaitForEndOfFrame();
@@ -401,7 +377,7 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 		}
 		else
 		{
-			_updateLoadoutTime = Time.time + 0.5f;
+			_updateLoadoutTime = Time.time + 5f;
 		}
 	}
 

@@ -13,10 +13,7 @@ public class SoundSimulator
 
 	public void Update()
 	{
-		// Decorator is null in offline editor mode (avatar build skipped to dodge
-		// Unity 4.6 mecanim DefaultAvatar crash). Footstep playback hangs off it,
-		// so bail when missing instead of NRE-spamming the console every frame.
-		if (character == null || character.Avatar == null || character.Avatar.Decorator == null || character.State == null)
+		if (character == null || character.Avatar == null || character.State == null)
 		{
 			return;
 		}

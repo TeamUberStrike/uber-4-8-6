@@ -67,9 +67,6 @@ public class PlanarReflection : MonoBehaviour
 
 	public void RenderHelpCameras(Camera currentCam)
 	{
-		// RESTORED (1:1 shipped Water4): render the planar reflection into the reflection camera's
-		// RenderTexture and bind it to _ReflectionTex. Guarded to once per source camera per frame
-		// (LateUpdate clears helperCameras). RenderReflectionFor excludes the Water layer -> no recursion.
 		if (helperCameras == null)
 		{
 			helperCameras = new Dictionary<Camera, bool>();
@@ -78,33 +75,14 @@ public class PlanarReflection : MonoBehaviour
 		{
 			helperCameras.Add(currentCam, false);
 		}
-		if (helperCameras[currentCam])
+		if (!helperCameras[currentCam])
 		{
-			return;
-		}
-		if (reflectionCamera == null)
-		{
-			reflectionCamera = CreateReflectionCameraFor(currentCam);
-		}
-		RenderReflectionFor(currentCam, reflectionCamera);
-		helperCameras[currentCam] = true;
-		if ((bool)sharedMaterial && (bool)reflectionCamera && (bool)reflectionCamera.targetTexture)
-		{
-			sharedMaterial.SetTexture(reflectionSampler, reflectionCamera.targetTexture);
-		}
-	}
-
-	private void OnDestroy()
-	{
-		if ((bool)reflectionCamera)
-		{
-			RenderTexture rt = reflectionCamera.targetTexture;
-			reflectionCamera.targetTexture = null;
-			if ((bool)rt)
+			if (!reflectionCamera)
 			{
-				Destroy(rt);
+				reflectionCamera = CreateReflectionCameraFor(currentCam);
 			}
-			Destroy(reflectionCamera.gameObject);
+			RenderReflectionFor(currentCam, reflectionCamera);
+			helperCameras[currentCam] = true;
 		}
 	}
 
@@ -118,12 +96,10 @@ public class PlanarReflection : MonoBehaviour
 
 	public void WaterTileBeingRendered(Transform tr, Camera currentCam)
 	{
-		// RESTORED (1:1 shipped Water4): trigger the reflection render for the camera about to draw
-		// this water tile. The RenderTexture unlock makes this viable; meshes carry normals so the
-		// re-render does not spam "Shader wants normals". Reflection can be toggled via m_Enabled.
-		if ((bool)currentCam && base.enabled)
+		RenderHelpCameras(currentCam);
+		if ((bool)reflectionCamera && (bool)sharedMaterial)
 		{
-			RenderHelpCameras(currentCam);
+			sharedMaterial.SetTexture(reflectionSampler, reflectionCamera.targetTexture);
 		}
 	}
 

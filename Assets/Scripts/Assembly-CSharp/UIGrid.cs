@@ -7,8 +7,8 @@ public class UIGrid : MonoBehaviour
 {
 	public enum Arrangement
 	{
-		Horizontal = 0,
-		Vertical = 1
+		Horizontal,
+		Vertical
 	}
 
 	public Arrangement arrangement;

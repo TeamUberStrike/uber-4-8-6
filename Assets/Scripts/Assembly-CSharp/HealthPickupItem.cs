@@ -5,10 +5,10 @@ public class HealthPickupItem : PickupItem
 {
 	public enum Category
 	{
-		HP_100 = 0,
-		HP_50 = 1,
-		HP_25 = 2,
-		HP_5 = 3
+		HP_100,
+		HP_50,
+		HP_25,
+		HP_5
 	}
 
 	[SerializeField]

@@ -14,7 +14,6 @@ namespace UberStrike.Core.Serialization
 				Int32Proxy.Serialize(memoryStream, instance.ConnectedPlayers);
 				Int32Proxy.Serialize(memoryStream, instance.GameFlags);
 				EnumProxy<GameModeType>.Serialize(memoryStream, instance.GameMode);
-				EnumProxy<GameBoxType>.Serialize(memoryStream, instance.BoxType);
 				if (instance.Guid != null)
 				{
 					StringProxy.Serialize(memoryStream, instance.Guid);
@@ -48,7 +47,6 @@ namespace UberStrike.Core.Serialization
 					num |= 4;
 				}
 				Int32Proxy.Serialize(memoryStream, instance.TimeLimit);
-				BooleanProxy.Serialize(memoryStream, instance.IsRandomMap);
 				Int32Proxy.Serialize(stream, ~num);
 				memoryStream.WriteTo(stream);
 			}
@@ -61,7 +59,6 @@ namespace UberStrike.Core.Serialization
 			gameRoomData.ConnectedPlayers = Int32Proxy.Deserialize(bytes);
 			gameRoomData.GameFlags = Int32Proxy.Deserialize(bytes);
 			gameRoomData.GameMode = EnumProxy<GameModeType>.Deserialize(bytes);
-			gameRoomData.BoxType = EnumProxy<GameBoxType>.Deserialize(bytes);
 			if ((num & 1) != 0)
 			{
 				gameRoomData.Guid = StringProxy.Deserialize(bytes);
@@ -83,7 +80,6 @@ namespace UberStrike.Core.Serialization
 				gameRoomData.Server = ConnectionAddressProxy.Deserialize(bytes);
 			}
 			gameRoomData.TimeLimit = Int32Proxy.Deserialize(bytes);
-			gameRoomData.IsRandomMap = BooleanProxy.Deserialize(bytes);
 			return gameRoomData;
 		}
 	}

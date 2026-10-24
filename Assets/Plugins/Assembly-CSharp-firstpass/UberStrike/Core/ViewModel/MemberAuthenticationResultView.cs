@@ -15,16 +15,10 @@ namespace UberStrike.Core.ViewModel
 
 		public DateTime ServerTime { get; set; }
 
-		public string ServerGameVersion { get; set; }
-
 		public bool IsAccountComplete { get; set; }
 
 		public LuckyDrawUnityView LuckyDraw { get; set; }
 
 		public string AuthToken { get; set; }
-
-		public int BanDuration { get; set; }
-
-		public int MuteDuration { get; set; }
 	}
 }

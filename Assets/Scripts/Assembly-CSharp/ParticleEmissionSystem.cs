@@ -8,21 +8,10 @@ public static class ParticleEmissionSystem
 		{
 			float num = 200f;
 			Vector3 velocity = direction * num;
-			// Cap the tracer's lifetime by a fixed travel distance so a far/dead-center shot draws
-			// the SAME short streak as a close one, instead of the legacy Stretch billboard sweeping
-			// all the way to the vanishing point (where velocity is parallel to view, the screen-space
-			// velocity collapses, and the quad degenerates into the vertical smear). Mirrors 4.3.8's
-			// tracer, whose length is fixed and has zero dependence on hit distance. Near shots
-			// (distance <= 10) are unchanged.
-			float energy = Mathf.Min(distance, 10f) / num * 0.9f;
+			float energy = distance / num * 0.9f;
 			if (distance > 3f)
 			{
-				// Polish (requested): the instant-hit tracers (machine guns, shotguns, sniper) were hard to
-				// read on bright maps. Push the trail color toward bright white at full alpha so the streak
-				// reads as a crisp flash. Deliberate deviation from the dim 1:1 color (a design tweak, not parity).
-				Color trailColor = Color.Lerp(particleConfiguration.ParticleColor, Color.white, 0.6f);
-				trailColor.a = 1f;
-				particleConfiguration.ParticleEmitter.Emit(muzzlePosition + direction * 3f, velocity, Random.Range(particleConfiguration.ParticleMinSize, particleConfiguration.ParticleMaxSize), energy, trailColor);
+				particleConfiguration.ParticleEmitter.Emit(muzzlePosition + direction * 3f, velocity, Random.Range(particleConfiguration.ParticleMinSize, particleConfiguration.ParticleMaxSize), energy, particleConfiguration.ParticleColor);
 			}
 		}
 	}

@@ -32,16 +32,9 @@ public class Heartbeat : MonoBehaviour
 	private IEnumerator Start()
 	{
 		m_MonoInitialized = false;
-		bool initOk = true;
-		try { I(); }
-		catch (DllNotFoundException) { initOk = false; }
-		if (!initOk) yield break;
+		I();
 		yield return new WaitForSeconds(1f);
-		int monoRet = -1;
-		bool statusOk = true;
-		try { monoRet = S(); }
-		catch (DllNotFoundException) { statusOk = false; }
-		if (!statusOk) yield break;
+		int monoRet = S();
 		m_MonoInitialized = monoRet == 0;
 	}
 

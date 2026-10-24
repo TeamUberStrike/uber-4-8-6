@@ -5,9 +5,9 @@ public class UIDragObject : IgnoreTimeScale
 {
 	public enum DragEffect
 	{
-		None = 0,
-		Momentum = 1,
-		MomentumAndSpring = 2
+		None,
+		Momentum,
+		MomentumAndSpring
 	}
 
 	public Transform target;

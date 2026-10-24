@@ -5,9 +5,9 @@ public class NGUIScrollList : MonoBehaviour
 {
 	public enum ScrollType
 	{
-		NotCircular = 0,
-		Visible1 = 1,
-		Visible3 = 2
+		NotCircular,
+		Visible1,
+		Visible3
 	}
 
 	public ScrollType scrollType;

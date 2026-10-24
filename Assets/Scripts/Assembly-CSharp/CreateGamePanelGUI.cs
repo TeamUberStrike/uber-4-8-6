@@ -260,13 +260,6 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 				{
 					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CreateGame, 0uL, 1f, 1f);
 					SelectMap(allMap2);
-					// Maps with two texture bundles (Bluebox / Normal) prompt for the
-					// desired texture on select; the choice is applied when the created
-					// game's scene loads (see SceneLoader -> MapTextureVariant.Apply).
-					if (MapTextureVariant.HasVariants(allMap2.SceneName))
-					{
-						MapTextureVariant.PromptAndRun(null);
-					}
 				}
 				num2++;
 			}
@@ -420,9 +413,6 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 				GUI.Label(new Rect(170f, 190f, _sliderWidth, 25f), "MaxLevel is too low for you!", BlueStonez.label_interparkbold_11pt);
 				GUI.contentColor = Color.white;
 			}
-			ToggleGameFlag(GameFlags.GAME_FLAGS.LowGravity, 220, "Low Gravity");
-			ToggleGameFlag(GameFlags.GAME_FLAGS.QuickSwitch, 240, "Quick Switch");
-			ToggleGameFlag(GameFlags.GAME_FLAGS.KnockBack, 260, "Knockback");
 			GUI.EndGroup();
 		}
 		else
@@ -433,14 +423,13 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 
 	private void ToggleGameFlag(GameFlags.GAME_FLAGS flag, int y, string content)
 	{
-		bool flag2 = (_gameFlags & flag) == flag;
-		if (GUI.Toggle(new Rect(8f, y, 160f, 16f), flag2, content, BlueStonez.toggle))
+		if (GUI.Toggle(new Rect(6f, y, 160f, 16f), _gameFlags == flag, content, BlueStonez.toggle))
 		{
-			_gameFlags |= flag;
+			_gameFlags = flag;
 		}
-		else
+		else if (_gameFlags == flag)
 		{
-			_gameFlags &= ~flag;
+			_gameFlags = GameFlags.GAME_FLAGS.None;
 		}
 	}
 

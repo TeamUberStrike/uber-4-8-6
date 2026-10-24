@@ -6,10 +6,10 @@ public class TextureLoader : AutoMonoBehaviour<TextureLoader>
 {
 	public enum State
 	{
-		Downloading = 0,
-		Ok = 1,
-		Error = 2,
-		Timeout = 3
+		Downloading,
+		Ok,
+		Error,
+		Timeout
 	}
 
 	public class Holder

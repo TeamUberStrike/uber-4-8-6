@@ -35,8 +35,8 @@ public class UIAtlas : MonoBehaviour
 
 	public enum Coordinates
 	{
-		Pixels = 0,
-		TexCoords = 1
+		Pixels,
+		TexCoords
 	}
 
 	[HideInInspector]

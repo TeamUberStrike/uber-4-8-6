@@ -36,7 +36,7 @@ public class FullAutoFireHandler : IWeaponFireHandler
 
 	public void Update()
 	{
-		if (IsTriggerPulled && !IsShooting && CanShoot)
+		if (IsTriggerPulled && !IsShooting && CanShoot && Singleton<WeaponController>.Instance.CheckAmmoCount())
 		{
 			GameState.Current.PlayerData.Set(PlayerStates.Shooting, true);
 			IsShooting = true;
@@ -51,7 +51,7 @@ public class FullAutoFireHandler : IWeaponFireHandler
 		{
 			GameState.Current.PlayerData.Set(PlayerStates.Shooting, false);
 			IsShooting = false;
-			if ((bool)weapon && !BaseWeaponDecorator._noAmmoSoundPlaying)
+			if ((bool)weapon)
 			{
 				weapon.PostShoot();
 			}

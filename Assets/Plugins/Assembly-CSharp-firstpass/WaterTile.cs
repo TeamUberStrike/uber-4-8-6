@@ -40,9 +40,6 @@ public class WaterTile : MonoBehaviour
 
 	public void OnWillRenderObject()
 	{
-		// RESTORED (1:1 with the shipped Water4): drive the planar-reflection helper camera and
-		// the depth-texture setup for whichever camera is about to render this tile. The reflection
-		// camera excludes the Water layer, so no recursion; PlanarReflection guards to one render/frame.
 		if ((bool)reflection)
 		{
 			reflection.WaterTileBeingRendered(base.transform, Camera.current);

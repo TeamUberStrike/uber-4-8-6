@@ -15,7 +15,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, groupId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "GetOwnClan", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "GetOwnClan", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -30,7 +30,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				MemberPositionUpdateViewProxy.Serialize(memoryStream, updateMemberPositionData);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "UpdateMemberPosition", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "UpdateMemberPosition", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -48,7 +48,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, inviteeCmid);
 				StringProxy.Serialize(memoryStream, message);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "InviteMemberToJoinAGroup", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "InviteMemberToJoinAGroup", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -64,7 +64,7 @@ namespace UberStrike.WebService.Unity
 			{
 				Int32Proxy.Serialize(memoryStream, clanInvitationId);
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "AcceptClanInvitation", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "AcceptClanInvitation", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -80,7 +80,7 @@ namespace UberStrike.WebService.Unity
 			{
 				Int32Proxy.Serialize(memoryStream, clanInvitationId);
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "DeclineClanInvitation", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "DeclineClanInvitation", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -97,7 +97,7 @@ namespace UberStrike.WebService.Unity
 				Int32Proxy.Serialize(memoryStream, groupId);
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, cmidToKick);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "KickMemberFromClan", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "KickMemberFromClan", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -113,7 +113,7 @@ namespace UberStrike.WebService.Unity
 			{
 				Int32Proxy.Serialize(memoryStream, groupId);
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "DisbandGroup", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "DisbandGroup", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -129,7 +129,7 @@ namespace UberStrike.WebService.Unity
 			{
 				Int32Proxy.Serialize(memoryStream, groupId);
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "LeaveAClan", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "LeaveAClan", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -144,7 +144,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "GetMyClanId", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "GetMyClanId", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -160,7 +160,7 @@ namespace UberStrike.WebService.Unity
 			{
 				Int32Proxy.Serialize(memoryStream, groupInvitationId);
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "CancelInvitation", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "CancelInvitation", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -175,7 +175,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "GetAllGroupInvitations", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "GetAllGroupInvitations", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -191,7 +191,7 @@ namespace UberStrike.WebService.Unity
 			{
 				Int32Proxy.Serialize(memoryStream, groupId);
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "GetPendingGroupInvitations", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "GetPendingGroupInvitations", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -206,7 +206,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				GroupCreationViewProxy.Serialize(memoryStream, createClanData);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "CreateClan", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "CreateClan", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -223,7 +223,7 @@ namespace UberStrike.WebService.Unity
 				Int32Proxy.Serialize(memoryStream, groupId);
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, newLeaderCmid);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "TransferOwnership", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "TransferOwnership", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -238,7 +238,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "CanOwnAClan", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "CanOwnAClan", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -252,7 +252,7 @@ namespace UberStrike.WebService.Unity
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "ClanWebService", "test", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IClanWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ClanWebServiceContract.svc", "test", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{

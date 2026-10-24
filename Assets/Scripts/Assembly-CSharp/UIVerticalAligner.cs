@@ -7,8 +7,8 @@ public class UIVerticalAligner : MonoBehaviour
 {
 	public enum Direction
 	{
-		TopToBottom = 0,
-		BottomToTop = 1
+		TopToBottom,
+		BottomToTop
 	}
 
 	public Direction direction;

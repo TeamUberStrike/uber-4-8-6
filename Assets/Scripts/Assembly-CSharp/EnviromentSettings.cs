@@ -6,10 +6,10 @@ public class EnviromentSettings
 {
 	public enum TYPE
 	{
-		NONE = 0,
-		WATER = 1,
-		SURFACE = 2,
-		LATTER = 3
+		NONE,
+		WATER,
+		SURFACE,
+		LATTER
 	}
 
 	public TYPE Type;

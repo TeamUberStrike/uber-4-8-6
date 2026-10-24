@@ -2,17 +2,17 @@ namespace Steamworks
 {
 	public enum EAccountType
 	{
-		k_EAccountTypeInvalid = 0,
-		k_EAccountTypeIndividual = 1,
-		k_EAccountTypeMultiseat = 2,
-		k_EAccountTypeGameServer = 3,
-		k_EAccountTypeAnonGameServer = 4,
-		k_EAccountTypePending = 5,
-		k_EAccountTypeContentServer = 6,
-		k_EAccountTypeClan = 7,
-		k_EAccountTypeChat = 8,
-		k_EAccountTypeConsoleUser = 9,
-		k_EAccountTypeAnonUser = 10,
-		k_EAccountTypeMax = 11
+		k_EAccountTypeInvalid,
+		k_EAccountTypeIndividual,
+		k_EAccountTypeMultiseat,
+		k_EAccountTypeGameServer,
+		k_EAccountTypeAnonGameServer,
+		k_EAccountTypePending,
+		k_EAccountTypeContentServer,
+		k_EAccountTypeClan,
+		k_EAccountTypeChat,
+		k_EAccountTypeConsoleUser,
+		k_EAccountTypeAnonUser,
+		k_EAccountTypeMax
 	}
 }

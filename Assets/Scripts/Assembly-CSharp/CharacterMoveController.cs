@@ -6,9 +6,9 @@ public class CharacterMoveController
 {
 	public enum ForceType
 	{
-		None = 0,
-		Additive = 1,
-		Exclusive = 2
+		None,
+		Additive,
+		Exclusive
 	}
 
 	public const float HEIGHT_NORMAL = 2f;

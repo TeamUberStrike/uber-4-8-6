@@ -158,13 +158,6 @@ public class Avatar
 			weapon.transform.localRotation = Quaternion.identity;
 			weapon.IsEnabled = slot == CurrentWeaponSlot;
 			weapon.WeaponClass = item.View.ItemClass;
-			// Skin the third-person weapon. Last, so the skin sees the decorator fully set up
-			// (layer already assigned by SetLayerRecursively above -- overlays created by
-			// ApplyFlames inherit it from the renderer they are built from, and a new
-			// GameObject would otherwise start on layer 0 and render in the wrong pass).
-			// ApplyToWeapon is ID-gated and returns immediately for anything that is not one
-			// of the skins, so stock weapons are unaffected.
-			WeaponSkinHelper.ApplyToWeapon(weapon.gameObject, item.View.ID);
 		}
 		else
 		{
@@ -220,10 +213,6 @@ public class Avatar
 				value.IsEnabled = false;
 			}
 		}
-		// Decorator is null in offline editor mode (avatar build skipped).
-		if (Decorator != null && Decorator.AnimationController != null)
-		{
-			Decorator.AnimationController.ChangeWeaponType((UberstrikeItemClass)0);
-		}
+		Decorator.AnimationController.ChangeWeaponType((UberstrikeItemClass)0);
 	}
 }

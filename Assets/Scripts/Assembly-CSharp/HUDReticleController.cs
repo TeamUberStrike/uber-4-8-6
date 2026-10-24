@@ -8,9 +8,9 @@ public class HUDReticleController : MonoBehaviour
 {
 	public enum State
 	{
-		None = 0,
-		Enemy = 1,
-		Friend = 2
+		None,
+		Enemy,
+		Friend
 	}
 
 	[SerializeField]

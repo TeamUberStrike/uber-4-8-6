@@ -2,15 +2,15 @@ namespace Steamworks
 {
 	public enum EVoiceResult
 	{
-		k_EVoiceResultOK = 0,
-		k_EVoiceResultNotInitialized = 1,
-		k_EVoiceResultNotRecording = 2,
-		k_EVoiceResultNoData = 3,
-		k_EVoiceResultBufferTooSmall = 4,
-		k_EVoiceResultDataCorrupted = 5,
-		k_EVoiceResultRestricted = 6,
-		k_EVoiceResultUnsupportedCodec = 7,
-		k_EVoiceResultReceiverOutOfDate = 8,
-		k_EVoiceResultReceiverDidNotAnswer = 9
+		k_EVoiceResultOK,
+		k_EVoiceResultNotInitialized,
+		k_EVoiceResultNotRecording,
+		k_EVoiceResultNoData,
+		k_EVoiceResultBufferTooSmall,
+		k_EVoiceResultDataCorrupted,
+		k_EVoiceResultRestricted,
+		k_EVoiceResultUnsupportedCodec,
+		k_EVoiceResultReceiverOutOfDate,
+		k_EVoiceResultReceiverDidNotAnswer
 	}
 }

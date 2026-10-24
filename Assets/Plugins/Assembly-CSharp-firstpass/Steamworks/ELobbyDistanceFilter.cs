@@ -2,9 +2,9 @@ namespace Steamworks
 {
 	public enum ELobbyDistanceFilter
 	{
-		k_ELobbyDistanceFilterClose = 0,
-		k_ELobbyDistanceFilterDefault = 1,
-		k_ELobbyDistanceFilterFar = 2,
-		k_ELobbyDistanceFilterWorldwide = 3
+		k_ELobbyDistanceFilterClose,
+		k_ELobbyDistanceFilterDefault,
+		k_ELobbyDistanceFilterFar,
+		k_ELobbyDistanceFilterWorldwide
 	}
 }

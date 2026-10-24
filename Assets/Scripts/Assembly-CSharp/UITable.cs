@@ -7,8 +7,8 @@ public class UITable : MonoBehaviour
 {
 	public enum Direction
 	{
-		Down = 0,
-		Up = 1
+		Down,
+		Up
 	}
 
 	public delegate void OnReposition();

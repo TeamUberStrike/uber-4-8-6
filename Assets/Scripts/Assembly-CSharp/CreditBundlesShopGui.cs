@@ -15,9 +15,7 @@ public class CreditBundlesShopGui
 		float height = Mathf.Max(position.height, scrollHeight);
 		bundleScroll = GUI.BeginScrollView(position, bundleScroll, new Rect(0f, 0f, position.width - 17f, height), false, true);
 		List<BundleUnityView> creditBundles = Singleton<BundleManager>.Instance.GetCreditBundles();
-		// BundleManager.Initialize() fails in offline editor mode (CSteamworks native dep missing),
-		// leaving GetCreditBundles() returning null. Treat null as empty so the OnGUI doesn't NRE-spam.
-		if (creditBundles == null || creditBundles.Count == 0)
+		if (creditBundles.Count == 0)
 		{
 			GUI.Label(new Rect(4f, 4f, position.width - 20f, 24f), "No credit packs are currently on sale.", BlueStonez.label_interparkbold_16pt);
 		}

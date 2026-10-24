@@ -4,8 +4,8 @@ public static class GuiCircle
 {
 	public enum Direction
 	{
-		Clockwise = 0,
-		CounterClockwise = 1
+		Clockwise,
+		CounterClockwise
 	}
 
 	private static Vector3 TexShift = new Vector3(0.5f, 0.5f, 0.5f);

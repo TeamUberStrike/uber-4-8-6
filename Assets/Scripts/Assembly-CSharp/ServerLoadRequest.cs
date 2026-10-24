@@ -10,10 +10,10 @@ public class ServerLoadRequest : BaseGamePeer
 {
 	public enum RequestStateType
 	{
-		None = 0,
-		Waiting = 1,
-		Running = 2,
-		Down = 3
+		None,
+		Waiting,
+		Running,
+		Down
 	}
 
 	private Action _callback;
@@ -106,10 +106,6 @@ public class ServerLoadRequest : BaseGamePeer
 	}
 
 	protected override void OnRoomEntered(GameRoomData game)
-	{
-	}
-
-	protected override void OnRoomRejoin(GameRoomData data, string password)
 	{
 	}
 

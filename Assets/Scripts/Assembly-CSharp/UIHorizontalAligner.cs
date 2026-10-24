@@ -7,8 +7,8 @@ public class UIHorizontalAligner : MonoBehaviour
 {
 	public enum Direction
 	{
-		LeftToRight = 0,
-		RightToLeft = 1
+		LeftToRight,
+		RightToLeft
 	}
 
 	public Direction direction;

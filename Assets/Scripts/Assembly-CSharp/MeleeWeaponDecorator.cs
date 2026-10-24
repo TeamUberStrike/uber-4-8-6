@@ -15,20 +15,10 @@ public sealed class MeleeWeaponDecorator : BaseWeaponDecorator
 	[SerializeField]
 	private AudioClip _equipSound;
 
-	private static float speed = 1f;
-
 	protected override void Awake()
 	{
 		base.Awake();
 		base.IsMelee = true;
-	}
-
-	private void OnEnable()
-	{
-		// Retail clears a previously interrupted swing on pickup with a fast animation.
-		speed = 10000f;
-		ShowShootEffect(null);
-		speed = 1f;
 	}
 
 	public override void ShowShootEffect(RaycastHit[] hits)
@@ -36,10 +26,6 @@ public sealed class MeleeWeaponDecorator : BaseWeaponDecorator
 		base.ShowShootEffect(hits);
 		if (base.EnableShootAnimation && (bool)_animation && _shootAnimClips.Length > 0)
 		{
-			foreach (AnimationState state in _animation)
-			{
-				state.speed = speed;
-			}
 			int num = Random.Range(0, _shootAnimClips.Length);
 			_animation.clip = _shootAnimClips[num];
 			_animation.Rewind();

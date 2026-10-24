@@ -6,9 +6,9 @@ public class UIPanel : MonoBehaviour
 {
 	public enum DebugInfo
 	{
-		None = 0,
-		Gizmos = 1,
-		Geometry = 2
+		None,
+		Gizmos,
+		Geometry
 	}
 
 	public delegate void OnChangeDelegate();

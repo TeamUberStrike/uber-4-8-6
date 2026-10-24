@@ -16,7 +16,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, receiverCmid);
 				StringProxy.Serialize(memoryStream, message);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "RelationshipWebService", "SendContactRequest", memoryStream.ToArray(), delegate
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "UberStrike.DataCenter.WebService.CWS.RelationshipWebServiceContract.svc", "SendContactRequest", memoryStream.ToArray(), delegate
 				{
 					if (callback != null)
 					{
@@ -31,7 +31,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "RelationshipWebService", "GetContactRequests", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "UberStrike.DataCenter.WebService.CWS.RelationshipWebServiceContract.svc", "GetContactRequests", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -47,7 +47,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, contactRequestId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "RelationshipWebService", "AcceptContactRequest", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "UberStrike.DataCenter.WebService.CWS.RelationshipWebServiceContract.svc", "AcceptContactRequest", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -63,7 +63,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, contactRequestId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "RelationshipWebService", "DeclineContactRequest", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "UberStrike.DataCenter.WebService.CWS.RelationshipWebServiceContract.svc", "DeclineContactRequest", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -79,7 +79,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, contactCmid);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "RelationshipWebService", "DeleteContact", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "UberStrike.DataCenter.WebService.CWS.RelationshipWebServiceContract.svc", "DeleteContact", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -95,7 +95,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				BooleanProxy.Serialize(memoryStream, populateFacebookIds);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "RelationshipWebService", "GetContactsByGroups", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IRelationshipWebServiceContract", "UberStrike.DataCenter.WebService.CWS.RelationshipWebServiceContract.svc", "GetContactsByGroups", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{

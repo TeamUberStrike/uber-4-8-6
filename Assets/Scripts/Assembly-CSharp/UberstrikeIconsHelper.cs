@@ -73,7 +73,7 @@ public static class UberstrikeIconsHelper
 		switch (channel)
 		{
 		case ChannelType.WebPortal:
-			return CommunicatorIcons.ChannelSteam16x16;
+			return CommunicatorIcons.ChannelPortal16x16;
 		case ChannelType.WebFacebook:
 			return CommunicatorIcons.ChannelFacebook16x16;
 		case ChannelType.WindowsStandalone:

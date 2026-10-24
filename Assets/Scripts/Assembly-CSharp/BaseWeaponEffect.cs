@@ -9,11 +9,6 @@ public abstract class BaseWeaponEffect : MonoBehaviour
 		_decorator = decorator;
 	}
 
-	public void HideAllEffects()
-	{
-		Hide();
-	}
-
 	public abstract void OnShoot();
 
 	public abstract void OnPostShoot();

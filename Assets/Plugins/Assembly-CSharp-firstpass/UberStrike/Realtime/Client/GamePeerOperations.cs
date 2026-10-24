@@ -88,7 +88,7 @@ namespace UberStrike.Realtime.Client
 			}
 		}
 
-		public void SendEnterRoom(int roomId, string password, string clientVersion, string authToken, string magicHash, bool isMac)
+		public void SendEnterRoom(int roomId, string password, string clientVersion, string authToken, string magicHash)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
@@ -97,7 +97,6 @@ namespace UberStrike.Realtime.Client
 				StringProxy.Serialize(memoryStream, clientVersion);
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, magicHash);
-				BooleanProxy.Serialize(memoryStream, isMac);
 				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
 				dictionary.Add(__id, memoryStream.ToArray());
 				Dictionary<byte, object> customOpParameters = dictionary;
@@ -108,7 +107,7 @@ namespace UberStrike.Realtime.Client
 			}
 		}
 
-		public void SendCreateRoom(GameRoomData metaData, string password, string clientVersion, string authToken, string magicHash, bool isMac)
+		public void SendCreateRoom(GameRoomData metaData, string password, string clientVersion, string authToken, string magicHash)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
@@ -117,7 +116,6 @@ namespace UberStrike.Realtime.Client
 				StringProxy.Serialize(memoryStream, clientVersion);
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, magicHash);
-				BooleanProxy.Serialize(memoryStream, isMac);
 				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
 				dictionary.Add(__id, memoryStream.ToArray());
 				Dictionary<byte, object> customOpParameters = dictionary;

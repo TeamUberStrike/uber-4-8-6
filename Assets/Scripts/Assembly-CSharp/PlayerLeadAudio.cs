@@ -2,9 +2,9 @@ public class PlayerLeadAudio
 {
 	public enum LeadState
 	{
-		Tied = 0,
-		Me = 1,
-		Others = 2
+		Tied,
+		Me,
+		Others
 	}
 
 	private int lastKillsLeftPlayed;

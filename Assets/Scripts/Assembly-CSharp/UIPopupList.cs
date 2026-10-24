@@ -7,9 +7,9 @@ public class UIPopupList : MonoBehaviour
 {
 	public enum Position
 	{
-		Auto = 0,
-		Above = 1,
-		Below = 2
+		Auto,
+		Above,
+		Below
 	}
 
 	public delegate void OnSelectionChange(string item);

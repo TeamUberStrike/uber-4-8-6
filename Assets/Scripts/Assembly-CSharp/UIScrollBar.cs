@@ -7,8 +7,8 @@ public class UIScrollBar : MonoBehaviour
 {
 	public enum Direction
 	{
-		Horizontal = 0,
-		Vertical = 1
+		Horizontal,
+		Vertical
 	}
 
 	public delegate void OnScrollBarChange(UIScrollBar sb);

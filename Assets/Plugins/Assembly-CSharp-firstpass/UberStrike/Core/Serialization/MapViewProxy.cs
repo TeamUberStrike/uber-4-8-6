@@ -27,7 +27,7 @@ namespace UberStrike.Core.Serialization
 				{
 					num |= 2;
 				}
-				EnumProxy<GameBoxType>.Serialize(memoryStream, instance.BoxType);
+				BooleanProxy.Serialize(memoryStream, instance.IsBlueBox);
 				Int32Proxy.Serialize(memoryStream, instance.MapId);
 				Int32Proxy.Serialize(memoryStream, instance.MaxPlayers);
 				Int32Proxy.Serialize(memoryStream, instance.RecommendedItemId);
@@ -66,7 +66,7 @@ namespace UberStrike.Core.Serialization
 			{
 				mapView.DisplayName = StringProxy.Deserialize(bytes);
 			}
-			mapView.BoxType = EnumProxy<GameBoxType>.Deserialize(bytes);
+			mapView.IsBlueBox = BooleanProxy.Deserialize(bytes);
 			mapView.MapId = Int32Proxy.Deserialize(bytes);
 			mapView.MaxPlayers = Int32Proxy.Deserialize(bytes);
 			mapView.RecommendedItemId = Int32Proxy.Deserialize(bytes);

@@ -28,8 +28,6 @@ public class GameStateController : Singleton<GameStateController>
 		gameRoomData.Name = name;
 		gameRoomData.Server = new ConnectionAddress(server);
 		gameRoomData.MapID = mapId;
-		UberstrikeMap map = Singleton<MapManager>.Instance.GetMapWithId(mapId);
-		gameRoomData.BoxType = map != null ? map.View.BoxType : GameBoxType.NORMAL;
 		gameRoomData.TimeLimit = timeMinutes;
 		gameRoomData.PlayerLimit = playerLimit;
 		gameRoomData.GameMode = mode;

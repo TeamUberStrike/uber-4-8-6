@@ -13,8 +13,6 @@ public class MuzzleFlash : BaseWeaponEffect
 
 	private List<Renderer> _renderers = new List<Renderer>();
 
-	private Light[] _lights;
-
 	private void Awake()
 	{
 		_animation = GetComponentInChildren<Animation>();
@@ -26,7 +24,6 @@ public class MuzzleFlash : BaseWeaponEffect
 			_animation.playAutomatically = false;
 		}
 		_muzzleFlashEnd = 0f;
-		_lights = GetComponentsInChildren<Light>(true);
 		_renderers.AddRange(GetComponentsInChildren<Renderer>());
 		foreach (Renderer renderer in _renderers)
 		{
@@ -44,14 +41,6 @@ public class MuzzleFlash : BaseWeaponEffect
 		foreach (Renderer renderer in _renderers)
 		{
 			renderer.enabled = false;
-		}
-		// anim light keeps last key when gun goes off mid flash
-		if (_lights != null)
-		{
-			foreach (Light l in _lights)
-			{
-				l.intensity = 0f;
-			}
 		}
 	}
 

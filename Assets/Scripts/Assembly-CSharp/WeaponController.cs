@@ -24,12 +24,6 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 
 	private int _projectileId;
 
-	// Latch for the QuickSwitch press-reconciliation in LateUpdate.
-	// True while LMB is physically held AND the current weapon's InputHandler
-	// has already been told (via a synthesized press). Resets on LMB release,
-	// on weapon switch, and when the can-shoot gate closes.
-	private bool _reconciledFireHeld;
-
 	public Dictionary<LoadoutSlotType, IUnityItem> LoadoutWeapons
 	{
 		get
@@ -151,21 +145,6 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		{
 			_holsterTime = Mathf.Max(_holsterTime - Time.deltaTime, 0f);
 		}
-		// Quick Switch toggle (KI-037): _holsterTime is the post-fire cooldown
-		// (set to GetRateOfFire on every Shoot()), and the slot-change branch
-		// below is gated on _holsterTime == 0. That's the original game's
-		// "equip delay after firing". When the player has the Quick Switch
-		// toggle enabled and a slot change has been requested, zero the
-		// cooldown so the switch executes on the same frame.
-		// TrainingPageGUI.QuickSwitchEnabled only covers Explore Maps' own local
-		// toggle -- a real match never sets it, so also honor the room's actual
-		// GameFlags (set via CreateGamePanelGUI, synced through RoomData), mirroring
-		// how GameState.ConfigureAvatar reads LowGravity the same way.
-		bool quickSwitchActive = (TrainingPageGUI.QuickSwitchEnabled && !GameState.Current.IsMultiplayer) || (GameState.Current.RoomData != null && GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, GameState.Current.RoomData.GameFlags));
-		if (_currentSlot != _weapons[_currentSlotID.Current] && quickSwitchActive)
-		{
-			_holsterTime = 0f;
-		}
 		if (_currentSlot != _weapons[_currentSlotID.Current] && _holsterTime == 0f)
 		{
 			_currentSlot = _weapons[_currentSlotID.Current];
@@ -176,40 +155,10 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 				WeaponFeedbackManager.Instance.PickUp(_currentSlot);
 				_currentSlot.Decorator.PlayEquipSound();
 			}
-			// QS reconcile latch — drop it on switch so the new weapon
-			// re-checks LMB-held on its first frame.
-			_reconciledFireHeld = false;
 		}
 		if (CheckPerformShotConditions() && _currentSlot != null && _currentSlot.HasWeapon)
 		{
-			// QuickSwitch trigger reconciliation (public issue #45 Part 2):
-			// InputChanged is edge-triggered, so if LMB was already held
-			// when the user scrolled/keyed to a new weapon, no press event
-			// arrives for the new weapon's InputHandler. Plus the previous
-			// weapon's Stop() clears FullAuto's IsTriggerPulled. Without
-			// this poll, full-auto stalls after a switch until the player
-			// releases-and-represses LMB. Synthesize the missed press once
-			// per held cycle; latch resets on switch and on LMB release.
-			InputManager im = AutoMonoBehaviour<InputManager>.Instance;
-			if (im.IsInputEnabled && im.IsDown(GameInputKey.PrimaryFire))
-			{
-				if (!_reconciledFireHeld && (_currentSlot.InputHandler.FireHandler is FullAutoFireHandler || _currentSlot.InputHandler is MinigunInputHandler))
-				{
-					_currentSlot.InputHandler.OnPrimaryFire(true);
-				}
-				_reconciledFireHeld = true;
-			}
-			else
-			{
-				_reconciledFireHeld = false;
-			}
 			_currentSlot.InputHandler.Update();
-		}
-		else
-		{
-			// Gate closed (dead/paused/disabled): drop the latch so the
-			// next time the gate opens, a still-held LMB is replayed.
-			_reconciledFireHeld = false;
 		}
 	}
 
@@ -334,7 +283,6 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 		{
 			if (CheckAmmoCount())
 			{
-				BaseWeaponDecorator._noAmmoSoundPlaying = false;
 				_currentSlot.InputHandler.FireHandler.RegisterShot();
 				_holsterTime = WeaponConfigurationHelper.GetRateOfFire(_currentSlot.View);
 				Ray ray = new Ray(GameState.Current.PlayerData.ShootingPoint + GameState.Current.Player.EyePosition, GameState.Current.PlayerData.ShootingDirection);
@@ -350,7 +298,7 @@ public class WeaponController : Singleton<WeaponController>, IWeaponController
 			}
 			else
 			{
-				_currentSlot.Decorator.PlayOutOfAmmoSound(_currentSlot.View);
+				_currentSlot.Decorator.PlayOutOfAmmoSound();
 				GameData.Instance.OnNotificationFull.Fire(string.Empty, "Out of ammo!", 1f);
 			}
 		}

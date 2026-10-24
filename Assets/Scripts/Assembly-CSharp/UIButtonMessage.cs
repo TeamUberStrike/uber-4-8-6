@@ -5,12 +5,12 @@ public class UIButtonMessage : MonoBehaviour
 {
 	public enum Trigger
 	{
-		OnClick = 0,
-		OnMouseOver = 1,
-		OnMouseOut = 2,
-		OnPress = 3,
-		OnRelease = 4,
-		OnDoubleClick = 5
+		OnClick,
+		OnMouseOver,
+		OnMouseOut,
+		OnPress,
+		OnRelease,
+		OnDoubleClick
 	}
 
 	public GameObject target;

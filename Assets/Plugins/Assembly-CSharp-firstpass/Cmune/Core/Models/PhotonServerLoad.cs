@@ -7,9 +7,9 @@ namespace Cmune.Core.Models
 	{
 		public enum Status
 		{
-			None = 0,
-			Alive = 1,
-			NotReachable = 2
+			None,
+			Alive,
+			NotReachable
 		}
 
 		public int Latency;

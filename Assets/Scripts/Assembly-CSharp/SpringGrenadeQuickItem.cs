@@ -7,7 +7,7 @@ public class SpringGrenadeQuickItem : QuickItem, IProjectile, IGrenadeProjectile
 	private enum SpringGrenadeState
 	{
 		Flying = 1,
-		Deployed = 2
+		Deployed
 	}
 
 	private class FlyingState : IState

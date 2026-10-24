@@ -5,9 +5,9 @@ public class ArmorPickupItem : PickupItem
 {
 	public enum Category
 	{
-		Gold = 0,
-		Silver = 1,
-		Bronze = 2
+		Gold,
+		Silver,
+		Bronze
 	}
 
 	[SerializeField]

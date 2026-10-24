@@ -31,7 +31,7 @@ public class SemiAutoFireHandler : IWeaponFireHandler
 		{
 			_weapon.PostShoot();
 		}
-		IsTriggerPulled = false;
+		IsTriggerPulled = pulled;
 	}
 
 	public void Update()

@@ -16,7 +16,7 @@ public class DebugApplication : IDebugPage
 	public void Draw()
 	{
 		GUILayout.Label("Channel: " + ApplicationDataManager.Channel);
-		GUILayout.Label("Version: " + ApplicationDataManager.Version);
+		GUILayout.Label("Version: 4.7.1");
 		GUILayout.Label("Source: " + Application.srcValue);
 		GUILayout.Label("WS API: " + UberStrike.DataCenter.UnitySdk.ApiVersion.Current);
 		GUILayout.Label("RT API: " + UberStrike.Realtime.UnitySdk.ApiVersion.Current);

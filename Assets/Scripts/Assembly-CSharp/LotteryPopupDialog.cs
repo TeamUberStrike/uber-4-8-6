@@ -4,8 +4,8 @@ public abstract class LotteryPopupDialog : IPopupDialog
 {
 	protected enum State
 	{
-		Normal = 0,
-		Rolled = 1
+		Normal,
+		Rolled
 	}
 
 	public const int IMG_WIDTH = 282;

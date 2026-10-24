@@ -8,9 +8,9 @@ public class SSAOEffect : MonoBehaviour
 {
 	public enum SSAOSamples
 	{
-		Low = 0,
-		Medium = 1,
-		High = 2
+		Low,
+		Medium,
+		High
 	}
 
 	public float m_Radius = 0.4f;

@@ -9,8 +9,8 @@ public class StatsPageGUI : MonoBehaviour
 {
 	private enum StatisticValueType
 	{
-		Counter = 0,
-		Percent = 1
+		Counter,
+		Percent
 	}
 
 	private const int StatsWidth = 490;

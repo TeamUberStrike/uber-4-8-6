@@ -7,14 +7,14 @@ namespace UberStrike.Core.Models
 	{
 		public enum Keys
 		{
-			AccessLevel = 0,
-			Channel = 1,
-			ClanTag = 2,
-			Cmid = 3,
-			CurrentRoom = 4,
-			ModerationFlag = 5,
-			ModInformation = 6,
-			PlayerName = 7
+			AccessLevel,
+			Channel,
+			ClanTag,
+			Cmid,
+			CurrentRoom,
+			ModerationFlag,
+			ModInformation,
+			PlayerName
 		}
 
 		public readonly Dictionary<Keys, object> Changes = new Dictionary<Keys, object>();

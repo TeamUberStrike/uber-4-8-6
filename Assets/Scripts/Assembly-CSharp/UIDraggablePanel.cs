@@ -8,16 +8,16 @@ public class UIDraggablePanel : IgnoreTimeScale
 {
 	public enum DragEffect
 	{
-		None = 0,
-		Momentum = 1,
-		MomentumAndSpring = 2
+		None,
+		Momentum,
+		MomentumAndSpring
 	}
 
 	public enum ShowCondition
 	{
-		Always = 0,
-		OnlyIfNeeded = 1,
-		WhenDragging = 2
+		Always,
+		OnlyIfNeeded,
+		WhenDragging
 	}
 
 	public delegate void OnDragFinished();

@@ -5,11 +5,11 @@ public class UIButtonSound : MonoBehaviour
 {
 	public enum Trigger
 	{
-		OnClick = 0,
-		OnMouseOver = 1,
-		OnMouseOut = 2,
-		OnPress = 3,
-		OnRelease = 4
+		OnClick,
+		OnMouseOver,
+		OnMouseOut,
+		OnPress,
+		OnRelease
 	}
 
 	public AudioClip audioClip;

@@ -46,10 +46,6 @@ namespace UberStrike.Core.Serialization
 					num |= 8;
 				}
 				DateTimeProxy.Serialize(memoryStream, instance.ServerTime);
-				StringProxy.Serialize(memoryStream, instance.ServerGameVersion);
-				// Match the server writer and Steam reader; Steam's writer omits/misorders durations.
-				Int32Proxy.Serialize(memoryStream, instance.BanDuration);
-				Int32Proxy.Serialize(memoryStream, instance.MuteDuration);
 				Int32Proxy.Serialize(stream, ~num);
 				memoryStream.WriteTo(stream);
 			}
@@ -78,9 +74,6 @@ namespace UberStrike.Core.Serialization
 				memberAuthenticationResultView.PlayerStatisticsView = PlayerStatisticsViewProxy.Deserialize(bytes);
 			}
 			memberAuthenticationResultView.ServerTime = DateTimeProxy.Deserialize(bytes);
-			memberAuthenticationResultView.ServerGameVersion = StringProxy.Deserialize(bytes);
-			memberAuthenticationResultView.BanDuration = Int32Proxy.Deserialize(bytes);
-			memberAuthenticationResultView.MuteDuration = Int32Proxy.Deserialize(bytes);
 			return memberAuthenticationResultView;
 		}
 	}

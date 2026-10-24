@@ -51,15 +51,6 @@ public class GlobalSceneLoader : MonoBehaviour
 
 	private void Awake()
 	{
-		// Dev tour: reflection keeps builds without Assets/Dev inert.
-		string[] tourArgs = Environment.GetCommandLineArgs();
-		for (int i = 0; i + 1 < tourArgs.Length; i++)
-		{
-			if (tourArgs[i] != "-verifyTour" || tourArgs[i + 1].StartsWith("-")) continue;
-			Type tour = Type.GetType("VerifyTour471");
-			if (tour != null) tour.GetMethod("Boot").Invoke(null, null);
-			break;
-		}
 		PopupSkin.Initialize(popupSkin);
 		_blackTexture = new Texture2D(1, 1, TextureFormat.RGB24, false);
 		_color = Color.black;
@@ -110,11 +101,6 @@ public class GlobalSceneLoader : MonoBehaviour
 	{
 		ApplicationDataManager.CurrentLocale = LocaleType.en_US;
 		ApplicationDataManager.ApplicationOptions.Initialize();
-		RenderSettingsController renderSettings = (RenderSettingsController)UnityEngine.Object.FindObjectOfType(typeof(RenderSettingsController));
-		if (renderSettings != null)
-		{
-			renderSettings.EnableImageEffects();
-		}
 		StartCoroutine(GUITools.StartScreenSizeListener(1f));
 		if (ApplicationDataManager.ApplicationOptions.IsUsingCustom)
 		{
@@ -136,7 +122,7 @@ public class GlobalSceneLoader : MonoBehaviour
 	private IEnumerator BeginAuthenticateApplication()
 	{
 		Debug.Log("BeginAuthenticateApplication " + Configuration.WebserviceBaseUrl);
-		yield return ApplicationWebServiceClient.AuthenticateApplication(ApplicationDataManager.Version, ApplicationDataManager.Channel, string.Empty, delegate(AuthenticateApplicationView callback)
+		yield return ApplicationWebServiceClient.AuthenticateApplication("4.7.1", ApplicationDataManager.Channel, string.Empty, delegate(AuthenticateApplicationView callback)
 		{
 			OnAuthenticateApplication(callback);
 		}, delegate(Exception exception)
@@ -173,7 +159,7 @@ public class GlobalSceneLoader : MonoBehaviour
 			}
 			else
 			{
-				Debug.Log(string.Concat("OnAuthenticateApplication failed with ", ApplicationDataManager.Version, "/", ApplicationDataManager.Channel, ": ", ErrorMessage));
+				Debug.Log(string.Concat("OnAuthenticateApplication failed with 4.7.1/", ApplicationDataManager.Channel, ": ", ErrorMessage));
 				ErrorMessage = "Please update.";
 				HandleVersionError();
 			}
@@ -181,7 +167,7 @@ public class GlobalSceneLoader : MonoBehaviour
 		catch (Exception ex)
 		{
 			ErrorMessage = ex.Message + " " + ex.StackTrace;
-			Debug.LogError(string.Concat("OnAuthenticateApplication crashed with ", ApplicationDataManager.Version, "/", ApplicationDataManager.Channel, ": ", ErrorMessage));
+			Debug.LogError(string.Concat("OnAuthenticateApplication crashed with 4.7.1/", ApplicationDataManager.Channel, ": ", ErrorMessage));
 			HandleApplicationAuthenticationError("There was a problem loading UberStrike. Please check your internet connection and try again.");
 		}
 	}
@@ -189,7 +175,7 @@ public class GlobalSceneLoader : MonoBehaviour
 	private void OnAuthenticateApplicationException(Exception exception)
 	{
 		ErrorMessage = exception.Message;
-		Debug.LogError(string.Concat("An exception occurred while authenticating the application with ", ApplicationDataManager.Version, "/", ApplicationDataManager.Channel, ": ", exception.Message));
+		Debug.LogError(string.Concat("An exception occurred while authenticating the application with 4.7.1/", ApplicationDataManager.Channel, ": ", exception.Message));
 		HandleApplicationAuthenticationError("There was a problem loading UberStrike. Please check your internet connection and try again.");
 	}
 

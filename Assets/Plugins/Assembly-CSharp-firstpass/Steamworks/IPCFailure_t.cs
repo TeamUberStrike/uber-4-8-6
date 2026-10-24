@@ -8,8 +8,8 @@ namespace Steamworks
 	{
 		public enum EFailureType
 		{
-			k_EFailureFlushedCallbackQueue = 0,
-			k_EFailurePipeFail = 1
+			k_EFailureFlushedCallbackQueue,
+			k_EFailurePipeFail
 		}
 
 		public const int k_iCallback = 117;

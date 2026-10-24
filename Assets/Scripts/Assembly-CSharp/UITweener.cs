@@ -6,19 +6,19 @@ public abstract class UITweener : IgnoreTimeScale
 {
 	public enum Method
 	{
-		Linear = 0,
-		EaseIn = 1,
-		EaseOut = 2,
-		EaseInOut = 3,
-		BounceIn = 4,
-		BounceOut = 5
+		Linear,
+		EaseIn,
+		EaseOut,
+		EaseInOut,
+		BounceIn,
+		BounceOut
 	}
 
 	public enum Style
 	{
-		Once = 0,
-		Loop = 1,
-		PingPong = 2
+		Once,
+		Loop,
+		PingPong
 	}
 
 	public delegate void OnFinished(UITweener tween);

@@ -5,13 +5,13 @@ public static class UIAudio
 {
 	public enum Clips
 	{
-		AudioVolumn = 0,
-		ButtonClick = 1,
-		ButtonRollover = 2,
-		ClickReady = 3,
-		ClickUnready = 4,
-		CloseLoadout = 5,
-		ClosePanel = 6
+		AudioVolumn,
+		ButtonClick,
+		ButtonRollover,
+		ClickReady,
+		ClickUnready,
+		CloseLoadout,
+		ClosePanel
 	}
 
 	private static Dictionary<Clips, AudioClip> _allClips;

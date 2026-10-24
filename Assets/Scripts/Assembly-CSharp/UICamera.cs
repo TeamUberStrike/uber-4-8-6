@@ -9,9 +9,9 @@ public class UICamera : MonoBehaviour
 {
 	public enum ClickNotification
 	{
-		None = 0,
-		Always = 1,
-		BasedOnDelta = 2
+		None,
+		Always,
+		BasedOnDelta
 	}
 
 	public class MouseOrTouch

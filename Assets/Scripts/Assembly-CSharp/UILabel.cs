@@ -6,9 +6,9 @@ public class UILabel : UIWidget
 {
 	public enum Effect
 	{
-		None = 0,
-		Shadow = 1,
-		Outline = 2
+		None,
+		Shadow,
+		Outline
 	}
 
 	[SerializeField]

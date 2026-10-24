@@ -6,10 +6,10 @@ public class UIRemoteTexture : MonoBehaviour
 {
 	private enum DownloadState
 	{
-		None = 0,
-		Downloading = 1,
-		Downloaded = 2,
-		Error = 3
+		None,
+		Downloading,
+		Downloaded,
+		Error
 	}
 
 	[SerializeField]

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class ColorScheme
 {
-	public static readonly Color ProgressBar = ColorConverter.RgbToColor(107f, 143f, 7f);
+	public static readonly Color ProgressBar = new Color(0f, 0.607f, 0.662f);
 
 	public static readonly Color HudTeamRed = ColorConverter.RgbToColor(206f, 87f, 87f);
 

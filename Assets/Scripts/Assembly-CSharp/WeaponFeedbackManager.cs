@@ -103,9 +103,9 @@ public class WeaponFeedbackManager : MonoBehaviour
 
 	public enum WeaponMode
 	{
-		Primary = 0,
-		Second = 1,
-		PutDown = 2
+		Primary,
+		Second,
+		PutDown
 	}
 
 	private abstract class WeaponState
@@ -392,10 +392,6 @@ public class WeaponFeedbackManager : MonoBehaviour
 		{
 			if (base.IsRunning && base.IsValid && !(_time > _transitionTime))
 			{
-				if (LevelCamera.IsZoomedIn)
-				{
-					Finish();
-				}
 				if (base.Decorator.IsMelee)
 				{
 					_currentRotation = Mathf.Lerp(_currentRotation, -90f, _time / _transitionTime);
@@ -786,16 +782,8 @@ public class WeaponFeedbackManager : MonoBehaviour
 	{
 		if (_pickupWeaponState != null && _pickupWeaponState.IsValid)
 		{
-			// Guns share the incoming weapon's pivot and must hide immediately to avoid
-			// the Vlad/Stinger scope ghost. Melee uses its own position/Z rotation:
-			// let PutDown finish as in retail, so its legacy swing can keep advancing.
-			BaseWeaponDecorator prevDecorator = _pickupWeaponState.Decorator;
 			PutDownWeapon(_pickupWeaponState.Weapon, _pickupWeaponState.Decorator, destroy);
 			_pickupWeaponState = null;
-			if ((bool)prevDecorator && !prevDecorator.IsMelee)
-			{
-				prevDecorator.IsEnabled = false;
-			}
 		}
 	}
 

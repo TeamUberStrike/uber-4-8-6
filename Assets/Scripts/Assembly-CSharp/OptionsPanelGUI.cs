@@ -49,7 +49,6 @@ public class OptionsPanelGUI : PanelGuiBase
 
 	private bool _postProcessing;
 
-
 	private Rect _rect;
 
 	private Vector2 _scrollVideo;
@@ -342,8 +341,7 @@ public class OptionsPanelGUI : PanelGuiBase
 			}
 			num5 += 30;
 		}
-		bool flag = GUI.Toggle(new Rect(8f, num5, 130f, 30f), ApplicationDataManager.ApplicationOptions.VideoShowFps, LocalizedStrings.ShowFPS, BlueStonez.toggle);
-		ApplicationDataManager.ApplicationOptions.FOVMode = GUI.Toggle(new Rect(140f, num5, width, 30f), ApplicationDataManager.ApplicationOptions.FOVMode, "FOV Mode", BlueStonez.toggle);
+		bool flag = GUI.Toggle(new Rect(8f, num5, width, 30f), ApplicationDataManager.ApplicationOptions.VideoShowFps, LocalizedStrings.ShowFPS, BlueStonez.toggle);
 		if (flag != ApplicationDataManager.ApplicationOptions.VideoShowFps)
 		{
 			ApplicationDataManager.ApplicationOptions.VideoShowFps = flag;
