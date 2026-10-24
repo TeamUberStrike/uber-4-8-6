@@ -1,63 +1,67 @@
-// Real Unlit/Transparent Colored (Packed) (SoftClip) shader. AssetRipper emitted a dummy surface shader stub
-// (#pragma surface surf Lambert) requiring vertex normals which NGUI's dynamic
-// quad meshes lack. Replaced with proper vertex+fragment unlit reading only
-// POSITION + COLOR + TEXCOORD0. Soft-clip variants don't implement NGUI's
-// _ClipRange0/_ClipArgs0 math yet — content past scroll-panel edges may leak.
-Shader "Unlit/Transparent Colored (Packed) (SoftClip)"
-{
-    Properties
-    {
-        _MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
-    }
-    SubShader
-    {
-        Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
-        LOD 100
-        Blend SrcAlpha OneMinusSrcAlpha
-        Cull Off
-        Lighting Off
-        ZWrite Off
-        Fog { Mode Off }
+Shader "Unlit/Transparent Colored (Packed) (SoftClip)" {
+Properties {
+ _MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
+}
+SubShader { 
+ LOD 200
+ Tags { "QUEUE"="Transparent" "IGNOREPROJECTOR"="true" "RenderType"="Transparent" }
+ Pass {
+  Tags { "QUEUE"="Transparent" "IGNOREPROJECTOR"="true" "RenderType"="Transparent" }
+  ZWrite Off
+  Cull Off
+  Fog { Mode Off }
+  Blend SrcAlpha OneMinusSrcAlpha
+  ColorMask RGB
+  Offset -1, -1
+CGPROGRAM
+		#pragma vertex vert
+		#pragma fragment frag
+		#pragma fragmentoption ARB_precision_hint_fastest
+		#include "UnityCG.cginc"
 
-        Pass
-        {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
+		sampler2D _MainTex;
+		float4 _MainTex_ST;
+		float2 _ClipSharpness = float2(20.0, 20.0);
 
-            struct appdata_t
-            {
-                float4 vertex   : POSITION;
-                fixed4 color    : COLOR;
-                float2 texcoord : TEXCOORD0;
-            };
+		struct appdata_t
+		{
+			float4 vertex : POSITION;
+			half4 color : COLOR;
+			float2 texcoord : TEXCOORD0;
+		};
 
-            struct v2f
-            {
-                float4 vertex   : SV_POSITION;
-                fixed4 color    : COLOR;
-                half2  texcoord : TEXCOORD0;
-            };
+		struct v2f
+		{
+			float4 vertex : POSITION;
+			half4 color : COLOR;
+			float2 texcoord : TEXCOORD0;
+			float2 worldPos : TEXCOORD1;
+		};
 
-            sampler2D _MainTex;
-            float4    _MainTex_ST;
+		v2f vert (appdata_t v)
+		{
+			v2f o;
+			o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+			o.color = v.color;
+			o.texcoord = v.texcoord;
+			o.worldPos = TRANSFORM_TEX(v.vertex.xy, _MainTex);
+			return o;
+		}
 
-            v2f vert(appdata_t v)
-            {
-                v2f o;
-                o.vertex   = mul(UNITY_MATRIX_MVP, v.vertex);
-                o.color    = v.color;
-                o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
-                return o;
-            }
+		half4 frag (v2f IN) : COLOR
+		{
+			half4 mask = tex2D(_MainTex, IN.texcoord);
+			half4 mixed = saturate(ceil(IN.color - 0.5));
+			half4 col = saturate((mixed * 0.51 - IN.color) * -2.04);
+			mask *= mixed;
+			col.a *= mask.r + mask.g + mask.b + mask.a;
+			float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipSharpness;
+			col.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
+			return col;
+		}
+		ENDCG
 
-            fixed4 frag(v2f i) : SV_Target
-            {
-                fixed4 col = tex2D(_MainTex, i.texcoord) * i.color;
-                return col;
-            }
-            ENDCG
-        }
-    }
+ }
+}
+Fallback Off
 }
