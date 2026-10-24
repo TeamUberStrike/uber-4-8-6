@@ -33,6 +33,12 @@ if exist "%UBERSTRIKE_STEAM_DIR%\uberdaemon.exe" (
   echo       Copy it from your Steam UberStrike folder next to UberStrike.exe, or set UBERSTRIKE_STEAM_DIR.
 )
 if exist "%REPO_ROOT%\EmbeddedResources\Assembly-CSharp" call :embed || exit /b 1
+rem UberKill.BoxLoader deletes sharedassets7.assets and copies sharedassets7.normal/.bluebox over it when a room or
+rem training starts; give it copies of this build's own file so the game data stays intact.
+if exist "%REPO_ROOT%\Assets\Scripts\Assembly-CSharp\UberKill.cs" (
+  copy /y "%BUILD_DIR%\UberStrike_Data\sharedassets7.assets" "%BUILD_DIR%\UberStrike_Data\sharedassets7.normal" >nul
+  copy /y "%BUILD_DIR%\UberStrike_Data\sharedassets7.assets" "%BUILD_DIR%\UberStrike_Data\sharedassets7.bluebox" >nul
+)
 type "%BUILD_DIR%\build_result.txt"
 echo.
 echo Done: %BUILD_DIR%\UberStrike.exe   - start it with tools\launch-client.bat
