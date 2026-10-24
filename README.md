@@ -22,6 +22,11 @@ found no visible differences on any map, in the lobby, shop or HUD, except the d
 
 ## Requirements
 
+> **Setting up a new PC?** [SETUP.md](SETUP.md) walks through everything step by step — installing and activating
+> Unity 4.6.5, the local server, building, playing and the optional ForgeRipper MCP — with double-click scripts in
+> [`tools/`](tools) (`setup-unity-4.6.5.bat`, `open-project.bat`, `build-player.bat`, `start-proxy.bat`,
+> `launch-client.bat`, `setup-mcp.bat`). The summary below is for people who know the stack.
+
 * **Windows** and **Unity 4.6.5f1**. The editor needs a licence; open the project with the GUI editor.
 * **Steam** running, logged into an account that owns UberStrike (`steam_appid.txt` = 291210 is in the repo root).
 * A **local UberStrike server stack** — the community UberStrok v4.8.6 server (`xavgru12/UberServer`):
@@ -32,15 +37,17 @@ found no visible differences on any map, in the lobby, shop or HUD, except the d
 ## Open, build and run
 
 1. Open the project folder in Unity 4.6.5f1 and let it import (first import takes a while).
-2. **File > Build Settings**: `Assets/Scenes/GlobalScene.unity` must stay scene **0**, then `Menu`, `DesktopHUD` and
-   the maps. Target **PC, Windows, x86**. Build.
-3. Next to the built `UberStrike.exe`, copy `steam_api.dll` and `steam_appid.txt` from the repo root.
+2. Build with `tools\build-player.bat` (steps 3 and 4 are then done for you), or by hand: **File > Build Settings**,
+   `Assets/Scenes/GlobalScene.unity` must stay scene **0**, then `Menu`, `DesktopHUD` and the maps; target
+   **PC, Windows, x86**; Build.
+3. Next to the built `UberStrike.exe`, copy `steam_api.dll` and `steam_appid.txt` from the repo root, and
+   `uberdaemon.exe` from your Steam UberStrike folder.
 4. Copy everything under `PlayerFiles/` into the build, keeping the folder layout
-   (`PlayerFiles/UberStrike_Data/SeloTron.ogg` → `<build>/UberStrike_Data/SeloTron.ogg`, the home-screen music).
+   (`PlayerFiles/UberStrike_Data/SeloTron.ogg` -> `<build>/UberStrike_Data/SeloTron.ogg`, the home-screen music).
 5. Start the server stack, then the proxy: `node svc_proxy.js` (listens on `127.0.0.1:8888`, forwards to `:5000` and
    rewrites the original Cmune service paths). The client's `ApplicationDataManager` points at
    `http://127.0.0.1:8888/2.0/`, version `4.8.6`.
-6. Launch `UberStrike.exe` with Steam running. Launch it from Explorer, PowerShell or cmd — **not from Git Bash**:
+6. Launch `UberStrike.exe` with Steam running (`tools\launch-client.bat`). Launch it from Explorer, PowerShell or cmd — **not from Git Bash**:
    its MSYS environment leaks into Steam's helper and the login hangs.
 
 The client shares its settings (Windows registry, `Cmune` key) with the Steam install.
