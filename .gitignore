@@ -45,3 +45,13 @@ mecanim_risk.lastrun.txt
 
 # Machine-specific Claude Code MCP config (written by tools\setup-mcp.bat)
 /.mcp.json
+
+# UberClient v4.8.6 layout: code lives at the root; Assets/ only holds junctions to it (tools/setup-links.bat)
+/Assets/Scripts/Assembly-CSharp
+/Assets/Plugins/Assembly-CSharp-firstpass
+/build/
+!/Client.sln
+!/Assembly-CSharp/Assembly-CSharp.csproj
+!/Assembly-CSharp-firstpass/Assembly-CSharp-firstpass.csproj
+/tools/EmbedResources.exe
+/tools/Mono.Cecil.dll

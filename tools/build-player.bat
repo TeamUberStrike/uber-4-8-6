@@ -1,6 +1,7 @@
 @echo off
 setlocal
 call "%~dp0config.bat"
+call "%~dp0setup-links.bat" || exit /b 1
 if not "%~1"=="" set "BUILD_DIR=%~f1"
 if not exist "%UNITY465_EXE%" ( echo Unity 4.6.5 not found at "%UNITY465_EXE%". Run tools\setup-unity-4.6.5.bat first. & exit /b 1 )
 tasklist /fi "imagename eq Unity.exe" 2>nul | findstr /i /c:"Unity.exe" >nul && ( echo Close the Unity editor first - a project can only be open once. & exit /b 1 )
