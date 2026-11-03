@@ -20,7 +20,11 @@ public class GuiDropDown
 		{
 			get
 			{
-				return (isOn != null && !isOn()) ? offContent : onContent;
+				if (isOn == null || isOn())
+				{
+					return onContent;
+				}
+				return offContent;
 			}
 		}
 

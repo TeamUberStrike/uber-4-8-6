@@ -333,7 +333,11 @@ public class GlobalUIRibbon : MonoBehaviour
 	{
 		get
 		{
-			return ApplicationDataManager.IsMobile ? 44 : 0;
+			if (!ApplicationDataManager.IsMobile)
+			{
+				return 0;
+			}
+			return 44;
 		}
 	}
 
@@ -495,10 +499,9 @@ public class GlobalUIRibbon : MonoBehaviour
 			}
 			_optionsDropdown.Add(new GUIContent(" " + LocalizedStrings.Logout, GlobalUiIcons.QuadpanelButtonLogout), delegate
 			{
-				PopupSystem.ShowMessage("Logout", "This will log out your Steam account and allow you to link another account.", PopupSystem.AlertType.OKCancel, delegate
+				PopupSystem.ShowMessage("Logout", "This will log out your UberStrike account and allow you to login to another account.", PopupSystem.AlertType.OKCancel, delegate
 				{
-					PlayerPrefs.DeleteKey("CurrentSteamUser");
-					Application.Quit();
+					Singleton<AuthenticationManager>.Instance.StartLogout();
 				});
 			});
 		}
@@ -636,7 +639,7 @@ public class GlobalUIRibbon : MonoBehaviour
 
 	private void DoFpsAndVersion()
 	{
-		string text = string.Format("{0} v{1}", ApplicationDataManager.FrameRate, "4.7.1");
+		string text = ApplicationDataManager.FrameRate + " v" + ApplicationDataManager.Version;
 		GUI.color = Color.white.SetAlpha(0.3f);
 		GUI.Label(new Rect(5f, Screen.height - 25, 190f, 20f), text, BlueStonez.label_interparkmed_11pt_right);
 		GUI.color = Color.white;
@@ -673,7 +676,7 @@ public class GlobalUIRibbon : MonoBehaviour
 		if (deltaCredits > 0)
 		{
 			_ribbonEvents[EventType.CreditEvent] = new GainEvent(x, Color.white, deltaCredits, PlayerDataManager.Credits);
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GetPoints, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GetPoints, 0uL);
 		}
 		else if (deltaCredits < 0)
 		{
@@ -687,7 +690,7 @@ public class GlobalUIRibbon : MonoBehaviour
 		if (deltaPoints > 0)
 		{
 			_ribbonEvents[EventType.PointEvent] = new GainEvent(x, Color.white, deltaPoints, PlayerDataManager.Points);
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GetPoints, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GetPoints, 0uL);
 		}
 		else if (deltaPoints < 0)
 		{

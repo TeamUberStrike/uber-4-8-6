@@ -125,7 +125,11 @@ public class ChatManager : Singleton<ChatManager>
 	{
 		get
 		{
-			return GameState.Current.PlayerData.IsSpectator ? ChatContext.Spectator : ChatContext.Player;
+			if (!GameState.Current.PlayerData.IsSpectator)
+			{
+				return ChatContext.Player;
+			}
+			return ChatContext.Spectator;
 		}
 	}
 
@@ -212,7 +216,11 @@ public class ChatManager : Singleton<ChatManager>
 		switch (tab)
 		{
 		case TabArea.InGame:
-			return GameState.Current.HasJoinedGame || Singleton<ChatManager>.Instance.GameHistoryUsers.Count > 0;
+			if (!GameState.Current.HasJoinedGame)
+			{
+				return Singleton<ChatManager>.Instance.GameHistoryUsers.Count > 0;
+			}
+			return true;
 		case TabArea.Clan:
 			return PlayerDataManager.IsPlayerInClan;
 		case TabArea.Moderation:
@@ -346,24 +354,24 @@ public class ChatManager : Singleton<ChatManager>
 		{
 			Singleton<ChatManager>.Instance._friendUsers.Add(new CommUser(facebookFriend));
 		}
-		CommUser f;
+		CommUser f3;
 		foreach (CommUser friendUser in Singleton<ChatManager>.Instance._friendUsers)
 		{
-			f = friendUser;
+			f3 = friendUser;
 			ChatDialog value;
-			if (Singleton<ChatManager>.Instance._otherUsers.RemoveAll((CommUser u) => u.Cmid == f.Cmid) > 0 && Singleton<ChatManager>.Instance._dialogsByCmid.TryGetValue(f.Cmid, out value))
+			if (Singleton<ChatManager>.Instance._otherUsers.RemoveAll((CommUser u) => u.Cmid == f3.Cmid) > 0 && Singleton<ChatManager>.Instance._dialogsByCmid.TryGetValue(f3.Cmid, out value))
 			{
 				value.Group = UserGroups.Friend;
 			}
 		}
-		CommUser f2;
+		CommUser f4;
 		foreach (CommUser item in list)
 		{
-			f2 = item;
+			f4 = item;
 			ChatDialog value2;
-			if (Singleton<ChatManager>.Instance._dialogsByCmid.TryGetValue(f2.Cmid, out value2) && !Singleton<ChatManager>.Instance._friendUsers.Exists((CommUser u) => u.Cmid == f2.Cmid) && !Singleton<ChatManager>.Instance._otherUsers.Exists((CommUser u) => u.Cmid == f2.Cmid))
+			if (Singleton<ChatManager>.Instance._dialogsByCmid.TryGetValue(f4.Cmid, out value2) && !Singleton<ChatManager>.Instance._friendUsers.Exists((CommUser u) => u.Cmid == f4.Cmid) && !Singleton<ChatManager>.Instance._otherUsers.Exists((CommUser u) => u.Cmid == f4.Cmid))
 			{
-				Singleton<ChatManager>.Instance._otherUsers.Add(f2);
+				Singleton<ChatManager>.Instance._otherUsers.Add(f4);
 				value2.Group = UserGroups.Other;
 			}
 		}
@@ -451,7 +459,11 @@ public class ChatManager : Singleton<ChatManager>
 
 	public bool TryGetClanUsers(int cmid, out CommUser user)
 	{
-		return _clanUsers.TryGetValue(cmid, out user) && user != null;
+		if (_clanUsers.TryGetValue(cmid, out user))
+		{
+			return user != null;
+		}
+		return false;
 	}
 
 	public bool TryGetGameUser(int cmid, out CommUser user)
@@ -626,7 +638,7 @@ public class ChatManager : Singleton<ChatManager>
 		if (cmid != PlayerDataManager.Cmid && ChatPageGUI.SelectedTab != TabArea.Clan)
 		{
 			HasUnreadClanMessage.Value = true;
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewMessage, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewMessage, 0uL);
 		}
 	}
 
@@ -652,7 +664,7 @@ public class ChatManager : Singleton<ChatManager>
 					CommActorInfo commActorInfo = new CommActorInfo();
 					commActorInfo.Cmid = cmid;
 					commActorInfo.PlayerName = msg.PlayerName;
-					commActorInfo.Channel = ChannelType.WebPortal;
+					commActorInfo.Channel = ChannelType.Steam;
 					commActorInfo.AccessLevel = msg.AccessLevel;
 					CommUser commUser2 = new CommUser(commActorInfo);
 					value = AddNewDialog(commUser2);
@@ -672,7 +684,7 @@ public class ChatManager : Singleton<ChatManager>
 				if (ChatPageGUI.SelectedTab != TabArea.Private)
 				{
 					HasUnreadPrivateMessage.Value = true;
-					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewMessage, 0uL, 1f, 1f);
+					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewMessage, 0uL);
 				}
 			}
 		}

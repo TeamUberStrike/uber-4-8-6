@@ -21,7 +21,14 @@ namespace Cmune.DataCenter.Common.Entities
 
 		public override string ToString()
 		{
-			return string.Concat("[CheckApplicationVersionView: [ClientVersion: ", ClientVersion, "][CurrentVersion: ", CurrentVersion, "]]");
+			string[] obj = new string[5] { "[CheckApplicationVersionView: [ClientVersion: ", null, null, null, null };
+			ApplicationView clientVersion = ClientVersion;
+			obj[1] = ((clientVersion != null) ? clientVersion.ToString() : null);
+			obj[2] = "][CurrentVersion: ";
+			ApplicationView currentVersion = CurrentVersion;
+			obj[3] = ((currentVersion != null) ? currentVersion.ToString() : null);
+			obj[4] = "]]";
+			return string.Concat(obj);
 		}
 	}
 }

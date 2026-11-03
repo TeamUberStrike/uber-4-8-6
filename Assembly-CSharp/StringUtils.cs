@@ -10,31 +10,33 @@ public static class StringUtils
 		T result = default(T);
 		try
 		{
-			if (typeFromHandle.IsEnum)
+			if (!typeFromHandle.IsEnum)
 			{
-				result = (T)Enum.Parse(typeFromHandle, value);
-			}
-			else if (typeFromHandle == typeof(int))
-			{
+				if (typeFromHandle != typeof(int))
+				{
+					if (typeFromHandle != typeof(string))
+					{
+						if (typeFromHandle != typeof(DateTime))
+						{
+							Debug.LogError("ParseValue couldn't find a conversion of value '" + value + "' into type '" + typeFromHandle.Name + "'");
+							return result;
+						}
+						result = (T)(object)DateTime.Parse(TextUtilities.Base64Decode(value));
+						return result;
+					}
+					result = (T)(object)value;
+					return result;
+				}
 				result = (T)(object)int.Parse(value);
+				return result;
 			}
-			else if (typeFromHandle == typeof(string))
-			{
-				result = (T)(object)value;
-			}
-			else if (typeFromHandle == typeof(DateTime))
-			{
-				result = (T)(object)DateTime.Parse(TextUtilities.Base64Decode(value));
-			}
-			else
-			{
-				Debug.LogError("ParseValue couldn't find a conversion of value '" + value + "' into type '" + typeFromHandle.Name + "'");
-			}
+			result = (T)Enum.Parse(typeFromHandle, value);
+			return result;
 		}
 		catch (Exception ex)
 		{
 			Debug.LogError("ParseValue failed converting value '" + value + "' into type '" + typeFromHandle.Name + "': " + ex.Message);
+			return result;
 		}
-		return result;
 	}
 }

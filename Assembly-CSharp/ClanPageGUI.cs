@@ -18,7 +18,11 @@ public class ClanPageGUI : MonoBehaviour
 		public static int CompareClanMembers(ClanMemberView a, ClanMemberView b)
 		{
 			int num = ComparePosition(a, b);
-			return (num == 0) ? CompareName(a, b) : num;
+			if (num != 0)
+			{
+				return num;
+			}
+			return CompareName(a, b);
 		}
 
 		public static int ComparePosition(ClanMemberView a, ClanMemberView b)
@@ -49,7 +53,15 @@ public class ClanPageGUI : MonoBehaviour
 			{
 				num2 = 3;
 			}
-			return (num != num2) ? ((num > num2) ? 1 : (-1)) : 0;
+			if (num == num2)
+			{
+				return 0;
+			}
+			if (num <= num2)
+			{
+				return -1;
+			}
+			return 1;
 		}
 
 		public static int CompareName(ClanMemberView a, ClanMemberView b)
@@ -142,7 +154,7 @@ public class ClanPageGUI : MonoBehaviour
 		GUI.Label(new Rect(10f, 5f, rect.width - 20f, 18f), string.Format("{0}: {1}", LocalizedStrings.YourClan, PlayerDataManager.ClanName), BlueStonez.label_interparkbold_16pt_left);
 		float num2 = Mathf.Max(Singleton<ClanDataManager>.Instance.NextClanRefresh - Time.time, 0f);
 		GUITools.PushGUIState();
-		GUI.enabled &= num2 == 0f;
+		GUI.enabled = GUI.enabled && num2 == 0f;
 		if (GUITools.Button(new Rect(rect.width - 130f, 5f, 120f, 19f), new GUIContent(string.Format(LocalizedStrings.Refresh + " {0}", (!(num2 > 0f)) ? string.Empty : ("(" + num2.ToString("N0") + ")"))), BlueStonez.buttondark_medium))
 		{
 			Singleton<ClanDataManager>.Instance.RefreshClanData();
@@ -268,18 +280,18 @@ public class ClanPageGUI : MonoBehaviour
 		{
 			if (member.Position == GroupPosition.Member && GUITools.Button(new Rect(num, 28f, 130f, 20f), new GUIContent(LocalizedStrings.PromoteMember), BlueStonez.buttondark_medium))
 			{
-				int memberCmid = member.Cmid;
+				int memberCmid2 = member.Cmid;
 				PopupSystem.ShowMessage(LocalizedStrings.PromoteMember, string.Format(LocalizedStrings.ThisWillChangeNPositionToN, member.Name, LocalizedStrings.Officer), PopupSystem.AlertType.OKCancel, delegate
 				{
-					Singleton<ClanDataManager>.Instance.UpdateMemberTo(memberCmid, GroupPosition.Officer);
+					Singleton<ClanDataManager>.Instance.UpdateMemberTo(memberCmid2, GroupPosition.Officer);
 				}, LocalizedStrings.PromoteCaps, null, LocalizedStrings.Cancel, PopupSystem.ActionType.Positive);
 			}
 			else if (member.Position == GroupPosition.Officer && GUITools.Button(new Rect(num, 28f, 130f, 20f), new GUIContent(LocalizedStrings.DemoteMember), BlueStonez.buttondark_medium))
 			{
-				int memberCmid2 = member.Cmid;
+				int memberCmid3 = member.Cmid;
 				PopupSystem.ShowMessage(LocalizedStrings.DemoteMember, string.Format(LocalizedStrings.ThisWillChangeNPositionToN, member.Name, LocalizedStrings.Member), PopupSystem.AlertType.OKCancel, delegate
 				{
-					Singleton<ClanDataManager>.Instance.UpdateMemberTo(memberCmid2, GroupPosition.Member);
+					Singleton<ClanDataManager>.Instance.UpdateMemberTo(memberCmid3, GroupPosition.Member);
 				}, LocalizedStrings.DemoteCaps, null, LocalizedStrings.Cancel, PopupSystem.ActionType.Negative);
 			}
 			num2 -= 160f;
@@ -374,11 +386,11 @@ public class ClanPageGUI : MonoBehaviour
 			bool flag = GUI.enabled;
 			GUI.Label(new Rect(position.width / 2f - 90f, 110f, 210f, 14f), LocalizedStrings.ToCreateAClanYouStillNeedTo, BlueStonez.label_interparkbold_11pt_left);
 			GUI.enabled = flag && !Singleton<ClanDataManager>.Instance.HaveLevel;
-			GUI.Label(new Rect(position.width / 2f - 90f, 124f, 200f, 14f), LocalizedStrings.ReachLevelFour + ((!Singleton<ClanDataManager>.Instance.HaveLevel) ? string.Empty : string.Format(" ({0})", LocalizedStrings.Done)), BlueStonez.label_interparkbold_11pt_left);
+			GUI.Label(new Rect(position.width / 2f - 90f, 124f, 200f, 14f), LocalizedStrings.ReachLevelFour + ((!Singleton<ClanDataManager>.Instance.HaveLevel) ? string.Empty : (" (" + LocalizedStrings.Done + ")")), BlueStonez.label_interparkbold_11pt_left);
 			GUI.enabled = flag && !Singleton<ClanDataManager>.Instance.HaveFriends;
-			GUI.Label(new Rect(position.width / 2f - 90f, 138f, 200f, 14f), LocalizedStrings.HaveAtLeastOneFriend + ((!Singleton<ClanDataManager>.Instance.HaveFriends) ? string.Empty : string.Format(" ({0})", LocalizedStrings.Done)), BlueStonez.label_interparkbold_11pt_left);
+			GUI.Label(new Rect(position.width / 2f - 90f, 138f, 200f, 14f), LocalizedStrings.HaveAtLeastOneFriend + ((!Singleton<ClanDataManager>.Instance.HaveFriends) ? string.Empty : (" (" + LocalizedStrings.Done + ")")), BlueStonez.label_interparkbold_11pt_left);
 			GUI.enabled = flag && !Singleton<ClanDataManager>.Instance.HaveLicense;
-			GUI.Label(new Rect(position.width / 2f - 90f, 152f, 240f, 14f), LocalizedStrings.BuyAClanLicense + ((!Singleton<ClanDataManager>.Instance.HaveLicense) ? string.Empty : string.Format(" ({0})", LocalizedStrings.Done)), BlueStonez.label_interparkbold_11pt_left);
+			GUI.Label(new Rect(position.width / 2f - 90f, 152f, 240f, 14f), LocalizedStrings.BuyAClanLicense + ((!Singleton<ClanDataManager>.Instance.HaveLicense) ? string.Empty : (" (" + LocalizedStrings.Done + ")")), BlueStonez.label_interparkbold_11pt_left);
 			GUI.enabled = flag;
 			if (!Singleton<ClanDataManager>.Instance.HaveLicense && GUITools.Button(new Rect((position.width - 200f) / 2f, 170f, 200f, 22f), new GUIContent(LocalizedStrings.BuyAClanLicense), BlueStonez.buttondark_medium))
 			{
@@ -465,6 +477,10 @@ public class ClanPageGUI : MonoBehaviour
 
 	private bool IsNoPopupOpen()
 	{
-		return !PanelManager.IsAnyPanelOpen && !PopupSystem.IsAnyPopupOpen;
+		if (!PanelManager.IsAnyPanelOpen)
+		{
+			return !PopupSystem.IsAnyPopupOpen;
+		}
+		return false;
 	}
 }

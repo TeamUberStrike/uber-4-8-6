@@ -13,7 +13,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, targetCmid);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IModerationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ModerationWebServiceContract.svc", "BanPermanently", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IModerationWebServiceContract", "ModerationWebService", "BanPermanently", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{

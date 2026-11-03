@@ -17,6 +17,8 @@ namespace UberStrike.Core.Models.Views
 
 		public bool IsBlueBox { get; set; }
 
+		public GameBoxType BoxType { get; set; }
+
 		public int RecommendedItemId { get; set; }
 
 		public int SupportedGameModes { get; set; }

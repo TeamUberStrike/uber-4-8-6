@@ -66,6 +66,6 @@ public static class ChatMessageFilter
 
 	public static string Cleanup(string msg)
 	{
-		return TextUtilities.ShortenText(TextUtilities.Trim(msg), 140, false);
+		return TextUtilities.ShortenText(TextUtilities.Trim(msg), 140, false).Replace('`', '\'');
 	}
 }

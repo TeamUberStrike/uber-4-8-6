@@ -14,7 +14,11 @@ public class UISavedOption : MonoBehaviour
 	{
 		get
 		{
-			return (!string.IsNullOrEmpty(keyName)) ? keyName : ("NGUI State: " + base.name);
+			if (string.IsNullOrEmpty(keyName))
+			{
+				return "NGUI State: " + base.name;
+			}
+			return keyName;
 		}
 	}
 
@@ -81,16 +85,24 @@ public class UISavedOption : MonoBehaviour
 			return;
 		}
 		UICheckbox[] componentsInChildren = GetComponentsInChildren<UICheckbox>(true);
-		int i = 0;
-		for (int num = componentsInChildren.Length; i < num; i++)
+		int num = 0;
+		int num2 = componentsInChildren.Length;
+		UICheckbox uICheckbox;
+		while (true)
 		{
-			UICheckbox uICheckbox = componentsInChildren[i];
-			if (uICheckbox.isChecked)
+			if (num < num2)
 			{
-				SaveSelection(uICheckbox.name);
-				break;
+				uICheckbox = componentsInChildren[num];
+				if (uICheckbox.isChecked)
+				{
+					break;
+				}
+				num++;
+				continue;
 			}
+			return;
 		}
+		SaveSelection(uICheckbox.name);
 	}
 
 	private void SaveSelection(string selection)

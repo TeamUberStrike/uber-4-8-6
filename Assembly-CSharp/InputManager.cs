@@ -146,7 +146,11 @@ public class InputManager : AutoMonoBehaviour<InputManager>
 
 	public static bool GetMouseButtonDown(int button)
 	{
-		return (Event.current == null || Event.current.type == EventType.Layout) && Input.GetMouseButtonDown(button);
+		if (Event.current == null || Event.current.type == EventType.Layout)
+		{
+			return Input.GetMouseButtonDown(button);
+		}
+		return false;
 	}
 
 	public bool ListenForNewKeyAssignment(UserInputMap map)
@@ -390,8 +394,7 @@ public class InputManager : AutoMonoBehaviour<InputManager>
 		{
 			if (value.Channel.Equals(channel))
 			{
-				result = true;
-				break;
+				return true;
 			}
 		}
 		return result;

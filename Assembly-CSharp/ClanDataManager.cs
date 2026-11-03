@@ -160,7 +160,7 @@ public class ClanDataManager : Singleton<ClanDataManager>
 					PopupSystem.ShowMessage("Clan Tag", "The tag '" + tag + "' is already taken, try another one.");
 					break;
 				default:
-					PopupSystem.ShowMessage("Sorry", "There was an error (code " + ev.ResultCode + "), please visit support.uberstrike.com for help.");
+					PopupSystem.ShowMessage("Sorry", "There was an error (code " + ev.ResultCode + "). Please try again later or contact us at https://discord.gg/hhxZCBamRT");
 					break;
 				}
 			}
@@ -220,7 +220,7 @@ public class ClanDataManager : Singleton<ClanDataManager>
 				PopupSystem.ShowMessage("Sorry", "The player you selected can't be a clan leader, because he doesn't own a clan license.");
 				break;
 			default:
-				PopupSystem.ShowMessage("Sorry", "There was an error (code " + ev + "), please visit support.uberstrike.com for help.");
+				PopupSystem.ShowMessage("Sorry", "There was an error (code " + ev + "). Please try again later or contact us at https://discord.gg/hhxZCBamRT");
 				break;
 			}
 		}, delegate

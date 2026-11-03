@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Cmune.DataCenter.Common.Entities;
 using UberStrike.Core.Models.Views;
@@ -268,17 +269,29 @@ public class LoadoutManager : Singleton<LoadoutManager>
 
 	public bool IsWeaponSlotType(LoadoutSlotType slot)
 	{
-		return slot >= LoadoutSlotType.WeaponMelee && slot <= LoadoutSlotType.WeaponTertiary;
+		if (slot >= LoadoutSlotType.WeaponMelee)
+		{
+			return slot <= LoadoutSlotType.WeaponTertiary;
+		}
+		return false;
 	}
 
 	public bool IsQuickItemSlotType(LoadoutSlotType slot)
 	{
-		return slot >= LoadoutSlotType.QuickUseItem1 && slot <= LoadoutSlotType.QuickUseItem3;
+		if (slot >= LoadoutSlotType.QuickUseItem1)
+		{
+			return slot <= LoadoutSlotType.QuickUseItem3;
+		}
+		return false;
 	}
 
 	public bool IsFunctionalItemSlotType(LoadoutSlotType slot)
 	{
-		return slot >= LoadoutSlotType.FunctionalItem1 && slot <= LoadoutSlotType.FunctionalItem3;
+		if (slot >= LoadoutSlotType.FunctionalItem1)
+		{
+			return slot <= LoadoutSlotType.FunctionalItem3;
+		}
+		return false;
 	}
 
 	public bool SwapLoadoutItems(LoadoutSlotType slotA, LoadoutSlotType slotB)
@@ -294,83 +307,83 @@ public class LoadoutManager : Singleton<LoadoutManager>
 				TryGetItemInSlot(slotB, out item2);
 				if (item != null || item2 != null)
 				{
-					object item4;
+					object obj;
 					if (item2 != null)
 					{
 						IUnityItem item3 = item2.Item;
-						item4 = item3;
+						obj = item3;
 					}
 					else
 					{
-						item4 = null;
+						obj = null;
 					}
-					SetLoadoutItem(slotA, (IUnityItem)item4);
-					object item5;
+					SetLoadoutItem(slotA, (IUnityItem)obj);
+					object obj2;
 					if (item != null)
 					{
-						IUnityItem item3 = item.Item;
-						item5 = item3;
+						IUnityItem item4 = item.Item;
+						obj2 = item4;
 					}
 					else
 					{
-						item5 = null;
+						obj2 = null;
 					}
-					SetLoadoutItem(slotB, (IUnityItem)item5);
-					object itemWeapon;
+					SetLoadoutItem(slotB, (IUnityItem)obj2);
+					object obj3;
 					if (item2 != null)
 					{
-						IUnityItem item3 = item2.Item;
-						itemWeapon = item3;
+						IUnityItem item5 = item2.Item;
+						obj3 = item5;
 					}
 					else
 					{
-						itemWeapon = null;
+						obj3 = null;
 					}
-					EquipWeapon(slotA, (IUnityItem)itemWeapon);
-					object itemWeapon2;
+					EquipWeapon(slotA, (IUnityItem)obj3);
+					object obj4;
 					if (item != null)
 					{
-						IUnityItem item3 = item.Item;
-						itemWeapon2 = item3;
+						IUnityItem item6 = item.Item;
+						obj4 = item6;
 					}
 					else
 					{
-						itemWeapon2 = null;
+						obj4 = null;
 					}
-					EquipWeapon(slotB, (IUnityItem)itemWeapon2);
+					EquipWeapon(slotB, (IUnityItem)obj4);
 					result = true;
 				}
 			}
 			else if ((IsQuickItemSlotType(slotA) && IsQuickItemSlotType(slotB)) || (IsFunctionalItemSlotType(slotA) && IsFunctionalItemSlotType(slotB)))
 			{
-				InventoryItem item6 = null;
 				InventoryItem item7 = null;
-				TryGetItemInSlot(slotA, out item6);
-				TryGetItemInSlot(slotB, out item7);
-				if (item6 != null || item7 != null)
+				InventoryItem item8 = null;
+				TryGetItemInSlot(slotA, out item7);
+				TryGetItemInSlot(slotB, out item8);
+				if (item7 != null || item8 != null)
 				{
-					object item8;
+					object obj5;
+					if (item8 != null)
+					{
+						IUnityItem item9 = item8.Item;
+						obj5 = item9;
+					}
+					else
+					{
+						obj5 = null;
+					}
+					SetLoadoutItem(slotA, (IUnityItem)obj5);
+					object obj6;
 					if (item7 != null)
 					{
-						IUnityItem item3 = item7.Item;
-						item8 = item3;
+						IUnityItem item10 = item7.Item;
+						obj6 = item10;
 					}
 					else
 					{
-						item8 = null;
+						obj6 = null;
 					}
-					SetLoadoutItem(slotA, (IUnityItem)item8);
-					object item9;
-					if (item6 != null)
-					{
-						IUnityItem item3 = item6.Item;
-						item9 = item3;
-					}
-					else
-					{
-						item9 = null;
-					}
-					SetLoadoutItem(slotB, (IUnityItem)item9);
+					SetLoadoutItem(slotB, (IUnityItem)obj6);
 					result = true;
 				}
 			}
@@ -402,15 +415,19 @@ public class LoadoutManager : Singleton<LoadoutManager>
 				buyPanelGUI.SetItem(item, BuyingLocationType.Shop, BuyingRecommendationType.None);
 			}
 		}
-		UnityRuntime.StartRoutine(Singleton<PlayerDataManager>.Instance.StartSetLoadout());
+		UnityRuntime.StartRoutine(BeginLoadoutUpdate());
+	}
+
+	private IEnumerator BeginLoadoutUpdate()
+	{
+		yield return UnityRuntime.StartRoutine(Singleton<PlayerDataManager>.Instance.StartSetLoadout());
 		UpdateArmor();
 	}
 
 	public void ResetSlot(LoadoutSlotType loadoutSlotType)
 	{
 		Loadout.ClearSlot(loadoutSlotType);
-		UnityRuntime.StartRoutine(Singleton<PlayerDataManager>.Instance.StartSetLoadout());
-		UpdateArmor();
+		UnityRuntime.StartRoutine(BeginLoadoutUpdate());
 	}
 
 	public void GetArmorValues(out int armorPoints)
@@ -473,7 +490,11 @@ public class LoadoutManager : Singleton<LoadoutManager>
 	{
 		item = null;
 		IUnityItem item2;
-		return Loadout.TryGetItem(slot, out item2) && Singleton<InventoryManager>.Instance.TryGetInventoryItem(item2.View.ID, out item);
+		if (Loadout.TryGetItem(slot, out item2))
+		{
+			return Singleton<InventoryManager>.Instance.TryGetInventoryItem(item2.View.ID, out item);
+		}
+		return false;
 	}
 
 	public bool TryGetSlotForItem(IUnityItem item, out LoadoutSlotType slot)

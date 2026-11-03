@@ -51,10 +51,10 @@ public class HUDArmorBar : MonoBehaviour
 
 	private void Update()
 	{
-		int value = GameState.Current.PlayerData.ArmorPoints.Value;
-		if ((float)value != oldValue)
+		float num = ((GameState.Current.PlayerData.ArmorPoints.Value == 0) ? 0.01f : ((float)GameState.Current.PlayerData.ArmorPoints.Value));
+		if (num != oldValue)
 		{
-			oldValue = Mathf.MoveTowards(oldValue, value, Time.deltaTime * animateSpeed);
+			oldValue = Mathf.MoveTowards(oldValue, num, Time.deltaTime * animateSpeed);
 			bgr.transform.localScale = bgr.transform.localScale.SetX(Mathf.Max(NORMAL_MAX, oldValue) / NORMAL_MAX * baseWidth);
 			bar.transform.localScale = bgr.transform.localScale.SetX(oldValue / NORMAL_MAX * baseWidth);
 			text.text = Mathf.FloorToInt(oldValue).ToString();
@@ -67,13 +67,14 @@ public class HUDArmorBar : MonoBehaviour
 		while (true)
 		{
 			time = Mathf.Min(time + Time.deltaTime * PulseSpeed, (float)Math.PI);
-			float pulse = Mathf.Sin(time) * PulseScale;
-			text.transform.localScale = (Vector3.one * (baseScale + pulse * (float)(up ? 1 : (-1)))).SetZ(1f);
-			if (time >= (float)Math.PI)
+			float num = Mathf.Sin(time) * PulseScale;
+			text.transform.localScale = (Vector3.one * (baseScale + num * (float)(up ? 1 : (-1)))).SetZ(1f);
+			if (!(time >= (float)Math.PI))
 			{
-				break;
+				yield return 0;
+				continue;
 			}
-			yield return 0;
+			break;
 		}
 	}
 }

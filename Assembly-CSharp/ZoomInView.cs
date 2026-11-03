@@ -20,7 +20,8 @@ public class ZoomInView : MonoBehaviour
 		UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(base.gameObject);
 		float pixelSizeAdjustment = uIRoot.pixelSizeAdjustment;
 		Vector3 localScale = leftBg.cachedTransform.localScale;
-		localScale.x = 2f * ((float)Screen.width * 0.5f * pixelSizeAdjustment - zoomReticle.cachedTransform.localScale.x * 0.5f + PADDING * pixelSizeAdjustment);
+		float num = (float)Screen.width * 0.5f * pixelSizeAdjustment;
+		localScale.x = 2f * (num - zoomReticle.cachedTransform.localScale.x * 0.5f + PADDING * pixelSizeAdjustment);
 		leftBg.cachedTransform.localScale = localScale;
 		rightBg.cachedTransform.localScale = localScale;
 	}

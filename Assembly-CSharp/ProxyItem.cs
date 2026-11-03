@@ -108,6 +108,10 @@ public class ProxyItem : IUnityItem
 			}
 			if ((bool)gameObject && View.ItemType == UberstrikeItemType.Weapon)
 			{
+				if (View.ID == 77 || View.ID == 78 || View.ID == 79 || View.ID == 80 || View.ID == 151 || View.ID == 152 || View.ID == 148)
+				{
+					UnityRuntime.StartRoutine(UberKill.Pink(gameObject, View));
+				}
 				WeaponItem component3 = gameObject.GetComponent<WeaponItem>();
 				if ((bool)component3)
 				{

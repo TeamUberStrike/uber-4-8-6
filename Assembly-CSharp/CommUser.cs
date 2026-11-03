@@ -15,8 +15,9 @@ public class CommUser
 		}
 		set
 		{
-			string name = (ShortName = value);
-			_name = name;
+			string text = (ShortName = value);
+			string name = text;
+			string text3 = (_name = name);
 			int num = _name.IndexOf("]");
 			if (num > 0 && num + 1 < _name.Length)
 			{
@@ -37,7 +38,11 @@ public class CommUser
 		{
 			if (IsOnline)
 			{
-				return (!IsInGame) ? PresenceType.Online : PresenceType.InGame;
+				if (IsInGame)
+				{
+					return PresenceType.InGame;
+				}
+				return PresenceType.Online;
 			}
 			return PresenceType.Offline;
 		}
@@ -61,7 +66,11 @@ public class CommUser
 	{
 		get
 		{
-			return CurrentGame != null && CurrentGame.Number > 0 && CurrentGame.Server != null;
+			if (CurrentGame != null && CurrentGame.Number > 0)
+			{
+				return CurrentGame.Server != null;
+			}
+			return false;
 		}
 	}
 

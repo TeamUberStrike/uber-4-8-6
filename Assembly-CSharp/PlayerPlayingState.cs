@@ -115,17 +115,17 @@ internal class PlayerPlayingState : IState
 	private void OnPlayerDamage(GameEvents.PlayerDamage ev)
 	{
 		Singleton<DamageFeedbackHud>.Instance.AddDamageMark(Mathf.Clamp01(ev.DamageValue / 50f), ev.Angle);
-		if (!GameState.Current.Player.MoveController.IsGrounded)
+		if (!GameState.Current.Player.MoveController.IsGrounded && UberKill.KnockBack)
 		{
 			GameState.Current.Player.MoveController.ApplyForce(Quaternion.AngleAxis(0f - ev.Angle, Vector3.up) * Vector3.forward * ev.DamageValue * 10f, CharacterMoveController.ForceType.Additive);
 		}
 		if ((int)GameState.Current.PlayerData.ArmorPoints > 0)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitArmorRemaining);
+			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitArmorRemaining, 0uL);
 		}
 		else
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitNoArmor);
+			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitNoArmor, 0uL);
 		}
 	}
 

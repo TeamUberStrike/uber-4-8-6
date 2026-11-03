@@ -28,7 +28,7 @@ public class HUDNotifications : MonoBehaviour
 	{
 		GameData.Instance.OnNotification.AddEvent(delegate(string el)
 		{
-			Show(el, string.Empty, 1f);
+			Show(el, string.Empty);
 		}, this);
 		GameData.Instance.OnNotificationFull.AddEvent(delegate(string el1, string el2, float duration)
 		{
@@ -42,7 +42,7 @@ public class HUDNotifications : MonoBehaviour
 				Show(GetGameModeName(), GetGameModeHint(), 0f);
 				break;
 			case GameStateId.MatchRunning:
-				Show(string.Empty, "Fight!", 1f);
+				Show(string.Empty, "Fight!");
 				break;
 			default:
 				Hide();
@@ -64,18 +64,20 @@ public class HUDNotifications : MonoBehaviour
 		lastKillTime = Time.time;
 		if (weapon == UberstrikeItemClass.WeaponMelee)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Smackdown, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KilledBySplatbat, 0uL);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Smackdown, 0uL);
 		}
 		else
 		{
 			switch (bodyPart)
 			{
 			case BodyPart.Head:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.HeadShot, 0uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GotHeadshotKill, 0uL);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.HeadShot, 0uL);
 				break;
 			case BodyPart.Nuts:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GotNutshotKill, 0uL, 1f, 1f);
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NutShot, 0uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GotNutshotKill, 0uL);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NutShot, 0uL);
 				break;
 			}
 		}
@@ -83,32 +85,32 @@ public class HUDNotifications : MonoBehaviour
 		if (killCounter == 2)
 		{
 			textBig = "DOUBLE KILL";
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.DoubleKill, 1000uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.DoubleKill, 1000uL);
 		}
 		else if (killCounter == 3)
 		{
 			textBig = "TRIPLE KILL";
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.TripleKill, 1000uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.TripleKill, 1000uL);
 		}
 		else if (killCounter == 4)
 		{
 			textBig = "QUAD KILL";
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.QuadKill, 1000uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.QuadKill, 1000uL);
 		}
 		else if (killCounter == 5)
 		{
 			textBig = "MEGA KILL";
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MegaKill, 1000uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.MegaKill, 1000uL);
 		}
 		else if (killCounter > 5)
 		{
 			textBig = "UBER KILL";
 			if (killCounter == 6)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.UberKill, 1000uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.UberKill, 1000uL);
 			}
 		}
-		Show(textBig, "You killed " + target.PlayerName, 1f);
+		Show(textBig, "You killed " + target.PlayerName);
 	}
 
 	private string GetGameModeName()
@@ -131,6 +133,14 @@ public class HUDNotifications : MonoBehaviour
 		if (GameState.Current.GameMode == GameModeType.DeathMatch)
 		{
 			return "Get as many kills as you can before the time runs out";
+		}
+		if (GameState.Current.GameMode == GameModeType.EliminationMode)
+		{
+			return "Eliminate all players on the enemy team.\nThe team with players standing at the end of the round wins.";
+		}
+		if (GameState.Current.GameMode == GameModeType.EliminationMode)
+		{
+			return "Eliminate all players on the enemy team.\nThe team with players standing at the end of the round wins.";
 		}
 		return "Get as many kills for your team as you can\nbefore the time runs out";
 	}

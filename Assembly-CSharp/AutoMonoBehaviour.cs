@@ -29,7 +29,14 @@ public class AutoMonoBehaviour<T> : MonoBehaviour where T : class
 			{
 				if (_isInstantiating)
 				{
-					throw new Exception(string.Concat("Recursive calls to Constuctor of AutoMonoBehaviour! Check your ", typeof(T), ":Awake() function for calls to ", typeof(T), ".Instance"));
+					string[] obj = new string[5] { "Recursive calls to Constuctor of AutoMonoBehaviour! Check your ", null, null, null, null };
+					Type typeFromHandle = typeof(T);
+					obj[1] = ((typeFromHandle != null) ? typeFromHandle.ToString() : null);
+					obj[2] = ":Awake() function for calls to ";
+					Type typeFromHandle2 = typeof(T);
+					obj[3] = ((typeFromHandle2 != null) ? typeFromHandle2.ToString() : null);
+					obj[4] = ".Instance";
+					throw new Exception(string.Concat(obj));
 				}
 				_isInstantiating = true;
 				_instance = GetInstance();

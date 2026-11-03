@@ -23,7 +23,11 @@ internal static class GameStateHelper
 
 	public static bool IsLocalConnection(ConnectionAddress address)
 	{
-		return address.IpAddress.StartsWith("10.") || address.IpAddress.StartsWith("172.16.") || address.IpAddress.StartsWith("192.168.") || address.IpAddress.StartsWith("127.");
+		if (!address.IpAddress.StartsWith("10.") && !address.IpAddress.StartsWith("172.16.") && !address.IpAddress.StartsWith("192.168."))
+		{
+			return address.IpAddress.StartsWith("127.");
+		}
+		return true;
 	}
 
 	public static void UpdateMatchTime()
@@ -84,7 +88,7 @@ internal static class GameStateHelper
 
 	public static bool CanChangeTeam()
 	{
-		if (GameState.Current.GameMode == GameModeType.DeathMatch)
+		if (GameState.Current.MatchState.CurrentStateId != GameStateId.MatchRunning || GameState.Current.GameMode == GameModeType.DeathMatch)
 		{
 			return false;
 		}
@@ -101,7 +105,11 @@ internal static class GameStateHelper
 				num2++;
 			}
 		}
-		return (GameState.Current.PlayerData.Player.TeamID != TeamID.BLUE) ? (num < num2) : (num > num2);
+		if (GameState.Current.PlayerData.Player.TeamID == TeamID.BLUE)
+		{
+			return num > num2;
+		}
+		return num < num2;
 	}
 
 	public static void SortDeathMatchPlayers(IEnumerable<GameActorInfo> toBeSortedPlayers)
@@ -171,6 +179,18 @@ internal static class GameStateHelper
 	{
 		if (ChatManager.CanShowMessage((ChatContext)context))
 		{
+			try
+			{
+				GameActorInfo value;
+				GameState.Current.Players.TryGetValue(cmid, out value);
+				if (value != null && !string.IsNullOrEmpty(value.ClanTag))
+				{
+					name = "[" + value.ClanTag + "] " + value.PlayerName;
+				}
+			}
+			catch
+			{
+			}
 			GameData.Instance.OnHUDChatMessage.Fire(name, message, accessLevel);
 		}
 		Singleton<ChatManager>.Instance.InGameDialog.AddMessage(new InstantMessage(cmid, name, message, accessLevel, (ChatContext)context));

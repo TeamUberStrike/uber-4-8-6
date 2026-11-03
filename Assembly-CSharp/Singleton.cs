@@ -33,7 +33,7 @@ public class Singleton<T> : IDisposable where T : Singleton<T>
 	public void Dispose()
 	{
 		OnDispose();
-		_instance = (T)null;
+		_instance = null;
 	}
 
 	protected virtual void OnDispose()

@@ -160,8 +160,11 @@ public class HUDDesktopChat : MonoBehaviour
 	{
 		textInput.text = textInput.text.Replace(textInput.caratChar, string.Empty);
 		inputLabel.text = textInput.text;
-		float num = NGUIMath.CalculateRelativeWidgetBounds(inputLabel.transform).size.y * inputLabel.transform.localScale.y;
-		inputLabelBgr.transform.localScale = inputLabelBgr.transform.localScale.SetY(num + inputLabel.transform.localScale.y);
+		float y = NGUIMath.CalculateRelativeWidgetBounds(inputLabel.transform).size.y;
+		float num = y * inputLabel.transform.localScale.y;
+		Transform transform = inputLabelBgr.transform;
+		Vector3 localScale = inputLabelBgr.transform.localScale;
+		transform.localScale = localScale.SetY(num + inputLabel.transform.localScale.y);
 	}
 
 	public void AddMessage(string from, string message, MemberAccessLevel accessLevel)

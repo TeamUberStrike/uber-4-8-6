@@ -183,7 +183,7 @@ public class StatsPageGUI : MonoBehaviour
 			{
 				Singleton<TransactionHistory>.Instance.GetCurrentTransactions();
 			}
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		GUI.BeginGroup(new Rect(0f, 55f, statsPage.width, statsPage.height - 55f), string.Empty, BlueStonez.window_standard_grey38);
 		switch (_selectedStatsTab)
@@ -229,7 +229,7 @@ public class StatsPageGUI : MonoBehaviour
 		int num = UnityGUI.Toolbar(new Rect(2f, 5f, rect.width - 4f, 22f), _selectedFilterIndex, _selectionsToShow, 4, BlueStonez.tab_medium);
 		if (GUI.changed)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		if (num != _selectedFilterIndex)
 		{
@@ -460,14 +460,14 @@ public class StatsPageGUI : MonoBehaviour
 	{
 		float num = (float)screenWidth / (float)screenHeight;
 		Rect result;
-		if (num > aspectRatio)
+		if (!(num > aspectRatio))
 		{
-			int num2 = Mathf.Clamp(Mathf.RoundToInt((float)screenHeight * aspectRatio), minpWidth, 2048);
-			result = new Rect((float)(screenWidth - num2) * 0.5f, offsetTop, num2, Mathf.Clamp(screenHeight, minHeight, 2048));
+			result = new Rect(0f, offsetTop, Mathf.Clamp(screenWidth, minpWidth, 2048), Mathf.Clamp(Mathf.RoundToInt((float)screenWidth / aspectRatio), minHeight, 2048));
 		}
 		else
 		{
-			result = new Rect(0f, offsetTop, Mathf.Clamp(screenWidth, minpWidth, 2048), Mathf.Clamp(Mathf.RoundToInt((float)screenWidth / aspectRatio), minHeight, 2048));
+			int num2 = Mathf.Clamp(Mathf.RoundToInt((float)screenHeight * aspectRatio), minpWidth, 2048);
+			result = new Rect((float)(screenWidth - num2) * 0.5f, offsetTop, num2, Mathf.Clamp(screenHeight, minHeight, 2048));
 		}
 		return result;
 	}
@@ -476,6 +476,8 @@ public class StatsPageGUI : MonoBehaviour
 	{
 		GUI.BeginGroup(rect, string.Empty, BlueStonez.group_grey81);
 		GUI.EndGroup();
-		GUI.Label(new Rect(rect.x + 18f, rect.y - 8f, style.CalcSize(new GUIContent(title)).x + 10f, 16f), title, style);
+		float left = rect.x + 18f;
+		float top = rect.y - 8f;
+		GUI.Label(new Rect(left, top, style.CalcSize(new GUIContent(title)).x + 10f, 16f), title, style);
 	}
 }

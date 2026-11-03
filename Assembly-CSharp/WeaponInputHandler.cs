@@ -22,33 +22,47 @@ public abstract class WeaponInputHandler
 		{
 			if (!LevelCamera.IsZoomedIn)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperScopeIn);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperScopeIn, 0uL);
 			}
 			else if (zoom < 0f && zoomInfo.CurrentMultiplier != zoomInfo.MinMultiplier)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperZoomIn);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperZoomIn, 0uL);
 			}
 			else if (zoom > 0f && zoomInfo.CurrentMultiplier != zoomInfo.MaxMultiplier)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperZoomOut);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperZoomOut, 0uL);
 			}
 			zoomInfo.CurrentMultiplier = Mathf.Clamp(zoomInfo.CurrentMultiplier + zoom, zoomInfo.MinMultiplier, zoomInfo.MaxMultiplier);
-			LevelCamera.DoZoomIn(75f / zoomInfo.CurrentMultiplier, 20f, hideWeapon);
-			UserInput.ZoomSpeed = 0.5f;
+			if (ApplicationDataManager.ApplicationOptions.FOVMode)
+			{
+				LevelCamera.DoZoomIn(100f / zoomInfo.CurrentMultiplier, 20f, hideWeapon);
+			}
+			else
+			{
+				LevelCamera.DoZoomIn(75f / zoomInfo.CurrentMultiplier, 20f, hideWeapon);
+			}
+			UserInputt.ZoomSpeed = 0.5f;
 		}
 	}
 
 	protected static void ZoomOut(ZoomInfo zoomInfo, BaseWeaponDecorator weapon)
 	{
-		LevelCamera.DoZoomOut(75f, 10f);
-		UserInput.ZoomSpeed = 1f;
+		if (ApplicationDataManager.ApplicationOptions.FOVMode)
+		{
+			LevelCamera.DoZoomOut(100f, 10f);
+		}
+		else
+		{
+			LevelCamera.DoZoomOut(75f, 10f);
+		}
+		UserInputt.ZoomSpeed = 1f;
 		if (zoomInfo != null)
 		{
 			zoomInfo.CurrentMultiplier = zoomInfo.DefaultMultiplier;
 		}
 		if ((bool)weapon)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperScopeOut);
+			AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.SniperScopeOut, 0uL);
 		}
 	}
 

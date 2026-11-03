@@ -9,7 +9,8 @@ public static class GuiManager
 			Matrix4x4 matrix = GUI.matrix;
 			GUI.matrix = Matrix4x4.identity;
 			Vector2 vector = BlueStonez.tooltip.CalcSize(new GUIContent(GUI.tooltip));
-			Rect position = new Rect(Mathf.Clamp(Event.current.mousePosition.x, 14f, (float)Screen.width - (vector.x + 14f)), Event.current.mousePosition.y + 24f, vector.x, vector.y + 16f);
+			float left = Mathf.Clamp(Event.current.mousePosition.x, 14f, (float)Screen.width - (vector.x + 14f));
+			Rect position = new Rect(left, Event.current.mousePosition.y + 24f, vector.x, vector.y + 16f);
 			if (position.yMax > (float)Screen.height)
 			{
 				position.x += 30f;

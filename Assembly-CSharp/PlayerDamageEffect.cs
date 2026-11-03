@@ -167,8 +167,11 @@ public class PlayerDamageEffect : MonoBehaviour
 			List<Vector3> list10 = (list11 = list);
 			int index5 = (index2 = k * 4);
 			vector = list11[index2];
-			list10[index5] = vector - new Vector3(list[k * 4].x + num / 2f - num2, height / 2);
-			num2 += list[k * 4 + 1].x - list[k * 4].x;
+			Vector3 vector5 = vector;
+			list10[index5] = vector5 - new Vector3(list[k * 4].x + num / 2f - num2, height / 2);
+			float num4 = num2;
+			float x = list[k * 4 + 1].x;
+			num2 = num4 + (x - list[k * 4].x);
 		}
 		mesh.vertices = list.ToArray();
 		mesh.uv = list2.ToArray();

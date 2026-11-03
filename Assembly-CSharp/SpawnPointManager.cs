@@ -55,7 +55,7 @@ public class SpawnPointManager : Singleton<SpawnPointManager>
 		return point != null;
 	}
 
-	private IList<SpawnPoint> GetSpawnPointList(GameModeType gameMode, TeamID team)
+	public IList<SpawnPoint> GetSpawnPointList(GameModeType gameMode, TeamID team)
 	{
 		if (gameMode == GameModeType.None)
 		{
@@ -64,9 +64,12 @@ public class SpawnPointManager : Singleton<SpawnPointManager>
 		return _spawnPointsDictionary[gameMode][team];
 	}
 
-	public void ConfigureSpawnPoints(SpawnPoint[] points)
+	public void ConfigureSpawnPoints(SpawnPoint[] points, bool clear = true)
 	{
-		Clear();
+		if (clear)
+		{
+			Clear();
+		}
 		foreach (SpawnPoint spawnPoint in points)
 		{
 			if (_spawnPointsDictionary.ContainsKey(spawnPoint.GameModeType))
@@ -107,13 +110,13 @@ public class SpawnPointManager : Singleton<SpawnPointManager>
 			return;
 		}
 		Debug.LogException(new Exception("No spawnpoints found at " + index + " int list of length " + GetSpawnPointCount(gameMode, team)));
-		if (GameState.Current.Map != null && GameState.Current.Map.DefaultSpawnPoint != null)
+		if (!(GameState.Current.Map != null) || !(GameState.Current.Map.DefaultSpawnPoint != null))
 		{
-			position = GameState.Current.Map.DefaultSpawnPoint.position;
+			position = new Vector3(0f, 10f, 0f);
 		}
 		else
 		{
-			position = new Vector3(0f, 10f, 0f);
+			position = GameState.Current.Map.DefaultSpawnPoint.position;
 		}
 		rotation = Quaternion.identity;
 	}
@@ -130,10 +133,12 @@ public class SpawnPointManager : Singleton<SpawnPointManager>
 			SpawnPoint spawnPoint = list[UnityEngine.Random.Range(0, list.Count)];
 			position = spawnPoint.transform.position;
 			rotation = spawnPoint.transform.rotation;
-			return;
 		}
-		Debug.LogWarning(string.Concat("GetRandomSpawnPoint failed for ", team, "/", gameMode));
-		position = Vector3.zero;
-		rotation = Quaternion.identity;
+		else
+		{
+			Debug.LogWarning("GetRandomSpawnPoint failed for " + team.ToString() + "/" + gameMode);
+			position = Vector3.zero;
+			rotation = Quaternion.identity;
+		}
 	}
 }

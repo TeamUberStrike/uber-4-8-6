@@ -19,6 +19,11 @@ public class MuzzleSmoke : BaseWeaponEffect
 		}
 	}
 
+	private void OnEnable()
+	{
+		HideAllEffects();
+	}
+
 	public override void OnPostShoot()
 	{
 	}
@@ -29,5 +34,9 @@ public class MuzzleSmoke : BaseWeaponEffect
 
 	public override void Hide()
 	{
+		if ((bool)_particleEmitter)
+		{
+			base.gameObject.SetActive(false);
+		}
 	}
 }

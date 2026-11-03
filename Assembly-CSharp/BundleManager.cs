@@ -24,15 +24,15 @@ public class BundleManager : Singleton<BundleManager>
 	{
 		get
 		{
-			foreach (KeyValuePair<BundleCategoryType, List<BundleUnityView>> category in _bundlesPerCategory)
+			foreach (KeyValuePair<BundleCategoryType, List<BundleUnityView>> item in _bundlesPerCategory)
 			{
-				if (category.Key == BundleCategoryType.None)
+				if (item.Key == BundleCategoryType.None)
 				{
 					continue;
 				}
-				foreach (BundleUnityView item in category.Value)
+				foreach (BundleUnityView item2 in item.Value)
 				{
-					yield return item;
+					yield return item2;
 				}
 			}
 		}
@@ -42,9 +42,9 @@ public class BundleManager : Singleton<BundleManager>
 	{
 		get
 		{
-			foreach (List<BundleUnityView> bundleUnityViews in _bundlesPerCategory.Values)
+			foreach (List<BundleUnityView> value in _bundlesPerCategory.Values)
 			{
-				foreach (BundleUnityView item in bundleUnityViews)
+				foreach (BundleUnityView item in value)
 				{
 					yield return item;
 				}
@@ -76,13 +76,13 @@ public class BundleManager : Singleton<BundleManager>
 				{
 					Debug.Log("Managed error from WebServices");
 					PopupSystem.ClearAll();
-					PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please visit support.uberstrike.com for help.", PopupSystem.AlertType.OK);
+					PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please try again later or contact us at https://discord.gg/hhxZCBamRT", PopupSystem.AlertType.OK);
 				}
 			}, delegate(Exception ex)
 			{
 				Debug.Log(ex.Message);
 				PopupSystem.ClearAll();
-				PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please visit support.uberstrike.com for help.", PopupSystem.AlertType.OK);
+				PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please try again later or contact us at https://discord.gg/hhxZCBamRT", PopupSystem.AlertType.OK);
 			});
 		}
 		else
@@ -169,13 +169,13 @@ public class BundleManager : Singleton<BundleManager>
 			{
 				Debug.Log("Starting steam payment failed! (Handled WS Error)");
 				PopupSystem.ClearAll();
-				PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please visit support.uberstrike.com for help.", PopupSystem.AlertType.OK);
+				PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please try again later or contact us at https://discord.gg/hhxZCBamRT", PopupSystem.AlertType.OK);
 			}
 		}, delegate(Exception ex)
 		{
 			Debug.Log(ex.Message);
 			PopupSystem.ClearAll();
-			PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please visit support.uberstrike.com for help.", PopupSystem.AlertType.OK);
+			PopupSystem.ShowMessage("Purchase Failed", "Sorry, there was a problem processing your payment. Please try again later or contact us at https://discord.gg/hhxZCBamRT", PopupSystem.AlertType.OK);
 		});
 		_appStorePopup = PopupSystem.ShowMessage("In App Purchase", "Purchasing, please wait...", PopupSystem.AlertType.None) as BasePopupDialog;
 		UnityRuntime.StartRoutine(StartCancelDialogTimer());

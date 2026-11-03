@@ -93,6 +93,7 @@
     <Compile Include="AvatarAnimationController.cs" />
     <Compile Include="AvatarBone.cs" />
     <Compile Include="AvatarBuilder.cs" />
+    <Compile Include="AvatarConfigAsync.cs" />
     <Compile Include="AvatarDecorator.cs" />
     <Compile Include="AvatarDecoratorConfig.cs" />
     <Compile Include="AvatarGearParts.cs" />
@@ -168,7 +169,9 @@
     <Compile Include="CreditBundlesShopGui.cs" />
     <Compile Include="CreditsUnityItem.cs" />
     <Compile Include="CrossbowWeaponDecorator.cs" />
+    <Compile Include="CustomBundleMapManager.cs" />
     <Compile Include="CustomPropertyAttribute.cs" />
+    <Compile Include="CustomUberstikeMap.cs" />
     <Compile Include="DailyPointsPopupDialog.cs" />
     <Compile Include="DamageEffect.cs" />
     <Compile Include="DamageEffectType.cs" />
@@ -416,7 +419,6 @@
     <Compile Include="LookToTarget.cs" />
     <Compile Include="LotteryPopupDialog.cs" />
     <Compile Include="MainMenuState.cs" />
-    <Compile Include="ManualArmIK.cs" />
     <Compile Include="MapConfiguration.cs" />
     <Compile Include="MapManager.cs" />
     <Compile Include="MatchRunningState.cs" />
@@ -435,6 +437,7 @@
     <Compile Include="MeleeWeapon.cs" />
     <Compile Include="MeleeWeaponDecorator.cs" />
     <Compile Include="MenuPageManager.cs" />
+    <Compile Include="Microsoft.CodeAnalysis\EmbeddedAttribute.cs" />
     <Compile Include="MinigunInputHandler.cs" />
     <Compile Include="MinigunWeaponDecorator.cs" />
     <Compile Include="MiscellaneousExtension.cs" />
@@ -620,6 +623,7 @@
     <Compile Include="StringUtils.cs" />
     <Compile Include="SurfaceEffectType.cs" />
     <Compile Include="SurfaceParameters.cs" />
+    <Compile Include="System.Runtime.CompilerServices\IsReadOnlyAttribute.cs" />
     <Compile Include="TabArea.cs" />
     <Compile Include="TabScreenPanelGUI.cs" />
     <Compile Include="TagUtil.cs" />
@@ -661,7 +665,9 @@
     <Compile Include="TweenTransform.cs" />
     <Compile Include="TweenVolume.cs" />
     <Compile Include="TypewriterEffect.cs" />
+    <Compile Include="UberBeat.cs" />
     <Compile Include="UberDaemon.cs" />
+    <Compile Include="UberKill.cs" />
     <Compile Include="UberStrikeConstants.cs" />
     <Compile Include="UberstrikeIcons.cs" />
     <Compile Include="UberstrikeIconsHelper.cs" />
@@ -742,8 +748,8 @@
     <Compile Include="UnityItemConfiguration.cs" />
     <Compile Include="UnityRuntime.cs" />
     <Compile Include="UserGroups.cs" />
-    <Compile Include="UserInput.cs" />
     <Compile Include="UserInputMap.cs" />
+    <Compile Include="UserInputt.cs" />
     <Compile Include="ValidationUtilities.cs" />
     <Compile Include="ValuablePlayerDetailGUI.cs" />
     <Compile Include="ValuablePlayerListGUI.cs" />
@@ -776,6 +782,8 @@
     <Compile Include="WeaponSimulator.cs" />
     <Compile Include="WeaponSlot.cs" />
     <Compile Include="WeaponTailSound.cs" />
+    <Compile Include="WeekendChallengePopupDialog.cs" />
+    <Compile Include="WindowsUpdater.cs" />
     <Compile Include="XPBarView.cs" />
     <Compile Include="XpPointsUtil.cs" />
     <Compile Include="ZoomInfo.cs" />

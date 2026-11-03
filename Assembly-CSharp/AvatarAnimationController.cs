@@ -237,11 +237,6 @@ public class AvatarAnimationController : MonoBehaviour
 		}
 	}
 
-	private void LateUpdate()
-	{
-		ManualArmIK.ApplyManualIK(this);
-	}
-
 	private void OnAnimatorIK()
 	{
 		if ((bool)_AnchorChest && (bool)_IKAnchor)
@@ -304,7 +299,6 @@ public class AvatarAnimationController : MonoBehaviour
 
 	public void TriggerGearAnimation(UberstrikeItemClass itemClass)
 	{
-		ChangeWeaponType((UberstrikeItemClass)0);
 		switch (itemClass)
 		{
 		case UberstrikeItemClass.GearHead:

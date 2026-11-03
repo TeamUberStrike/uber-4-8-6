@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -109,13 +110,29 @@ public class Loadout
 		switch (type)
 		{
 		case UberstrikeItemType.Functional:
-			return slot >= LoadoutSlotType.FunctionalItem1 && slot <= LoadoutSlotType.FunctionalItem3;
+			if (slot >= LoadoutSlotType.FunctionalItem1)
+			{
+				return slot <= LoadoutSlotType.FunctionalItem3;
+			}
+			return false;
 		case UberstrikeItemType.Gear:
-			return slot >= LoadoutSlotType.GearHead && slot <= LoadoutSlotType.GearHolo;
+			if (slot >= LoadoutSlotType.GearHead)
+			{
+				return slot <= LoadoutSlotType.GearHolo;
+			}
+			return false;
 		case UberstrikeItemType.QuickUse:
-			return slot >= LoadoutSlotType.QuickUseItem1 && slot <= LoadoutSlotType.QuickUseItem3;
+			if (slot >= LoadoutSlotType.QuickUseItem1)
+			{
+				return slot <= LoadoutSlotType.QuickUseItem3;
+			}
+			return false;
 		case UberstrikeItemType.Weapon:
-			return slot >= LoadoutSlotType.WeaponMelee && slot <= LoadoutSlotType.WeaponTertiary;
+			if (slot >= LoadoutSlotType.WeaponMelee)
+			{
+				return slot <= LoadoutSlotType.WeaponTertiary;
+			}
+			return false;
 		default:
 			Debug.LogError("Item attempted to be equipped into a slot that isn't supported.");
 			return false;
@@ -144,16 +161,16 @@ public class Loadout
 			foreach (KeyValuePair<LoadoutSlotType, IUnityItem> item2 in _items)
 			{
 				IUnityItem item;
-				if (a.TryGetItem(item2.Key, out item))
+				if (!a.TryGetItem(item2.Key, out item))
 				{
-					if (item != item2.Value)
-					{
-						return false;
-					}
-					continue;
+					return false;
 				}
-				return false;
+				if (item != item2.Value)
+				{
+					return false;
+				}
 			}
+			return flag;
 		}
 		return flag;
 	}
@@ -194,8 +211,7 @@ public class Loadout
 		{
 			if (value.View.PrefabName.Equals(prefabName))
 			{
-				result = true;
-				break;
+				return true;
 			}
 		}
 		return result;
@@ -208,8 +224,7 @@ public class Loadout
 		{
 			if (value.View.ID == itemId)
 			{
-				result = true;
-				break;
+				return true;
 			}
 		}
 		return result;
@@ -247,9 +262,8 @@ public class Loadout
 				case UberstrikeItemType.Weapon:
 					this.OnWeaponChanged(key);
 					break;
-				case UberstrikeItemType.QuickUse:
-					break;
 				case UberstrikeItemType.WeaponMod:
+				case UberstrikeItemType.QuickUse:
 					break;
 				}
 			}
@@ -329,6 +343,51 @@ public class Loadout
 		return avatarGearParts;
 	}
 
+	public IEnumerator GetGearPart(Action<AvatarGearParts> callback)
+	{
+		bool flag = false;
+		AvatarGearParts avatarGearParts = new AvatarGearParts();
+		IUnityItem value;
+		if (_items.TryGetValue(LoadoutSlotType.GearHolo, out value))
+		{
+			avatarGearParts.Base = value.Create(Vector3.zero, Quaternion.identity);
+		}
+		if (!avatarGearParts.Base)
+		{
+			flag = true;
+			avatarGearParts.Base = UnityEngine.Object.Instantiate(PrefabManager.Instance.DefaultAvatar.gameObject) as GameObject;
+		}
+		if (flag)
+		{
+			LoadoutSlotType[] gearSlots = LoadoutManager.GearSlots;
+			LoadoutSlotType[] array = gearSlots;
+			LoadoutSlotType[] array2 = array;
+			foreach (LoadoutSlotType loadoutSlotType in array2)
+			{
+				yield return null;
+				if (_items.TryGetValue(loadoutSlotType, out value))
+				{
+					GameObject gameObject = value.Create(Vector3.zero, Quaternion.identity);
+					if ((bool)gameObject)
+					{
+						avatarGearParts.Parts.Add(gameObject);
+					}
+					continue;
+				}
+				GameObject defaultGearItem = Singleton<ItemManager>.Instance.GetDefaultGearItem(ItemUtil.ItemClassFromSlot(loadoutSlotType));
+				if ((bool)defaultGearItem)
+				{
+					GameObject gameObject2 = UnityEngine.Object.Instantiate(defaultGearItem) as GameObject;
+					if ((bool)gameObject2)
+					{
+						avatarGearParts.Parts.Add(gameObject2);
+					}
+				}
+			}
+		}
+		callback(avatarGearParts);
+	}
+
 	public AvatarGearParts GetRagdollGear()
 	{
 		bool flag = false;
@@ -361,35 +420,39 @@ public class Loadout
 				flag = true;
 				avatarGearParts.Base = UnityEngine.Object.Instantiate(PrefabManager.Instance.DefaultRagdoll.gameObject) as GameObject;
 			}
-			if (flag)
+			if (!flag)
 			{
-				LoadoutSlotType[] gearSlots = LoadoutManager.GearSlots;
-				foreach (LoadoutSlotType loadoutSlotType in gearSlots)
+				return avatarGearParts;
+			}
+			LoadoutSlotType[] gearSlots = LoadoutManager.GearSlots;
+			LoadoutSlotType[] array = gearSlots;
+			LoadoutSlotType[] array2 = array;
+			foreach (LoadoutSlotType loadoutSlotType in array2)
+			{
+				if (_items.TryGetValue(loadoutSlotType, out value))
 				{
-					if (_items.TryGetValue(loadoutSlotType, out value))
+					GameObject gameObject = value.Create(Vector3.zero, Quaternion.identity);
+					if ((bool)gameObject)
 					{
-						GameObject gameObject = value.Create(Vector3.zero, Quaternion.identity);
-						if ((bool)gameObject)
-						{
-							avatarGearParts.Parts.Add(gameObject);
-						}
+						avatarGearParts.Parts.Add(gameObject);
 					}
-					else if (Singleton<ItemManager>.Instance.TryGetDefaultItem(ItemUtil.ItemClassFromSlot(loadoutSlotType), out value))
+				}
+				else if (Singleton<ItemManager>.Instance.TryGetDefaultItem(ItemUtil.ItemClassFromSlot(loadoutSlotType), out value))
+				{
+					GameObject gameObject2 = value.Create(Vector3.zero, Quaternion.identity);
+					if ((bool)gameObject2)
 					{
-						GameObject gameObject2 = value.Create(Vector3.zero, Quaternion.identity);
-						if ((bool)gameObject2)
-						{
-							avatarGearParts.Parts.Add(gameObject2);
-						}
+						avatarGearParts.Parts.Add(gameObject2);
 					}
 				}
 			}
+			return avatarGearParts;
 		}
 		catch (Exception exception)
 		{
 			Debug.LogException(exception);
+			return avatarGearParts;
 		}
-		return avatarGearParts;
 	}
 
 	internal void UpdateWeaponSlots(List<int> weaponItemIds)

@@ -75,6 +75,11 @@ public class MuzzleHeatWave : BaseWeaponEffect
 	{
 	}
 
+	private void OnEnable()
+	{
+		HideAllEffects();
+	}
+
 	public override void Hide()
 	{
 		if (!_renderer)

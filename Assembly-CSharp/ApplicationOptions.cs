@@ -6,6 +6,8 @@ public class ApplicationOptions
 
 	public bool IsUsingCustom;
 
+	public bool FOVMode;
+
 	public int VideoQualityLevel = 2;
 
 	public int VideoTextureQuality = 4;
@@ -70,12 +72,12 @@ public class ApplicationOptions
 	{
 		string text = PlayerPrefs.GetString("Version", "Invalid");
 		bool flag = false;
-		if ("4.7.1" != text)
+		if (ApplicationDataManager.Version != text)
 		{
 			flag = true;
 			CmunePrefs.Reset();
 			QualitySettings.SetQualityLevel(2, true);
-			PlayerPrefs.SetString("Version", "4.7.1");
+			PlayerPrefs.SetString("Version", ApplicationDataManager.Version);
 		}
 		Application.targetFrameRate = -1;
 		QualitySettings.maxQueuedFrames = -1;
@@ -96,21 +98,22 @@ public class ApplicationOptions
 		VideoPostProcessing = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoPostProcessing, VideoPostProcessing);
 		IsFullscreen = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoIsFullscreen, true);
 		ScreenResolution = CmunePrefs.ReadKey(CmunePrefs.Key.Options_VideoScreenRes, ScreenResolutionManager.CurrentResolutionIndex);
-		InputXMouseSensitivity = Mathf.Clamp(CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputXMouseSensitivity, 3f), 1f, 10f);
-		InputYMouseSensitivity = Mathf.Clamp(CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputYMouseSensitivity, 3f), 1f, 10f);
+		InputXMouseSensitivity = Mathf.Clamp(CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputXMouseSensitivity, 3f), 0.1f, 10f);
+		InputYMouseSensitivity = Mathf.Clamp(CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputYMouseSensitivity, 3f), 0.1f, 10f);
 		InputMouseRotationMaxX = CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputMouseRotationMaxX, 360f);
 		InputMouseRotationMaxY = CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputMouseRotationMaxY, 90f);
 		InputMouseRotationMinX = CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputMouseRotationMinX, -360f);
 		InputMouseRotationMinY = CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputMouseRotationMinY, -90f);
 		InputInvertMouse = CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputInvertMouse, false);
 		bool flag2 = CmunePrefs.ReadKey(CmunePrefs.Key.Options_InputEnableGamepad, false);
-		AutoMonoBehaviour<InputManager>.Instance.IsGamepadEnabled = Input.GetJoystickNames().Length > 0 && flag2;
+		AutoMonoBehaviour<InputManager>.Instance.IsGamepadEnabled = Input.GetJoystickNames().Length != 0 && flag2;
 		GameplayAutoPickupEnabled = CmunePrefs.ReadKey(CmunePrefs.Key.Options_GameplayAutoPickupEnabled, true);
 		GameplayAutoEquipEnabled = CmunePrefs.ReadKey(CmunePrefs.Key.Options_GameplayAutoEquipEnabled, false);
 		AudioEnabled = CmunePrefs.ReadKey(CmunePrefs.Key.Options_AudioEnabled, true);
 		AudioEffectsVolume = CmunePrefs.ReadKey(CmunePrefs.Key.Options_AudioEffectsVolume, 0.7f);
 		AudioMusicVolume = CmunePrefs.ReadKey(CmunePrefs.Key.Options_AudioMusicVolume, 0.5f);
 		AudioMasterVolume = CmunePrefs.ReadKey(CmunePrefs.Key.Options_AudioMasterVolume, 0.5f);
+		FOVMode = CmunePrefs.ReadKey(CmunePrefs.Key.Options_FOVMode, FOVMode);
 		if (flag)
 		{
 			SaveApplicationOptions();
@@ -146,5 +149,6 @@ public class ApplicationOptions
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_AudioEffectsVolume, AudioEffectsVolume);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_AudioMusicVolume, AudioMusicVolume);
 		CmunePrefs.WriteKey(CmunePrefs.Key.Options_AudioMasterVolume, AudioMasterVolume);
+		CmunePrefs.WriteKey(CmunePrefs.Key.Options_FOVMode, FOVMode);
 	}
 }

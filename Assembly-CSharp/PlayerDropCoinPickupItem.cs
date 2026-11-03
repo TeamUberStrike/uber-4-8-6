@@ -13,10 +13,14 @@ public class PlayerDropCoinPickupItem : PickupItem
 		_timeout = Time.time + Timeout;
 		Vector3 oldpos = base.transform.position;
 		Vector3 newpos = oldpos;
-		RaycastHit hit;
-		if (Physics.Raycast(oldpos + Vector3.up, Vector3.down, out hit, 100f, UberstrikeLayerMasks.ProtectionMask) && oldpos.y > hit.point.y + 1f)
+		RaycastHit hitInfo;
+		if (Physics.Raycast(oldpos + Vector3.up, Vector3.down, out hitInfo, 100f, UberstrikeLayerMasks.ProtectionMask))
 		{
-			newpos = hit.point + Vector3.up;
+			float y = oldpos.y;
+			if (y > hitInfo.point.y + 1f)
+			{
+				newpos = hitInfo.point + Vector3.up;
+			}
 		}
 		_timeout = Time.time + Timeout;
 		float time = 0f;

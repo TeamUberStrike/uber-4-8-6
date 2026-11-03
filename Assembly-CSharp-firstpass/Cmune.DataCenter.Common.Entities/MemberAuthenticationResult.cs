@@ -12,6 +12,7 @@ namespace Cmune.DataCenter.Common.Entities
 		InvalidEsns,
 		InvalidCookie,
 		IsIpBanned,
-		UnknownError
+		UnknownError,
+		NewUpdate
 	}
 }

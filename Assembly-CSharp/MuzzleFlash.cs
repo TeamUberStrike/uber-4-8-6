@@ -11,6 +11,8 @@ public class MuzzleFlash : BaseWeaponEffect
 
 	private float _flashDuration = 0.1f;
 
+	private float _dummyDuration = 1E-06f;
+
 	private List<Renderer> _renderers = new List<Renderer>();
 
 	private void Awake()
@@ -29,6 +31,11 @@ public class MuzzleFlash : BaseWeaponEffect
 		{
 			renderer.enabled = false;
 		}
+	}
+
+	private void OnEnable()
+	{
+		HideAllEffects();
 	}
 
 	public override void Hide()

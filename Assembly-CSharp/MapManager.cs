@@ -132,12 +132,40 @@ public class MapManager : Singleton<MapManager>
 	{
 		PickupItem.Reset();
 		Debug.LogWarning("Loading map: " + map.SceneName);
+		if (CustomBundleMapManager.Instance.IsBundleMap(map.Id))
+		{
+			CustomBundleMapManager.LoadBundle(map.Id, delegate
+			{
+				Singleton<SceneLoader>.Instance.LoadLevel(map.SceneName, delegate
+				{
+					if (onSuccess != null)
+					{
+						onSuccess();
+					}
+					Debug.LogWarning("Finished Loading map");
+				});
+			});
+			return;
+		}
 		Singleton<SceneLoader>.Instance.LoadLevel(map.SceneName, delegate
 		{
 			if (onSuccess != null)
 			{
 				onSuccess();
 			}
+			Debug.LogWarning("Finished Loading map");
+		});
+	}
+
+	public void LoadMapNext(string mapScene, Action onSuccess)
+	{
+		Singleton<SceneLoader>.Instance.LoadLevel(mapScene, delegate
+		{
+			if (onSuccess != null)
+			{
+				onSuccess();
+			}
+			PopupSystem.ClearAll();
 			Debug.LogWarning("Finished Loading map");
 		});
 	}
