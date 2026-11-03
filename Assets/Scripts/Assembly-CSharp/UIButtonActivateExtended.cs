@@ -1,0 +1,32 @@
+using UnityEngine;
+
+[AddComponentMenu("NGUI/Interaction/Button Activate Advanced")]
+public class UIButtonActivateExtended : MonoBehaviour
+{
+	[SerializeField]
+	private GameObject[] _targets;
+
+	[SerializeField]
+	private bool _state;
+
+	[SerializeField]
+	private bool _switch;
+
+	private void OnClick()
+	{
+		if (_targets.Length == 0)
+		{
+			return;
+		}
+		GameObject[] targets = _targets;
+		GameObject[] array = targets;
+		GameObject[] array2 = array;
+		foreach (GameObject gameObject in array2)
+		{
+			if (gameObject != null)
+			{
+				NGUITools.SetActive(gameObject, (!_switch) ? _state : (!gameObject.activeInHierarchy));
+			}
+		}
+	}
+}
