@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-public static class WeaponSkinHelper
+public static partial class WeaponSkinHelper
 {
 	public enum FlameMode
 	{
@@ -164,6 +164,10 @@ public static class WeaponSkinHelper
 
 	private static readonly MaterialBindings LavaBindings;
 
+	public const string LavaShader = "CMune/Lava/Opaque_Flowing";
+
+	private const string LavaShaderPath = "items/shared/shaders/lava_flowing_a";
+
 	private static readonly MaterialBindings GlassIceBindings;
 
 	private static readonly MaterialBindings GlassMatteBindings;
@@ -270,12 +274,54 @@ public static class WeaponSkinHelper
 		}
 	}
 
+	private static byte[] ReadSkinBytes(string fileName)
+	{
+		byte[] array = ReadEmbedded(fileName);
+		if (array != null)
+		{
+			return array;
+		}
+		return ReadResource(fileName);
+	}
+
+	private static byte[] ReadResource(string fileName)
+	{
+		string text = "weaponskins/" + fileName;
+		try
+		{
+			TextAsset textAsset = Resources.Load(text, typeof(TextAsset)) as TextAsset;
+			if (textAsset == null)
+			{
+				return null;
+			}
+			byte[] bytes = textAsset.bytes;
+			if (bytes == null || bytes.Length == 0)
+			{
+				Debug.LogError("WeaponSkinHelper: resource \"" + text + "\" loaded but is empty");
+				return null;
+			}
+			return bytes;
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("WeaponSkinHelper: could not read resource " + text + ": " + ex.Message);
+			return null;
+		}
+	}
+
+	private static bool IsMipmappedPack(string stem)
+	{
+		int result;
+		int num = (stem == null) ? (-1) : stem.IndexOf('_');
+		return num > 0 && int.TryParse(stem.Substring(0, num), out result) && result >= 2077 && result <= 2280;
+	}
+
 	private static Texture2D LoadSkinFile(string fileName)
 	{
 		string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
 		string text = fileNameWithoutExtension + ".jpg";
 		string text2 = fileNameWithoutExtension + ".alpha.png";
-		byte[] array = ReadEmbedded(text);
+		byte[] array = ReadSkinBytes(text);
 		if (array != null)
 		{
 			Texture2D texture2D = DecodeTexture(array, text);
@@ -283,44 +329,71 @@ public static class WeaponSkinHelper
 			{
 				return null;
 			}
-			byte[] array2 = ReadEmbedded(text2);
+			byte[] array2 = ReadSkinBytes(text2);
 			if (array2 == null)
 			{
-				return texture2D;
+				return MakeNonReadable(texture2D);
 			}
 			Texture2D texture2D2 = DecodeTexture(array2, text2);
 			if (texture2D2 == null)
 			{
-				return texture2D;
+				return MakeNonReadable(texture2D);
 			}
 			if (texture2D2.width != texture2D.width || texture2D2.height != texture2D.height)
 			{
 				Debug.LogError("WeaponSkinHelper: alpha mask size " + texture2D2.width + "x" + texture2D2.height + " does not match colour " + texture2D.width + "x" + texture2D.height + " for " + fileNameWithoutExtension);
-				return texture2D;
+				UnityEngine.Object.Destroy(texture2D2);
+				return MakeNonReadable(texture2D);
 			}
 			bool flag = fileNameWithoutExtension != null && fileNameWithoutExtension.IndexOf("Uberverse", StringComparison.OrdinalIgnoreCase) >= 0;
+			bool pack = IsMipmappedPack(fileNameWithoutExtension);
+			flag |= pack;
 			Texture2D texture2D3 = new Texture2D(texture2D.width, texture2D.height, TextureFormat.RGBA32, flag);
-			Color[] pixels = texture2D.GetPixels();
-			Color[] pixels2 = texture2D2.GetPixels();
+			Color32[] pixels = texture2D.GetPixels32();
+			Color32[] pixels2 = texture2D2.GetPixels32();
 			for (int i = 0; i < pixels.Length; i++)
 			{
 				pixels[i].a = pixels2[i].r;
 			}
-			texture2D3.SetPixels(pixels);
-			texture2D3.Apply(flag);
+			texture2D3.SetPixels32(pixels);
+			if (pack && texture2D3.width > 1024)
+			{
+				texture2D3.Apply(true, false);
+				texture2D3.Compress(true);
+				texture2D3.Apply(false, true);
+			}
+			else
+			{
+				texture2D3.Apply(flag, true);
+			}
 			if (flag)
 			{
 				texture2D3.filterMode = FilterMode.Trilinear;
 			}
+			if (pack)
+			{
+				texture2D3.anisoLevel = 4;
+			}
+			UnityEngine.Object.Destroy(texture2D);
+			UnityEngine.Object.Destroy(texture2D2);
 			return texture2D3;
 		}
-		byte[] array3 = ReadEmbedded(fileName);
+		byte[] array3 = ReadSkinBytes(fileName);
 		if (array3 == null)
 		{
-			Debug.LogError("WeaponSkinHelper: skin not embedded as \"WeaponSkins." + fileName + "\"");
+			Debug.LogError("WeaponSkinHelper: skin not embedded as \"WeaponSkins." + fileName + "\" and not in Resources/weaponskins");
 			return null;
 		}
-		return DecodeTexture(array3, fileName);
+		return MakeNonReadable(DecodeTexture(array3, fileName));
+	}
+
+	private static Texture2D MakeNonReadable(Texture2D texture)
+	{
+		if (texture != null)
+		{
+			texture.Apply(false, true);
+		}
+		return texture;
 	}
 
 	private static Texture2D DecodeTexture(byte[] data, string label)
@@ -424,6 +497,14 @@ public static class WeaponSkinHelper
 				continue;
 			}
 			Shader shader = sharedMaterial.shader;
+			if (shader != null && shader.name != null && (shader.name.EndsWith(" Add", StringComparison.OrdinalIgnoreCase) || shader.name.IndexOf("Additive", StringComparison.OrdinalIgnoreCase) >= 0 || shader.name.IndexOf("AlphaRenderTexture", StringComparison.OrdinalIgnoreCase) >= 0))
+			{
+				continue;
+			}
+			if (itemId >= 2077 && itemId <= 2280 && (renderer is ParticleSystemRenderer || renderer is ParticleRenderer))
+			{
+				continue;
+			}
 			if ((shader != null && shader.name != null && shader.name.IndexOf("Particle", StringComparison.OrdinalIgnoreCase) >= 0) || renderer.material == null)
 			{
 				continue;
@@ -1355,15 +1436,7 @@ public static class WeaponSkinHelper
 		_sleeveAxis = new Dictionary<string, Vector3>();
 		_sleeveCentre = new Dictionary<string, Vector3>();
 		MUZZLE_DEBUG = false;
-		Skins = new Dictionary<int, SkinDef> { 
-		{
-			2010,
-			new SkinDef
-			{
-				SkinTextures = "2010_HazardousShotgun.png",
-				IconTextures = "2010_HazardousShotgun_Icon.png"
-			}
-		} };
+		Skins = BuildSkins();
 		foreach (KeyValuePair<int, SkinDef> skin in Skins)
 		{
 			int key = skin.Key;
