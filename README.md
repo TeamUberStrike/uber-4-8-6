@@ -1,50 +1,27 @@
-# UberStrike 4.7.1 - `original`
+# UberStrike 4.7.1 - `patcher-qa`
 
-Unity 4.6.5f1 project of the UberStrike 4.7.1 Steam client **without the patch**.
+[`original`](../../tree/original) + **the test server's patcher.zip**, as code and files in this project.
+Same layout and use as `original` (see its README and [SETUP.md](SETUP.md)).
 
-- C# = the 2016 Steam client (`Assembly-CSharp.dll` sha256 `9aef3003...`, `Assembly-CSharp-firstpass.dll` `f6a393d3...`),
-  decompiled with ILSpy (`ilspycmd -lv CSharp4`).
-- Assets fixed so a build looks and plays like the Steam client.
-- The patch (team client v4.8.6, server address, skins, patcher files) is the branch [`patcher-qa`](../../tree/patcher-qa).
-
-## Layout (same as xavgru12/UberClient v4.8.6)
-
-```
-Client.sln                      builds both DLLs into build/Release
-Assembly-CSharp/                game code (+ .csproj)
-Assembly-CSharp-firstpass/      web service / realtime code (+ .csproj)
-UnityDependencies/              UnityEngine.dll etc. (= the Steam client's)
-copyToLocalUberStrikeInstallation.cmd, deployToUberUpdates.cmd, deploy-base.cmd
-Assets/ ProjectSettings/        Unity project; Assets/Scripts/Assembly-CSharp and
-                                Assets/Plugins/Assembly-CSharp-firstpass are junctions to the folders above
-tools/                          setup-links.bat, open-project.bat, build-player.bat, ...
-```
-
-## Use
-
-1. Unity 4.6.5f1: TeamUberStrike/unity-4-6-5f1-portable (INSTALL.bat). Details: [SETUP.md](SETUP.md).
-2. `tools\setup-links.bat` (open-project.bat and build-player.bat run it).
-3. DLLs only: build `Client.sln` (Release), then `copyToLocalUberStrikeInstallation.cmd`.
-4. Whole game: `tools\build-player.bat`.
-
-The address is the original `ws.uberstrike.com` (offline). To play, use `patcher-qa`.
-
-## Changes on top of the Steam code (all make the rebuilt project match the Steam client)
+## Commits on top of `original`
 
 | Commit | What |
 |---|---|
-| layout (2) | UberClient folder layout, Client.sln, junctions |
-| fix(volley) x3 | DangerZone tower materials/frames like retail (Unity 6 fix f4ed6479) |
-| fix(spaceportalpha) x3 | Jump/accelerator pads match the map bundle |
-| fix(textures) x3 | Texture import settings: 2278/2278 baked textures = Steam (mips, NPOT size, format, aniso, alpha, sprite mode) |
-| port(spacecity) | Space City scene 1:1 with the retail bundle |
-| fix: shop aim pose | `ManualArmIK`: native hand IK is a no-op in this project |
-| fix(avatar): swim | Weapons layer upper-body AvatarMask like the Steam client |
-| fix: UberZone + tracer | UberZone preview spawn; MG/shotgun tracer texture without mips |
+| patch: test patcher code without skins | C# of the patcher's `Assembly-CSharp*.dll` (UberClient `all_skins` bca2890 + QA updater urls): v4.8.6 protocol, updater, UberBeat, bundle-map loader, BoxLoader. Release address `steam-qa.uberstrike.com`, debug `127.0.0.1`. No IP check, no ManualArmIK (the patcher has neither). `PlayerFiles/devx` keeps the updater from replacing built DLLs |
+| patch: patcher data files | 6 map bundles + `SeloTron.ogg` (= patcher files, copied by `build-player.bat`); `sharedassets7.normal/.bluebox` for BoxLoader made from this build by `tools/MakeBluebox.cs` (same edit as the patcher's file: bluebox `InsideGrayAlt 1`, no `Tiling_SandDetail 2`) |
+| skins | 66 weapon skins: `WeaponSkinHelper` + effects, 3 hooks (Avatar, WeaponSlot, ProxyItem), 180 embedded art files |
+
+Not here because they are the same as `original`: the patcher's `level3`, `level13`, `uberbeat.dll`, and `UnityEngine.dll`
+(only attribute order differs).
 
 ## Proof
 
-- IL of the built DLLs vs the 2016 DLLs (`stage_proof_il.py`): identical apart from `ManualArmIK`,
-  `AvatarAnimationController.LateUpdate` (its hook) and compiler-generated helper names.
-- Baked textures vs the Steam client (UnityPy): 2278/2278 paired textures match (size, mips, format, filter, wrap,
-  aniso); pixels mean diff 0.035/255.
+- Code: `Client.sln` build decompiled = patcher DLLs decompiled, every type; left are compiler-only differences
+  (temporaries, local names). 180 embedded files byte-identical. One down-level for Unity 4.6.5: `GameState` uses
+  `TryGetValue` where the patcher calls `GetValueOrDefault` (same result).
+- Unity build: same classes as the patcher DLLs; map bundles, `SeloTron.ogg`, `uberbeat.dll` byte-identical.
+- No-op changes removed: where the v4.8.6 decompile only differs from the Steam decompile in compiler output, the file or
+  hunk keeps `original`'s text (checked by building and decompiling both).
+
+Our own additions (204 more skins, heatwave, swim pose, AA, lobby avatar, quick-item icon, scene maps + runtime
+bluebox, ManualArmIK) are the branch `patcher-qa-extras`.
