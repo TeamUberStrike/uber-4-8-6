@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using UberStrike.Core.Types;
 using UnityEngine;
 
 public class SceneLoader : Singleton<SceneLoader>
@@ -49,6 +50,11 @@ public class SceneLoader : Singleton<SceneLoader>
 		_color.a = 1f;
 		Application.LoadLevel(level);
 		yield return new WaitForEndOfFrame();
+		if (level != "Menu" && GameState.Current != null && GameState.Current.RoomData != null && CreateGamePanelGUI.BlueBoxSupport(GameState.Current.RoomData.MapID) && MapTextureVariant.HasVariants(level))
+		{
+			MapTextureVariant.Selected = (GameState.Current.RoomData.BoxType == GameBoxType.BLUE) ? MapTextureVariant.Variant.BlueBox : MapTextureVariant.Variant.Normal;
+			MapTextureVariant.Apply(level);
+		}
 		if (level == "Menu")
 		{
 			AutoMonoBehaviour<BackgroundMusicPlayer>.Instance.Play(GameAudio.HomeSceneBackground);

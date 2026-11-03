@@ -21,6 +21,7 @@ public class MenuPageManager : MonoBehaviour
 	private void Awake()
 	{
 		_pageByPageType = new Dictionary<PageType, PageScene>();
+		_currentPageType = PageType.None;
 	}
 
 	private void OnEnable()

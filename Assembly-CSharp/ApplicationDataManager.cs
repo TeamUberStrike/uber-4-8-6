@@ -103,8 +103,8 @@ public static class ApplicationDataManager
 		}
 		else
 		{
-			WebServiceBaseUrl = "127.0.0.1/2.0/";
-			ImagePath = "127.0.0.1/images/";
+			WebServiceBaseUrl = "steam-qa.uberstrike.com/2.0/";
+			ImagePath = "steam-qa.uberstrike.com/images/";
 		}
 		Version = "4.8.11";
 		IsMac = Application.platform == RuntimePlatform.OSXPlayer;

@@ -217,7 +217,8 @@ public class AvatarAnimationController : MonoBehaviour
 			_IKAnchor.transform.localEulerAngles = localEulerAngles;
 		}
 		EnableLayer(AnimationLayer.Shop, !GameState.Current.IsMultiplayer);
-		if (!GameState.Current.IsMultiplayer && !Animator.GetCurrentAnimatorStateInfo(2).IsTag("ShopIdle"))
+		bool swimming = state != null && (state.MovementState & (MoveStates.Swimming | MoveStates.Diving)) != 0;
+		if (!GameState.Current.IsMultiplayer && !swimming && !Animator.GetCurrentAnimatorStateInfo(2).IsTag("ShopIdle"))
 		{
 			EnableLayer(AnimationLayer.Weapons, false);
 		}
@@ -235,6 +236,11 @@ public class AvatarAnimationController : MonoBehaviour
 		{
 			weaponSwitch = false;
 		}
+	}
+
+	private void LateUpdate()
+	{
+		ManualArmIK.ApplyManualIK(this);
 	}
 
 	private void OnAnimatorIK()

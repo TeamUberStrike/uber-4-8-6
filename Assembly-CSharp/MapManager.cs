@@ -132,7 +132,7 @@ public class MapManager : Singleton<MapManager>
 	{
 		PickupItem.Reset();
 		Debug.LogWarning("Loading map: " + map.SceneName);
-		if (CustomBundleMapManager.Instance.IsBundleMap(map.Id))
+		if (CustomBundleMapManager.Instance.IsBundleMap(map.Id) && !Application.CanStreamedLevelBeLoaded(map.SceneName))
 		{
 			CustomBundleMapManager.LoadBundle(map.Id, delegate
 			{

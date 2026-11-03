@@ -34,8 +34,12 @@ if exist "%UBERSTRIKE_STEAM_DIR%\uberdaemon.exe" (
   echo       Copy it from your Steam UberStrike folder next to UberStrike.exe, or set UBERSTRIKE_STEAM_DIR.
 )
 if exist "%REPO_ROOT%\EmbeddedResources\Assembly-CSharp" call :embed || exit /b 1
-rem UberKill.BoxLoader copies sharedassets7.normal or .bluebox over sharedassets7.assets when a room or training starts.
-if exist "%REPO_ROOT%\Assets\Scripts\Assembly-CSharp\UberKill.cs" call :bluebox || exit /b 1
+rem UberKill.BoxLoader deletes sharedassets7.assets and copies sharedassets7.normal/.bluebox over it when a room or
+rem training starts; give it copies of this build's own file so the game data stays intact.
+if exist "%REPO_ROOT%\Assets\Scripts\Assembly-CSharp\UberKill.cs" (
+  copy /y "%BUILD_DIR%\UberStrike_Data\sharedassets7.assets" "%BUILD_DIR%\UberStrike_Data\sharedassets7.normal" >nul
+  copy /y "%BUILD_DIR%\UberStrike_Data\sharedassets7.assets" "%BUILD_DIR%\UberStrike_Data\sharedassets7.bluebox" >nul
+)
 type "%BUILD_DIR%\build_result.txt"
 echo.
 echo Done: %BUILD_DIR%\UberStrike.exe   - start it with tools\launch-client.bat
@@ -48,12 +52,4 @@ for %%I in ("%UNITY465_EXE%") do set "UNITY_MANAGED=%%~dpIData\Managed"
 if not exist "%~dp0Mono.Cecil.dll" copy /y "%UNITY_MANAGED%\Mono.Cecil.dll" "%~dp0" >nul
 if not exist "%~dp0EmbedResources.exe" "%CSC%" /nologo /out:"%~dp0EmbedResources.exe" /r:"%~dp0Mono.Cecil.dll" "%~dp0EmbedResources.cs" || ( echo Could not compile tools\EmbedResources.cs & exit /b 1 )
 "%~dp0EmbedResources.exe" "%BUILD_DIR%\UberStrike_Data\Managed\Assembly-CSharp.dll" "%REPO_ROOT%\EmbeddedResources\Assembly-CSharp" || ( echo Embedding resources failed & exit /b 1 )
-exit /b 0
-
-:bluebox
-rem Same edit as the patcher's sharedassets7.bluebox, made from this build's own file.
-set "CSC=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\csc.exe"
-copy /y "%BUILD_DIR%\UberStrike_Data\sharedassets7.assets" "%BUILD_DIR%\UberStrike_Data\sharedassets7.normal" >nul
-if not exist "%~dp0MakeBluebox.exe" "%CSC%" /nologo /out:"%~dp0MakeBluebox.exe" "%~dp0MakeBluebox.cs" || ( echo Could not compile tools\MakeBluebox.cs & exit /b 1 )
-"%~dp0MakeBluebox.exe" "%BUILD_DIR%\UberStrike_Data\sharedassets7.assets" "%~dp0bluebox\InsideGrayAlt_1.dxt5" "%BUILD_DIR%\UberStrike_Data\sharedassets7.bluebox" || ( echo Making sharedassets7.bluebox failed & exit /b 1 )
 exit /b 0

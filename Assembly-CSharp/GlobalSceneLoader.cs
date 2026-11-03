@@ -100,7 +100,7 @@ public class GlobalSceneLoader : MonoBehaviour
 		{
 			QualitySettings.masterTextureLimit = ApplicationDataManager.ApplicationOptions.VideoTextureQuality;
 			QualitySettings.vSyncCount = ApplicationDataManager.ApplicationOptions.VideoVSyncCount;
-			QualitySettings.antiAliasing = ApplicationDataManager.ApplicationOptions.VideoAntiAliasing;
+			GraphicSettings.SetAntiAliasing(ApplicationDataManager.ApplicationOptions.VideoAntiAliasing, true);
 		}
 		else
 		{

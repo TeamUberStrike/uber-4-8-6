@@ -38,6 +38,14 @@ public class ShopPageGUI : PageGUI
 
 	private CreditBundlesShopGui _creditsGui = new CreditBundlesShopGui();
 
+	private Dictionary<string, List<IShopItemGUI>> _skinRows = new Dictionary<string, List<IShopItemGUI>>();
+
+	private int _expandedItemId = -1;
+
+	private int _pressedItemId = -1;
+
+	private int _expandedRowCount;
+
 	private ShopSorting.ItemComparer<IShopItemGUI> _inventoryComparer = new ShopSorting.ItemClassComparer();
 
 	private ShopSorting.ItemComparer<IShopItemGUI> _shopComparer = new ShopSorting.LevelComparer();
@@ -206,6 +214,7 @@ public class ShopPageGUI : PageGUI
 
 	private void OnDisable()
 	{
+		_expandedItemId = -1;
 		EventHandler.Global.RemoveListener<ShopEvents.SelectShopArea>(OnSelectShopAreaEvent);
 		EventHandler.Global.RemoveListener<ShopEvents.SelectLoadoutArea>(OnSelectLoadoutAreaEvent);
 		EventHandler.Global.RemoveListener<ShopEvents.RefreshCurrentItemList>(OnRefreshCurrentItemListEvent);
@@ -493,14 +502,49 @@ public class ShopPageGUI : PageGUI
 	{
 		_shopItemGUIList.Clear();
 		_inventoryItemGUIList.Clear();
+		_skinRows.Clear();
 		foreach (InventoryItem allItem in Singleton<InventoryManager>.Instance.GetAllItems(false))
 		{
-			_inventoryItemGUIList.Add(new InventoryItemGUI(allItem, BuyingLocationType.Shop));
+			if (!ShopSkinRows.IsRetired(allItem.Item))
+			{
+				_inventoryItemGUIList.Add(new InventoryItemGUI(allItem, BuyingLocationType.Shop));
+			}
 		}
 		_inventoryItemGUIList.Sort(_inventoryComparer);
-		foreach (IUnityItem allShopItem in Singleton<ItemManager>.Instance.GetAllShopItems())
+		HashSet<string> basePrefabs = new HashSet<string>();
+		List<IUnityItem> allShopItems = Singleton<ItemManager>.Instance.GetAllShopItems();
+		Dictionary<string, string> variantBases = ShopSkinRows.VariantBasePrefabs(allShopItems);
+		foreach (IUnityItem allShopItem in allShopItems)
 		{
+			if (ShopSkinRows.IsRetired(allShopItem))
+			{
+				continue;
+			}
+			string rowKey = ShopSkinRows.RowKey(allShopItem, variantBases);
+			if (rowKey != null)
+			{
+				List<IShopItemGUI> rows;
+				if (!_skinRows.TryGetValue(rowKey, out rows))
+				{
+					rows = new List<IShopItemGUI>();
+					_skinRows.Add(rowKey, rows);
+				}
+				rows.Add(new ShopItemGUI(allShopItem, BuyingLocationType.Shop));
+				continue;
+			}
+			if (allShopItem.View.ItemType == UberstrikeItemType.Weapon)
+			{
+				basePrefabs.Add(allShopItem.View.PrefabName);
+			}
 			_shopItemGUIList.Add(new ShopItemGUI(allShopItem, BuyingLocationType.Shop));
+		}
+		foreach (KeyValuePair<string, List<IShopItemGUI>> skinRow in _skinRows)
+		{
+			skinRow.Value.Sort(ShopSkinRows.CompareByName);
+			if (!basePrefabs.Contains(skinRow.Key))
+			{
+				_shopItemGUIList.AddRange(skinRow.Value);
+			}
 		}
 		_shopItemGUIList.Sort(_shopComparer);
 	}
@@ -682,12 +726,14 @@ public class ShopPageGUI : PageGUI
 		int num4 = 60;
 		int num5 = ((_shopAreaSelection.Current != ShopArea.Inventory) ? (116 + num) : 109);
 		Rect position2 = new Rect(0f, num5, position.width, position.height - (float)(num5 + 1));
-		Rect contentRect = new Rect(0f, 0f, position.width - 20f, (list.Count - _skippedDefaultGearCount) * num4 + 106);
+		bool expandSkins = _shopAreaSelection.Current == ShopArea.Shop;
+		Rect contentRect = new Rect(0f, 0f, position.width - 20f, (list.Count - _skippedDefaultGearCount + (expandSkins ? _expandedRowCount : 0)) * num4 + 106);
 		bool flag = position2.Contains(Event.current.mousePosition) && !PanelManager.IsAnyPanelOpen && !PopupSystem.IsAnyPopupOpen;
 		List<string> list2 = new List<string>();
 		_labScroll = GUITools.BeginScrollView(position2, _labScroll, contentRect);
 		int num6 = ((!(contentRect.height > position2.height)) ? 5 : 20);
 		_skippedDefaultGearCount = 0;
+		_expandedRowCount = 0;
 		int num7 = -num4;
 		for (int i = 0; i < list.Count; i++)
 		{
@@ -721,6 +767,10 @@ public class ShopPageGUI : PageGUI
 				}
 				val2.Draw(rect, rect.Contains(Event.current.mousePosition));
 				GUITools.PopGUIState();
+				if (expandSkins)
+				{
+					DrawSkinToggle(val2.Item, rect, rect2, flag);
+				}
 				list2.Add(val2.Item.View.PrefabName);
 				if (flag && rect2.Contains(Event.current.mousePosition) && !Singleton<DragAndDrop>.Instance.IsDragging)
 				{
@@ -734,12 +784,113 @@ public class ShopPageGUI : PageGUI
 				item.Slot = LoadoutSlotType.Shop;
 				instance.DrawSlot(rect3, item, OnDropShop, null, true);
 			}
+			List<IShopItemGUI> skinRows;
+			if (!expandSkins || list[i].Item.View.ID != _expandedItemId || !_skinRows.TryGetValue(list[i].Item.View.PrefabName, out skinRows) || ShopSkinRows.IsSkin(list[i].Item))
+			{
+				continue;
+			}
+			foreach (IShopItemGUI skinRow in skinRows)
+			{
+				num7 += num4;
+				_expandedRowCount++;
+				if ((float)(num7 + num4) < _labScroll.y || (float)num7 > _labScroll.y + position2.height)
+				{
+					continue;
+				}
+				Rect rect3 = new Rect(18f, num7, position.width - (float)num6 - 18f, num4);
+				GUI.color = new Color(1f, 1f, 1f, 0.06f);
+				GUI.DrawTexture(new Rect(0f, num7, position.width - (float)num6, num4), Texture2D.whiteTexture);
+				GUI.color = new Color(0.94f, 0.63f, 0.19f, 0.9f);
+				GUI.DrawTexture(new Rect(6f, num7 + 6, 3f, num4 - 12), Texture2D.whiteTexture);
+				GUI.color = Color.white;
+				GUITools.PushGUIState();
+				if (!Singleton<InventoryManager>.Instance.Contains(skinRow.Item.View.ID) && skinRow.Item.View.LevelLock > PlayerDataManager.PlayerLevel)
+				{
+					GUI.enabled = false;
+				}
+				skinRow.Draw(rect3, rect3.Contains(Event.current.mousePosition));
+				GUITools.PopGUIState();
+				if (RowClicked(skinRow.Item, new Rect(rect3.x, rect3.y, rect3.width - 100f, rect3.height), flag))
+				{
+					PreviewWeapon(skinRow.Item);
+				}
+				if (flag && new Rect(rect3.x, rect3.y, rect3.width - 100f, rect3.height).Contains(Event.current.mousePosition) && !Singleton<DragAndDrop>.Instance.IsDragging)
+				{
+					AutoMonoBehaviour<ItemToolTip>.Instance.SetItem(skinRow.Item, rect3, PopupViewSide.Left);
+				}
+				Singleton<DragAndDrop>.Instance.DrawSlot(rect3, new ShopDragSlot
+				{
+					Item = skinRow.Item,
+					Slot = LoadoutSlotType.Shop
+				}, OnDropShop, null, true);
+			}
 		}
 		GUITools.EndScrollView();
 	}
 
+	private void DrawSkinToggle(IUnityItem item, Rect rect, Rect clickRect, bool inList)
+	{
+		List<IShopItemGUI> skinRows;
+		if (item.View.ItemType != UberstrikeItemType.Weapon || ShopSkinRows.IsSkin(item) || !_skinRows.TryGetValue(item.View.PrefabName, out skinRows))
+		{
+			return;
+		}
+		bool expanded = _expandedItemId == item.View.ID;
+		GUI.color = new Color(0.94f, 0.63f, 0.19f, 1f);
+		GUI.Label(new Rect(rect.x + rect.width - 128f, rect.y + 6f, 72f, 16f), skinRows.Count + (skinRows.Count == 1 ? " SKIN " : " SKINS ") + (expanded ? "-" : "+"), BlueStonez.label_interparkmed_11pt_left);
+		GUI.color = Color.white;
+		if (RowClicked(item, clickRect, inList))
+		{
+			_expandedItemId = expanded ? -1 : item.View.ID;
+			if (!expanded)
+			{
+				PreviewWeapon(item);
+			}
+		}
+	}
+
+	private bool RowClicked(IUnityItem item, Rect clickRect, bool inList)
+	{
+		if (!inList || !GUI.enabled || !clickRect.Contains(Event.current.mousePosition) || Event.current.button != 0 || Singleton<DragAndDrop>.Instance.IsDragging || PanelManager.IsAnyPanelOpen || PopupSystem.IsAnyPopupOpen)
+		{
+			return false;
+		}
+		if (Event.current.type == EventType.MouseDown)
+		{
+			_pressedItemId = item.View.ID;
+		}
+		else if (Event.current.type == EventType.MouseUp && _pressedItemId == item.View.ID)
+		{
+			_pressedItemId = -1;
+			return true;
+		}
+		return false;
+	}
+
+	// Avatar-only preview, same path as gear Try: nothing is bought or equipped, the shop resets it on enter/leave.
+	private void PreviewWeapon(IUnityItem item)
+	{
+		LoadoutSlotType slot = item.View.ItemClass == UberstrikeItemClass.WeaponMelee ? LoadoutSlotType.WeaponMelee : LoadoutSlotType.WeaponPrimary;
+		if (slot != LoadoutSlotType.WeaponMelee)
+		{
+			foreach (LoadoutSlotType weaponSlot in LoadoutManager.WeaponSlots)
+			{
+				InventoryItem equipped;
+				if (weaponSlot != LoadoutSlotType.WeaponMelee && Singleton<LoadoutManager>.Instance.TryGetItemInSlot(weaponSlot, out equipped) && equipped.Item.View.ItemClass == item.View.ItemClass)
+				{
+					slot = weaponSlot;
+					break;
+				}
+			}
+		}
+		Singleton<TemporaryLoadoutManager>.Instance.SetLoadoutItem(slot, item);
+		Singleton<InventoryManager>.Instance.CurrentWeaponSlot = slot;
+		GameState.Current.Avatar.ShowWeapon(slot);
+	}
+
 	private void UpdateItemFilter()
 	{
+		_expandedItemId = -1;
 		switch (_shopAreaSelection.Current)
 		{
 		case ShopArea.Inventory:
