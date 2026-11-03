@@ -12,11 +12,7 @@ public class CharacterHitArea : BaseGameProp
 	{
 		get
 		{
-			if (Shootable != null)
-			{
-				return Shootable.IsLocal;
-			}
-			return false;
+			return Shootable != null && Shootable.IsLocal;
 		}
 	}
 

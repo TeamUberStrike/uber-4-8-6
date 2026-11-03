@@ -117,11 +117,7 @@ public class AvatarHudInformation : MonoBehaviour
 			_screenPosition = Vector3.Lerp(_screenPosition, Camera.main.WorldToScreenPoint(_transform.position + _offset), Time.deltaTime * 30f);
 			Vector3 rhs = _transform.position + _offset - Camera.main.transform.position;
 			Camera.main.ResetWorldToCameraMatrix();
-			if (Vector3.Dot(Camera.main.transform.forward, rhs) > 0f && _screenPosition.x >= 0f && _screenPosition.x <= (float)Screen.width && _screenPosition.y >= 0f)
-			{
-				return _screenPosition.y <= (float)Screen.height;
-			}
-			return false;
+			return Vector3.Dot(Camera.main.transform.forward, rhs) > 0f && _screenPosition.x >= 0f && _screenPosition.x <= (float)Screen.width && _screenPosition.y >= 0f && _screenPosition.y <= (float)Screen.height;
 		}
 		return false;
 	}

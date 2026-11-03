@@ -135,7 +135,7 @@ public class TabScreenPanelGUI : MonoBehaviour
 		GUI.skin = BlueStonez.Skin;
 		GUI.BeginGroup(_rect, GUIContent.none, BlueStonez.label_interparkmed_11pt);
 		DoTitle(new Rect(0f, 0f, _panelSize.x, 50f));
-		int num = 60;
+		int num = ((0 == 0) ? 60 : 174);
 		GameModeType gameMode = GameState.Current.GameMode;
 		if (gameMode == GameModeType.TeamDeathMatch || gameMode == GameModeType.EliminationMode)
 		{

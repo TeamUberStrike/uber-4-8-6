@@ -87,11 +87,7 @@ public class UnityItemConfiguration : MonoBehaviour
 
 	public bool Contains(string prefabName)
 	{
-		if (!UnityItemsDefaultGears.Find((GearItem item) => item.name.Equals(prefabName)))
-		{
-			return UnityItemsDefaultWeapons.Find((WeaponItem item) => item.name.Equals(prefabName));
-		}
-		return true;
+		return (bool)UnityItemsDefaultGears.Find((GearItem item) => item.name.Equals(prefabName)) || (bool)UnityItemsDefaultWeapons.Find((WeaponItem item) => item.name.Equals(prefabName));
 	}
 
 	public Texture2D GetDefaultIcon(UberstrikeItemClass itemClass)

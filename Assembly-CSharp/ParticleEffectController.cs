@@ -61,9 +61,7 @@ public class ParticleEffectController : MonoBehaviour
 		_explosionParticleSystem = new ExplosionController();
 		_allConfigurations = new Dictionary<ParticleConfigurationType, ParticleConfigurationPerWeapon>();
 		ParticleConfiguration[] allWeaponData = _allWeaponData;
-		ParticleConfiguration[] array = allWeaponData;
-		ParticleConfiguration[] array2 = array;
-		foreach (ParticleConfiguration particleConfiguration in array2)
+		foreach (ParticleConfiguration particleConfiguration in allWeaponData)
 		{
 			_allConfigurations[particleConfiguration.Type] = particleConfiguration.Configuration;
 		}

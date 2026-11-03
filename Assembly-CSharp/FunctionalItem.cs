@@ -80,10 +80,8 @@ public class FunctionalItem : IUnityItem
 		if (_icon != null)
 		{
 			GUI.DrawTexture(position, _icon);
+			return;
 		}
-		else
-		{
-			Debug.LogError("Can't find icon for item:" + View.ID + ", " + View.Name);
-		}
+		Debug.LogError("Can't find icon for item:" + View.ID + ", " + View.Name);
 	}
 }

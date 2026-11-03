@@ -26,9 +26,7 @@ public class SecretBehaviour : MonoBehaviour
 		{
 			bool flag = true;
 			SecretTrigger[] trigger = _trigger;
-			SecretTrigger[] array = trigger;
-			SecretTrigger[] array2 = array;
-			foreach (SecretTrigger secretTrigger in array2)
+			foreach (SecretTrigger secretTrigger in trigger)
 			{
 				flag &= secretTrigger.ActivationTimeOut > Time.time;
 			}
@@ -45,14 +43,10 @@ public class SecretBehaviour : MonoBehaviour
 	private void Awake()
 	{
 		Door[] doors = _doors;
-		Door[] array = doors;
-		Door[] array2 = array;
-		foreach (Door door in array2)
+		foreach (Door door in doors)
 		{
 			SecretTrigger[] trigger = door.Trigger;
-			SecretTrigger[] array3 = trigger;
-			SecretTrigger[] array4 = array3;
-			foreach (SecretTrigger secretTrigger in array4)
+			foreach (SecretTrigger secretTrigger in trigger)
 			{
 				secretTrigger.SetSecretReciever(this);
 			}
@@ -62,9 +56,7 @@ public class SecretBehaviour : MonoBehaviour
 	public void SetTriggerActivated(SecretTrigger trigger)
 	{
 		Door[] doors = _doors;
-		Door[] array = doors;
-		Door[] array2 = array;
-		foreach (Door door in array2)
+		foreach (Door door in doors)
 		{
 			door.CheckAllTriggers();
 		}

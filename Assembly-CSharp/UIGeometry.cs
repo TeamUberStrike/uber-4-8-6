@@ -26,11 +26,7 @@ public class UIGeometry
 	{
 		get
 		{
-			if (mRtpVerts != null && mRtpVerts.size > 0)
-			{
-				return mRtpVerts.size == verts.size;
-			}
-			return false;
+			return mRtpVerts != null && mRtpVerts.size > 0 && mRtpVerts.size == verts.size;
 		}
 	}
 

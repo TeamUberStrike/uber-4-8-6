@@ -24,11 +24,7 @@ public class UIImageButton : MonoBehaviour
 		get
 		{
 			Collider collider = base.collider;
-			if ((bool)collider)
-			{
-				return collider.enabled;
-			}
-			return false;
+			return (bool)collider && collider.enabled;
 		}
 		set
 		{

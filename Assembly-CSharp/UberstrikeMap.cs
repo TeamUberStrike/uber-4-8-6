@@ -56,10 +56,6 @@ public class UberstrikeMap
 
 	public bool IsGameModeSupported(GameModeType mode)
 	{
-		if (View.Settings != null)
-		{
-			return View.Settings.ContainsKey(mode);
-		}
-		return false;
+		return View.Settings != null && View.Settings.ContainsKey(mode);
 	}
 }

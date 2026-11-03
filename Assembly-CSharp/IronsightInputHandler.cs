@@ -66,11 +66,7 @@ public class IronsightInputHandler : WeaponInputHandler
 
 	public override bool CanChangeWeapon()
 	{
-		if (!_isIronsight)
-		{
-			return _ironSightDelay <= 0f;
-		}
-		return false;
+		return !_isIronsight && _ironSightDelay <= 0f;
 	}
 
 	private void UpdateIronsight()

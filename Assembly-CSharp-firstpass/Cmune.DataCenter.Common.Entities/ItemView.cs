@@ -65,11 +65,7 @@ namespace Cmune.DataCenter.Common.Entities
 		{
 			get
 			{
-				if (PermanentCredits == -1)
-				{
-					return PermanentPoints != -1;
-				}
-				return true;
+				return PermanentCredits != -1 || PermanentPoints != -1;
 			}
 		}
 

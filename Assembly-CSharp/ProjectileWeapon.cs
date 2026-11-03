@@ -94,14 +94,14 @@ public class ProjectileWeapon : BaseWeaponLogic
 			{
 				if ((bool)_decorator)
 				{
-					int num = base.Controller.NextProjectileId();
+					int shotCount = base.Controller.NextProjectileId();
 					ray.origin = _decorator.MuzzlePosition + Quaternion.AngleAxis(angle * (float)i, _decorator.transform.forward) * _decorator.transform.up * 0.2f;
-					Projectile projectile = EmitProjectile(ray, num, base.Controller.Cmid);
-					if ((bool)projectile && this.OnProjectileShoot != null)
+					Projectile p = EmitProjectile(ray, shotCount, base.Controller.Cmid);
+					if ((bool)p && this.OnProjectileShoot != null)
 					{
-						this.OnProjectileShoot(new ProjectileInfo(num, ray)
+						this.OnProjectileShoot(new ProjectileInfo(shotCount, ray)
 						{
-							Projectile = projectile
+							Projectile = p
 						});
 					}
 					yield return new WaitForSeconds(0.2f);
@@ -110,13 +110,13 @@ public class ProjectileWeapon : BaseWeaponLogic
 		}
 		else
 		{
-			int num2 = base.Controller.NextProjectileId();
-			Projectile projectile2 = EmitProjectile(ray, num2, base.Controller.Cmid);
-			if ((bool)projectile2 && this.OnProjectileShoot != null)
+			int shotCount2 = base.Controller.NextProjectileId();
+			Projectile p2 = EmitProjectile(ray, shotCount2, base.Controller.Cmid);
+			if ((bool)p2 && this.OnProjectileShoot != null)
 			{
-				this.OnProjectileShoot(new ProjectileInfo(num2, ray)
+				this.OnProjectileShoot(new ProjectileInfo(shotCount2, ray)
 				{
-					Projectile = projectile2
+					Projectile = p2
 				});
 			}
 		}
@@ -154,9 +154,7 @@ public class ProjectileWeapon : BaseWeaponLogic
 				if (GameState.Current != null && GameState.Current.TryGetPlayerAvatar(cmid, out character) && (bool)character.Avatar.Decorator && projectile.gameObject.activeSelf)
 				{
 					CharacterHitArea[] hitAreas = character.Avatar.Decorator.HitAreas;
-					CharacterHitArea[] array = hitAreas;
-					CharacterHitArea[] array2 = array;
-					foreach (CharacterHitArea characterHitArea in array2)
+					foreach (CharacterHitArea characterHitArea in hitAreas)
 					{
 						if (characterHitArea.gameObject.activeInHierarchy)
 						{

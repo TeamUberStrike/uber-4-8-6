@@ -61,9 +61,9 @@ namespace Cmune.DataCenter.Common.Entities
 			string text2 = text;
 			text = text2 + "[Member name:" + Name + "][CMID:" + Cmid + "][Is banned from chat: " + IsChatDisabled + "]";
 			text2 = text;
-			text = text2 + "[Access level:" + AccessLevel.ToString() + "][Group tag: " + GroupTag + "][Last login date: " + LastLoginDate.ToString() + "]]";
+			text = string.Concat(text2, "[Access level:", AccessLevel, "][Group tag: ", GroupTag, "][Last login date: ", LastLoginDate, "]]");
 			text2 = text;
-			return text2 + "[EmailAddressStatus:" + EmailAddressStatus.ToString() + "][FacebookId: " + FacebookId + "]";
+			return string.Concat(text2, "[EmailAddressStatus:", EmailAddressStatus, "][FacebookId: ", FacebookId, "]");
 		}
 	}
 }

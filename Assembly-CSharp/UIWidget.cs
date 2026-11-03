@@ -70,11 +70,7 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		get
 		{
-			if (mVisibleByPanel)
-			{
-				return finalAlpha > 0.001f;
-			}
-			return false;
+			return mVisibleByPanel && finalAlpha > 0.001f;
 		}
 	}
 
@@ -116,11 +112,7 @@ public abstract class UIWidget : MonoBehaviour
 			{
 				CreatePanel();
 			}
-			if (mPanel != null)
-			{
-				return mColor.a * mPanel.alpha;
-			}
-			return mColor.a;
+			return (!(mPanel != null)) ? mColor.a : (mColor.a * mPanel.alpha);
 		}
 	}
 
@@ -380,9 +372,7 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			Camera cachedCamera = uICamera.cachedCamera;
 			UIWidget[] componentsInChildren = root.GetComponentsInChildren<UIWidget>();
-			UIWidget[] array = componentsInChildren;
-			UIWidget[] array2 = array;
-			foreach (UIWidget uIWidget in array2)
+			foreach (UIWidget uIWidget in componentsInChildren)
 			{
 				Vector3[] worldPoints = NGUIMath.CalculateWidgetCorners(uIWidget);
 				if (NGUIMath.DistanceToRectangle(worldPoints, mousePos, cachedCamera) == 0f)

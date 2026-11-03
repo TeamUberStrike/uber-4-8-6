@@ -6,14 +6,10 @@ public static class AvatarBuilder
 	{
 		Renderer[] componentsInChildren = obj.GetComponentsInChildren<Renderer>();
 		Renderer[] array = componentsInChildren;
-		Renderer[] array2 = array;
-		Renderer[] array3 = array2;
-		foreach (Renderer renderer in array3)
+		foreach (Renderer renderer in array)
 		{
 			Material[] materials = renderer.materials;
-			Material[] array4 = materials;
-			Material[] array5 = array4;
-			foreach (Material obj2 in array5)
+			foreach (Material obj2 in materials)
 			{
 				Object.Destroy(obj2);
 			}
@@ -114,9 +110,7 @@ public static class AvatarBuilder
 		}
 		gear.Parts.Add(gear.Base);
 		ParticleSystem[] componentsInChildren = avatar.GetComponentsInChildren<ParticleSystem>(true);
-		ParticleSystem[] array = componentsInChildren;
-		ParticleSystem[] array2 = array;
-		foreach (ParticleSystem particleSystem in array2)
+		foreach (ParticleSystem particleSystem in componentsInChildren)
 		{
 			Object.Destroy(particleSystem.gameObject);
 		}

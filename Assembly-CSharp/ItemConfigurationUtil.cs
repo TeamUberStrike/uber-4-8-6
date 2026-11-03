@@ -49,11 +49,7 @@ public static class ItemConfigurationUtil
 	private static string GetCustomPropertyName(FieldInfo info)
 	{
 		object[] customAttributes = info.GetCustomAttributes(typeof(CustomPropertyAttribute), true);
-		if (customAttributes.Length != 0)
-		{
-			return ((CustomPropertyAttribute)customAttributes[0]).Name;
-		}
-		return string.Empty;
+		return (customAttributes.Length <= 0) ? string.Empty : ((CustomPropertyAttribute)customAttributes[0]).Name;
 	}
 
 	private static object Convert(string value, Type type)
@@ -74,6 +70,6 @@ public static class ItemConfigurationUtil
 		{
 			return bool.Parse(value);
 		}
-		throw new NotSupportedException("ConfigurableItem has unsupported property of type: " + ((type != null) ? type.ToString() : null));
+		throw new NotSupportedException("ConfigurableItem has unsupported property of type: " + type);
 	}
 }

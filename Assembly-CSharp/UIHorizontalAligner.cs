@@ -76,8 +76,7 @@ public class UIHorizontalAligner : MonoBehaviour
 				SetPivot(component, direction == Direction.LeftToRight);
 			}
 			item2.localPosition = item2.localPosition.SetX(num);
-			float x = NGUIMath.CalculateRelativeWidgetBounds(item2).size.x;
-			float num2 = x * item2.localScale.x + padding;
+			float num2 = NGUIMath.CalculateRelativeWidgetBounds(item2).size.x * item2.localScale.x + padding;
 			num = ((direction != Direction.LeftToRight) ? (num - num2) : (num + num2));
 		}
 	}

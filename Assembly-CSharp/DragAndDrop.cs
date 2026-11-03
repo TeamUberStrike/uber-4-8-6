@@ -27,11 +27,7 @@ public class DragAndDrop : Singleton<DragAndDrop>
 	{
 		get
 		{
-			if (CurrentId > 0 && DraggedItem != null)
-			{
-				return DraggedItem.Item != null;
-			}
-			return false;
+			return CurrentId > 0 && DraggedItem != null && DraggedItem.Item != null;
 		}
 	}
 

@@ -52,10 +52,6 @@ internal class SearchBarGUI
 
 	public bool CheckIfPassFilter(string text)
 	{
-		if (IsSearching)
-		{
-			return text.ToLower().Contains(FilterText.ToLower());
-		}
-		return true;
+		return !IsSearching || text.ToLower().Contains(FilterText.ToLower());
 	}
 }

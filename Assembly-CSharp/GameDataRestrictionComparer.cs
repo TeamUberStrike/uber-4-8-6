@@ -17,11 +17,7 @@ public class GameDataRestrictionComparer : GameDataBaseComparer
 	{
 		if (GameRoomHelper.HasLevelRestriction(x) || GameRoomHelper.HasLevelRestriction(y))
 		{
-			if (_playerLevel < 5)
-			{
-				return NoobLevelsUp(x, y);
-			}
-			return VeteranLevelsUp(x, y);
+			return (_playerLevel >= 5) ? VeteranLevelsUp(x, y) : NoobLevelsUp(x, y);
 		}
 		return _baseComparer.Compare(x, y);
 	}

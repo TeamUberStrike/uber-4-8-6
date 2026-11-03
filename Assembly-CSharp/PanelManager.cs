@@ -122,11 +122,11 @@ public class PanelManager : MonoBehaviour
 		{
 			if (_wasAnyPanelOpen)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ClosePanel, 0uL);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ClosePanel, 0uL, 1f, 1f);
 			}
 			else
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.OpenPanel, 0uL);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.OpenPanel, 0uL, 1f, 1f);
 			}
 			_wasAnyPanelOpen = !_wasAnyPanelOpen;
 		}

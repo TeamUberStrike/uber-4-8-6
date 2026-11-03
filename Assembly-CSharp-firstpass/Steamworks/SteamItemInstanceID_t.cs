@@ -20,11 +20,7 @@ namespace Steamworks
 
 		public override bool Equals(object other)
 		{
-			if (other is SteamItemInstanceID_t)
-			{
-				return this == (SteamItemInstanceID_t)other;
-			}
-			return false;
+			return other is SteamItemInstanceID_t && this == (SteamItemInstanceID_t)other;
 		}
 
 		public override int GetHashCode()

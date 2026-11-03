@@ -88,11 +88,7 @@ public static class Mathfx
 	public static float ProjectedAngle(Vector3 a, Vector3 b)
 	{
 		float num = Vector3.Angle(a, b);
-		if (Vector3.Dot(a, _rotate90 * b) < 0f)
-		{
-			return 360f - num;
-		}
-		return num;
+		return (!(Vector3.Dot(a, _rotate90 * b) < 0f)) ? num : (360f - num);
 	}
 
 	public static Vector3 ProjectVector3(Vector3 v, Vector3 normal)
@@ -107,15 +103,7 @@ public static class Mathfx
 
 	public static int Sign(float s)
 	{
-		if (s == 0f)
-		{
-			return 0;
-		}
-		if (s < 0f)
-		{
-			return -1;
-		}
-		return 1;
+		return (s != 0f) ? ((!(s < 0f)) ? 1 : (-1)) : 0;
 	}
 
 	public static short Clamp(short v, short min, short max)

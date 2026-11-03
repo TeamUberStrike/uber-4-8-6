@@ -63,9 +63,7 @@ public class TouchFollow : TouchBaseControl
 			if (_finger.FingerId == touch.fingerId)
 			{
 				Aim = touch.deltaPosition * 500f / Screen.width;
-				float totalMoved = _totalMoved;
-				float num = Mathf.Abs(touch.deltaPosition.x);
-				_totalMoved = totalMoved + (num + Mathf.Abs(touch.deltaPosition.y));
+				_totalMoved += Mathf.Abs(touch.deltaPosition.x) + Mathf.Abs(touch.deltaPosition.y);
 			}
 		}
 		else if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && _finger.FingerId == touch.fingerId)

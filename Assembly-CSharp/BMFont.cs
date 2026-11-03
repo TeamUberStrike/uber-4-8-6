@@ -91,11 +91,7 @@ public class BMFont
 	{
 		get
 		{
-			if (!isValid)
-			{
-				return 0;
-			}
-			return mSaved.Count;
+			return isValid ? mSaved.Count : 0;
 		}
 	}
 

@@ -34,9 +34,7 @@ public class TempleTeleporter : SecretDoor
 		_audios = GetComponents<AudioSource>();
 		_particles.emit = false;
 		Renderer[] visuals = _visuals;
-		Renderer[] array = visuals;
-		Renderer[] array2 = array;
-		foreach (Renderer renderer in array2)
+		foreach (Renderer renderer in visuals)
 		{
 			renderer.enabled = false;
 		}
@@ -58,17 +56,13 @@ public class TempleTeleporter : SecretDoor
 		if (_timeOut < Time.time)
 		{
 			AudioSource[] audios = _audios;
-			AudioSource[] array = audios;
-			AudioSource[] array2 = array;
-			foreach (AudioSource audioSource in array2)
+			foreach (AudioSource audioSource in audios)
 			{
 				audioSource.Stop();
 			}
 			_particles.emit = false;
 			Renderer[] visuals = _visuals;
-			Renderer[] array3 = visuals;
-			Renderer[] array4 = array3;
-			foreach (Renderer renderer in array4)
+			foreach (Renderer renderer in visuals)
 			{
 				renderer.enabled = false;
 			}
@@ -107,17 +101,13 @@ public class TempleTeleporter : SecretDoor
 		base.enabled = true;
 		_particles.emit = true;
 		Renderer[] visuals = _visuals;
-		Renderer[] array = visuals;
-		Renderer[] array2 = array;
-		foreach (Renderer renderer in array2)
+		foreach (Renderer renderer in visuals)
 		{
 			renderer.enabled = true;
 		}
 		_timeOut = Time.time + _activationTime;
 		AudioSource[] audios = _audios;
-		AudioSource[] array3 = audios;
-		AudioSource[] array4 = array3;
-		foreach (AudioSource audioSource in array4)
+		foreach (AudioSource audioSource in audios)
 		{
 			audioSource.Play();
 		}

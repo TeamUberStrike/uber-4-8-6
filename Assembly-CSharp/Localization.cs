@@ -87,7 +87,7 @@ public class Localization : MonoBehaviour
 			mInstance = this;
 			Object.DontDestroyOnLoad(base.gameObject);
 			currentLanguage = PlayerPrefs.GetString("Language", startingLanguage);
-			if (string.IsNullOrEmpty(mLanguage) && languages != null && languages.Length != 0)
+			if (string.IsNullOrEmpty(mLanguage) && languages != null && languages.Length > 0)
 			{
 				currentLanguage = languages[0].name;
 			}
@@ -126,19 +126,11 @@ public class Localization : MonoBehaviour
 	public string Get(string key)
 	{
 		string value;
-		if (mDictionary.TryGetValue(key, out value))
-		{
-			return value;
-		}
-		return key;
+		return (!mDictionary.TryGetValue(key, out value)) ? key : value;
 	}
 
 	public static string Localize(string key)
 	{
-		if (instance != null)
-		{
-			return instance.Get(key);
-		}
-		return key;
+		return (!(instance != null)) ? key : instance.Get(key);
 	}
 }

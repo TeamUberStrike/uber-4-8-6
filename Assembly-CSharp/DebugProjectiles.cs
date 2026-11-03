@@ -20,9 +20,7 @@ public class DebugProjectiles : IDebugPage
 		scroll1 = GUILayout.BeginScrollView(scroll1);
 		foreach (KeyValuePair<int, IProjectile> allProjectile in Singleton<ProjectileManager>.Instance.AllProjectiles)
 		{
-			string text = allProjectile.Key.ToString();
-			IProjectile value = allProjectile.Value;
-			GUILayout.Label((text + " - " + ((value != null) ? value.ToString() : null) == null) ? (ProjectileManager.PrintID(allProjectile.Key) + " (exploded zombie)") : ProjectileManager.PrintID(allProjectile.Key));
+			GUILayout.Label((allProjectile.Key + " - " + allProjectile.Value == null) ? (ProjectileManager.PrintID(allProjectile.Key) + " (exploded zombie)") : ProjectileManager.PrintID(allProjectile.Key));
 		}
 		GUILayout.EndScrollView();
 		GUILayout.Space(30f);

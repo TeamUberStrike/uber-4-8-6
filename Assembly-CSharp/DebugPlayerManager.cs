@@ -32,9 +32,9 @@ public class DebugPlayerManager : IDebugPage
 				GUILayout.Label("Keys: " + CmunePrint.Flag(characterState.KeyState));
 				GUILayout.Label("Move: " + CmunePrint.Flag(characterState.MovementState));
 				float num = Mathf.Clamp(characterState.VerticalRotation + 90f, 0f, 180f) / 180f;
-				GUILayout.Label("Rotation: " + characterState.HorizontalRotation.ToString() + "/" + characterState.VerticalRotation.ToString("f2") + "/" + num.ToString("f2"));
-				GUILayout.Label("Position: " + characterState.Position.ToString());
-				GUILayout.Label("Velocity: " + characterState.Velocity.ToString());
+				GUILayout.Label(string.Concat("Rotation: ", characterState.HorizontalRotation, "/", characterState.VerticalRotation.ToString("f2"), "/", num.ToString("f2")));
+				GUILayout.Label("Position: " + characterState.Position);
+				GUILayout.Label("Velocity: " + characterState.Velocity);
 			}
 			GUI.contentColor = ((value.TeamID == TeamID.RED) ? Color.red : ((value.TeamID != TeamID.BLUE) ? Color.white : Color.blue));
 			GUILayout.Label("AVATAR: " + GameState.Current.Avatars.ContainsKey(value.Cmid));

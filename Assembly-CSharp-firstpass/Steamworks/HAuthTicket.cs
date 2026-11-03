@@ -20,11 +20,7 @@ namespace Steamworks
 
 		public override bool Equals(object other)
 		{
-			if (other is HAuthTicket)
-			{
-				return this == (HAuthTicket)other;
-			}
-			return false;
+			return other is HAuthTicket && this == (HAuthTicket)other;
 		}
 
 		public override int GetHashCode()

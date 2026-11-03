@@ -42,7 +42,7 @@ public class MouseInputChannel : IInputChannel
 		}
 		set
 		{
-			_isDown = (_wasDown = value != 0f);
+			_isDown = (_wasDown = ((value != 0f) ? true : false));
 		}
 	}
 

@@ -35,11 +35,7 @@ public class PopupSystem : AutoMonoBehaviour<PopupSystem>
 	{
 		get
 		{
-			if (AutoMonoBehaviour<PopupSystem>.Instance._popups.Count > 0)
-			{
-				return AutoMonoBehaviour<PopupSystem>.Instance._popups.Peek().ToString();
-			}
-			return string.Empty;
+			return (AutoMonoBehaviour<PopupSystem>.Instance._popups.Count <= 0) ? string.Empty : AutoMonoBehaviour<PopupSystem>.Instance._popups.Peek().ToString();
 		}
 	}
 
@@ -185,10 +181,6 @@ public class PopupSystem : AutoMonoBehaviour<PopupSystem>
 
 	private static bool IsCurrentPopup(IPopupDialog dialog)
 	{
-		if (AutoMonoBehaviour<PopupSystem>.Instance._popups.Count > 0)
-		{
-			return AutoMonoBehaviour<PopupSystem>.Instance._popups.Peek() == dialog;
-		}
-		return false;
+		return AutoMonoBehaviour<PopupSystem>.Instance._popups.Count > 0 && AutoMonoBehaviour<PopupSystem>.Instance._popups.Peek() == dialog;
 	}
 }

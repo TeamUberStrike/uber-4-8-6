@@ -10,7 +10,7 @@ public class HUDSniperControls : MonoBehaviour
 
 	private ZoomInfo zoomInfo;
 
-	private Rect ignoreRect;
+	private Rect ignoreRect = default(Rect);
 
 	private void OnEnable()
 	{

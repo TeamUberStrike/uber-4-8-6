@@ -818,8 +818,14 @@
   </ItemGroup>
   <!-- Skin art embedded like xavgru12/UberClient (kept outside the code folder so Unity does not import it) -->
   <ItemGroup>
-    <EmbeddedResource Include="..\EmbeddedResources\Assembly-CSharp">
-      <LogicalName>Assembly-CSharp</LogicalName>
+    <EmbeddedResource Include="..\EmbeddedResources\Assembly-CSharp\WeaponSkins.2010_HazardousShotgun.alpha.png">
+      <LogicalName>WeaponSkins.2010_HazardousShotgun.alpha.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\EmbeddedResources\Assembly-CSharp\WeaponSkins.2010_HazardousShotgun.jpg">
+      <LogicalName>WeaponSkins.2010_HazardousShotgun.jpg</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\EmbeddedResources\Assembly-CSharp\WeaponSkins.2010_HazardousShotgun_Icon.png">
+      <LogicalName>WeaponSkins.2010_HazardousShotgun_Icon.png</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

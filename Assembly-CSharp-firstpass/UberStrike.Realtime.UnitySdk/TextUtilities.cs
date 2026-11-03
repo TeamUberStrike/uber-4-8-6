@@ -159,9 +159,7 @@ namespace UberStrike.Realtime.UnitySdk
 					numericText = numericText.Replace("-", string.Empty);
 				}
 				string text = numericText;
-				string text2 = text;
-				string text3 = text2;
-				foreach (char c in text3)
+				foreach (char c in text)
 				{
 					flag = char.IsNumber(c);
 					if (!flag)

@@ -29,7 +29,7 @@ namespace Cmune.DataCenter.Common.Entities
 		{
 			string text = "[Private Message: ";
 			string text2 = text;
-			text = text2 + "[ID:" + PrivateMessageId + "][From:" + FromCmid + "][To:" + ToCmid + "][Date:" + DateSent.ToString() + "][";
+			text = string.Concat(text2, "[ID:", PrivateMessageId, "][From:", FromCmid, "][To:", ToCmid, "][Date:", DateSent, "][");
 			text2 = text;
 			text = text2 + "[Content:" + ContentText + "][Is Read:" + IsRead + "][Has attachment:" + HasAttachment + "][Is deleted by sender:" + IsDeletedBySender + "][Is deleted by receiver:" + IsDeletedByReceiver + "]";
 			return text + "]";

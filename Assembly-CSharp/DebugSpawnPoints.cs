@@ -26,8 +26,7 @@ public class DebugSpawnPoints : IDebugPage
 		GUILayout.BeginHorizontal();
 		foreach (int value in Enum.GetValues(typeof(GameModeType)))
 		{
-			GameModeType gameModeType = (GameModeType)value;
-			if (GUILayout.Button(gameModeType.ToString()))
+			if (GUILayout.Button(((GameModeType)value).ToString()))
 			{
 				gameMode = (GameModeType)value;
 			}
@@ -41,9 +40,7 @@ public class DebugSpawnPoints : IDebugPage
 		for (int i = 0; i < Singleton<SpawnPointManager>.Instance.GetSpawnPointCount(gameMode, TeamID.NONE); i++)
 		{
 			Singleton<SpawnPointManager>.Instance.GetSpawnPointAt(i, gameMode, TeamID.NONE, out position, out rotation);
-			string text = i.ToString();
-			Vector3 vector = position;
-			GUILayout.Label(text + ": " + vector.ToString());
+			GUILayout.Label(i + ": " + position);
 		}
 		GUILayout.EndScrollView();
 		scroll2 = GUILayout.BeginScrollView(scroll2);
@@ -51,9 +48,7 @@ public class DebugSpawnPoints : IDebugPage
 		for (int j = 0; j < Singleton<SpawnPointManager>.Instance.GetSpawnPointCount(gameMode, TeamID.BLUE); j++)
 		{
 			Singleton<SpawnPointManager>.Instance.GetSpawnPointAt(j, gameMode, TeamID.BLUE, out position, out rotation);
-			string text2 = j.ToString();
-			Vector3 vector2 = position;
-			GUILayout.Label(text2 + ": " + vector2.ToString());
+			GUILayout.Label(j + ": " + position);
 		}
 		GUILayout.EndScrollView();
 		scroll3 = GUILayout.BeginScrollView(scroll3);
@@ -61,9 +56,7 @@ public class DebugSpawnPoints : IDebugPage
 		for (int k = 0; k < Singleton<SpawnPointManager>.Instance.GetSpawnPointCount(gameMode, TeamID.RED); k++)
 		{
 			Singleton<SpawnPointManager>.Instance.GetSpawnPointAt(k, gameMode, TeamID.RED, out position, out rotation);
-			string text3 = k.ToString();
-			Vector3 vector3 = position;
-			GUILayout.Label(text3 + ": " + vector3.ToString());
+			GUILayout.Label(k + ": " + position);
 		}
 		GUILayout.EndScrollView();
 		GUILayout.EndHorizontal();

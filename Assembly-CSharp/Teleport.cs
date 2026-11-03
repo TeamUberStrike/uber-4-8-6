@@ -21,7 +21,7 @@ public class Teleport : MonoBehaviour
 		{
 			if ((bool)_audio)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(_sound, 0uL);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(_sound, 0uL, 1f, 1f);
 			}
 			GameState.Current.Player.SpawnPlayerAt(_spawnPoint.position, _spawnPoint.rotation);
 		}

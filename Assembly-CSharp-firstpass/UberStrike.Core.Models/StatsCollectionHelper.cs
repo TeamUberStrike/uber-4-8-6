@@ -13,9 +13,7 @@ namespace UberStrike.Core.Models
 			properties = new List<PropertyInfo>();
 			PropertyInfo[] array = typeof(StatsCollection).GetProperties(BindingFlags.Instance | BindingFlags.Public);
 			PropertyInfo[] array2 = array;
-			PropertyInfo[] array3 = array2;
-			PropertyInfo[] array4 = array3;
-			foreach (PropertyInfo propertyInfo in array4)
+			foreach (PropertyInfo propertyInfo in array2)
 			{
 				if (propertyInfo.PropertyType == typeof(int) && propertyInfo.CanRead && propertyInfo.CanWrite)
 				{

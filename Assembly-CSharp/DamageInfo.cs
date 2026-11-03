@@ -36,11 +36,7 @@ public class DamageInfo
 	{
 		get
 		{
-			if (WeaponClass != UberstrikeItemClass.WeaponCannon)
-			{
-				return WeaponClass == UberstrikeItemClass.WeaponLauncher;
-			}
-			return true;
+			return WeaponClass == UberstrikeItemClass.WeaponCannon || WeaponClass == UberstrikeItemClass.WeaponLauncher;
 		}
 	}
 

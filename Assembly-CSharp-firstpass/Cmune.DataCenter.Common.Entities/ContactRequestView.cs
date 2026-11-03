@@ -50,7 +50,7 @@ namespace Cmune.DataCenter.Common.Entities
 		{
 			string text = "[Request contact: [Request ID: " + RequestId + "][Initiator Cmid :" + InitiatorCmid + "][Initiator Name:" + InitiatorName + "][Receiver Cmid: " + ReceiverCmid + "]";
 			string text2 = text;
-			return text2 + "[Initiator Message: " + InitiatorMessage + "][Status: " + Status.ToString() + "][Sent Date: " + SentDate.ToString() + "]]";
+			return string.Concat(text2, "[Initiator Message: ", InitiatorMessage, "][Status: ", Status, "][Sent Date: ", SentDate, "]]");
 		}
 	}
 }

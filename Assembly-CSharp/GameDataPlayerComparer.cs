@@ -5,14 +5,6 @@ public class GameDataPlayerComparer : GameDataBaseComparer
 	protected override int OnCompare(GameRoomData a, GameRoomData b)
 	{
 		int num = a.ConnectedPlayers - b.ConnectedPlayers;
-		if (num != 0)
-		{
-			if (GameDataComparer.SortAscending)
-			{
-				return num;
-			}
-			return -num;
-		}
-		return GameDataNameComparer.StaticCompare(a, b);
+		return (num == 0) ? GameDataNameComparer.StaticCompare(a, b) : ((!GameDataComparer.SortAscending) ? (-num) : num);
 	}
 }

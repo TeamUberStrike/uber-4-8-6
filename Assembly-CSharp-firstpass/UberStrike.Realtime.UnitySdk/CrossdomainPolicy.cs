@@ -27,11 +27,7 @@ namespace UberStrike.Realtime.UnitySdk
 					return false;
 				}
 			}
-			if (value.HasValue)
-			{
-				return value.Value;
-			}
-			return false;
+			return value.HasValue && value.Value;
 		}
 
 		public static bool HasPolicyEntry(string address)

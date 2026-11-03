@@ -128,11 +128,9 @@ public class CameraFeedback : MonoBehaviour
 
 	private void DoApplyFeedback()
 	{
-		GUI.Label(new Rect(10f, 50f, 300f, 20f), "Camera local position = " + _transformCache.localPosition.ToString());
-		GUI.Label(new Rect(10f, 60f, 300f, 20f), "Camera world position = " + _transformCache.position.ToString());
-		Rect position = new Rect(10f, 70f, 300f, 20f);
-		Vector3 rotationAxis = _rotationAxis;
-		GUI.Label(position, "Rotation Axis = " + rotationAxis.ToString());
+		GUI.Label(new Rect(10f, 50f, 300f, 20f), "Camera local position = " + _transformCache.localPosition);
+		GUI.Label(new Rect(10f, 60f, 300f, 20f), "Camera world position = " + _transformCache.position);
+		GUI.Label(new Rect(10f, 70f, 300f, 20f), "Rotation Axis = " + _rotationAxis);
 		GUI.Label(new Rect(10f, 80f, 300f, 20f), "Rotation Angle = " + _testAngle);
 		if (GUI.Button(new Rect(10f, 100f, 60f, 25f), "Land"))
 		{

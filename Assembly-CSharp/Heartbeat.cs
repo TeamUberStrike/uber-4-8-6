@@ -34,8 +34,8 @@ public class Heartbeat : MonoBehaviour
 		m_MonoInitialized = false;
 		I();
 		yield return new WaitForSeconds(1f);
-		int num = S();
-		m_MonoInitialized = num == 0;
+		int monoRet = S();
+		m_MonoInitialized = monoRet == 0;
 	}
 
 	private void Awake()

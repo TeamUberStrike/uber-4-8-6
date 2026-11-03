@@ -34,9 +34,7 @@ public class GamePageManager : MonoBehaviour
 	private void Start()
 	{
 		SceneGuiController[] componentsInChildren = GetComponentsInChildren<SceneGuiController>(true);
-		SceneGuiController[] array = componentsInChildren;
-		SceneGuiController[] array2 = array;
-		foreach (SceneGuiController sceneGuiController in array2)
+		foreach (SceneGuiController sceneGuiController in componentsInChildren)
 		{
 			_pageByPageType[sceneGuiController.PageType] = sceneGuiController;
 		}

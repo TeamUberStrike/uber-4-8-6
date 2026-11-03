@@ -21,8 +21,8 @@ public class GrenadeProjectile : Projectile
 		{
 			if (LayerUtil.IsLayerInMask(UberstrikeLayerMasks.GrenadeCollisionMask, c.gameObject.layer))
 			{
-				Singleton<ProjectileManager>.Instance.RemoveProjectile(base.ID);
-				GameState.Current.Actions.RemoveProjectile(base.ID, true);
+				Singleton<ProjectileManager>.Instance.RemoveProjectile(ID);
+				GameState.Current.Actions.RemoveProjectile(ID, true);
 			}
 			PlayBounceSound(c.transform.position);
 		}
@@ -36,14 +36,14 @@ public class GrenadeProjectile : Projectile
 		}
 		if (LayerUtil.IsLayerInMask(UberstrikeLayerMasks.GrenadeCollisionMask, c.gameObject.layer))
 		{
-			Singleton<ProjectileManager>.Instance.RemoveProjectile(base.ID);
-			GameState.Current.Actions.RemoveProjectile(base.ID, true);
+			Singleton<ProjectileManager>.Instance.RemoveProjectile(ID);
+			GameState.Current.Actions.RemoveProjectile(ID, true);
 		}
 		else if (Sticky)
 		{
 			base.Rigidbody.isKinematic = true;
 			base.collider.isTrigger = true;
-			if (c.contacts.Length != 0)
+			if (c.contacts.Length > 0)
 			{
 				base.transform.position = c.contacts[0].point + c.contacts[0].normal * base.collider.bounds.extents.sqrMagnitude;
 			}

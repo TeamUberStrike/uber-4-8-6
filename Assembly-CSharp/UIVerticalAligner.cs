@@ -76,8 +76,7 @@ public class UIVerticalAligner : MonoBehaviour
 				SetPivot(component, direction == Direction.TopToBottom);
 			}
 			item2.localPosition = item2.localPosition.SetY(num);
-			float y = NGUIMath.CalculateRelativeWidgetBounds(item2).size.y;
-			float num2 = y * item2.localScale.y + padding;
+			float num2 = NGUIMath.CalculateRelativeWidgetBounds(item2).size.y * item2.localScale.y + padding;
 			num = ((direction != Direction.TopToBottom) ? (num + num2) : (num - num2));
 		}
 	}

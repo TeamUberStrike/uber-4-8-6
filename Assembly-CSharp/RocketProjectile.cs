@@ -65,8 +65,8 @@ public class RocketProjectile : Projectile
 	{
 		if (!base.IsProjectileExploded && LayerUtil.IsLayerInMask(base.CollisionMask, c.gameObject.layer))
 		{
-			Singleton<ProjectileManager>.Instance.RemoveProjectile(base.ID);
-			GameState.Current.Actions.RemoveProjectile(base.ID, true);
+			Singleton<ProjectileManager>.Instance.RemoveProjectile(ID);
+			GameState.Current.Actions.RemoveProjectile(ID, true);
 		}
 	}
 
@@ -74,8 +74,8 @@ public class RocketProjectile : Projectile
 	{
 		if (!base.IsProjectileExploded && (bool)c.gameObject && LayerUtil.IsLayerInMask(base.CollisionMask, c.gameObject.layer))
 		{
-			Singleton<ProjectileManager>.Instance.RemoveProjectile(base.ID);
-			GameState.Current.Actions.RemoveProjectile(base.ID, true);
+			Singleton<ProjectileManager>.Instance.RemoveProjectile(ID);
+			GameState.Current.Actions.RemoveProjectile(ID, true);
 		}
 	}
 }

@@ -60,7 +60,7 @@ namespace Cmune.DataCenter.Common.Entities
 		{
 			string text = "[Wallet: ";
 			string text2 = text;
-			text = text2 + "[CMID:" + Cmid + "][Credits:" + Credits + "][Credits Expiration:" + CreditsExpiration.ToString() + "][Points:" + Points + "][Points Expiration:" + PointsExpiration.ToString() + "]";
+			text = string.Concat(text2, "[CMID:", Cmid, "][Credits:", Credits, "][Credits Expiration:", CreditsExpiration, "][Points:", Points, "][Points Expiration:", PointsExpiration, "]");
 			return text + "]";
 		}
 	}

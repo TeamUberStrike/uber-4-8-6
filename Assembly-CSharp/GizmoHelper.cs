@@ -35,8 +35,7 @@ public class GizmoHelper : AutoMonoBehaviour<GizmoHelper>
 
 	public void AddGizmo(Vector3 position, [Optional] Color color, GizmoType type = GizmoType.Sphere, float size = 0.1f)
 	{
-		Vector3 vector = position;
-		Debug.Log("AddGizmo " + vector.ToString());
+		Debug.Log("AddGizmo " + position);
 		gizmos.Add(new Gizmo
 		{
 			Position = position,

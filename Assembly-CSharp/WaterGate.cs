@@ -52,9 +52,7 @@ public class WaterGate : SecretDoor
 	{
 		_state = DoorState.Closed;
 		DoorElement[] elements = _elements;
-		DoorElement[] array = elements;
-		DoorElement[] array2 = array;
-		foreach (DoorElement doorElement in array2)
+		foreach (DoorElement doorElement in elements)
 		{
 			doorElement.ClosedPosition = doorElement.Element.transform.localPosition;
 		}
@@ -129,9 +127,7 @@ public class WaterGate : SecretDoor
 		{
 			_currentTime += Time.deltaTime;
 			DoorElement[] elements = _elements;
-			DoorElement[] array = elements;
-			DoorElement[] array2 = array;
-			foreach (DoorElement doorElement in array2)
+			foreach (DoorElement doorElement in elements)
 			{
 				doorElement.Element.transform.localPosition = Vector3.Lerp(doorElement.ClosedPosition, doorElement.OpenPosition, _currentTime / _maxTime);
 			}
@@ -165,9 +161,7 @@ public class WaterGate : SecretDoor
 			}
 			_currentTime += Time.deltaTime;
 			DoorElement[] elements2 = _elements;
-			DoorElement[] array3 = elements2;
-			DoorElement[] array4 = array3;
-			foreach (DoorElement doorElement2 in array4)
+			foreach (DoorElement doorElement2 in elements2)
 			{
 				doorElement2.Element.transform.localPosition = Vector3.Lerp(doorElement2.OpenPosition, doorElement2.ClosedPosition, _currentTime / _maxTime);
 			}

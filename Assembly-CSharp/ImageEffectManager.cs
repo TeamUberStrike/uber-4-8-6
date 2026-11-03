@@ -43,11 +43,7 @@ public class ImageEffectManager
 		{
 			get
 			{
-				if (!_permanentEnable)
-				{
-					return _timedEnable;
-				}
-				return true;
+				return _permanentEnable || _timedEnable;
 			}
 		}
 

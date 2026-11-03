@@ -9,15 +9,7 @@ public static class NGUIMath
 
 	public static int ClampIndex(int val, int max)
 	{
-		if (val < 0)
-		{
-			return 0;
-		}
-		if (val < max)
-		{
-			return val;
-		}
-		return max - 1;
+		return (val >= 0) ? ((val >= max) ? (max - 1) : val) : 0;
 	}
 
 	public static int RepeatIndex(int val, int max)

@@ -71,11 +71,13 @@ namespace Steamworks
 
 		public static ICustomMarshaler GetInstance(string cookie)
 		{
-			if (cookie != null && cookie == "DoNotFree")
+			switch (cookie)
 			{
+			case "DoNotFree":
 				return static_instance;
+			default:
+				return static_instance_free;
 			}
-			return static_instance_free;
 		}
 	}
 }

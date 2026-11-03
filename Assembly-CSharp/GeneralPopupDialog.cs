@@ -5,8 +5,8 @@ public class GeneralPopupDialog : BasePopupDialog
 {
 	public GeneralPopupDialog(string title, string text, PopupSystem.AlertType flag, Action ok, string okCaption, Action cancel, string cancelCaption, PopupSystem.ActionType actionType, bool allowAudio = true)
 	{
-		base.Text = text;
-		base.Title = title;
+		Text = text;
+		Title = title;
 		_alertType = flag;
 		_actionType = actionType;
 		_callbackOk = ok;
@@ -43,6 +43,6 @@ public class GeneralPopupDialog : BasePopupDialog
 
 	protected override void DrawPopupWindow()
 	{
-		GUI.Label(new Rect(17f, 55f, _size.x - 34f, _size.y - 100f), base.Text, PopupSkin.label);
+		GUI.Label(new Rect(17f, 55f, _size.x - 34f, _size.y - 100f), Text, PopupSkin.label);
 	}
 }

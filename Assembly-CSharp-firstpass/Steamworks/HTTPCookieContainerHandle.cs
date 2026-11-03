@@ -20,11 +20,7 @@ namespace Steamworks
 
 		public override bool Equals(object other)
 		{
-			if (other is HTTPCookieContainerHandle)
-			{
-				return this == (HTTPCookieContainerHandle)other;
-			}
-			return false;
+			return other is HTTPCookieContainerHandle && this == (HTTPCookieContainerHandle)other;
 		}
 
 		public override int GetHashCode()

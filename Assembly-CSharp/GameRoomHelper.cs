@@ -5,24 +5,12 @@ public static class GameRoomHelper
 {
 	public static bool HasLevelRestriction(GameRoomData room)
 	{
-		if (room.LevelMin == 0)
-		{
-			return room.LevelMax != 0;
-		}
-		return true;
+		return room.LevelMin != 0 || room.LevelMax != 0;
 	}
 
 	public static bool IsLevelAllowed(int min, int max, int level)
 	{
-		if (level >= min)
-		{
-			if (max != 0)
-			{
-				return level <= max;
-			}
-			return true;
-		}
-		return false;
+		return level >= min && (max == 0 || level <= max);
 	}
 
 	public static bool IsLevelAllowed(GameRoomData room, int level)

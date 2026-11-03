@@ -118,11 +118,7 @@ public class QuickItemBehaviour
 	{
 		get
 		{
-			if (IsCoolingDown)
-			{
-				return 1f - CoolDownTimeRemaining / CoolDownTimeTotal;
-			}
-			return 1f;
+			return (!IsCoolingDown) ? 1f : (1f - CoolDownTimeRemaining / CoolDownTimeTotal);
 		}
 	}
 

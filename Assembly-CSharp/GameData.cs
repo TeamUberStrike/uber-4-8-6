@@ -56,11 +56,7 @@ public class GameData
 	{
 		get
 		{
-			if (ApplicationDataManager.Channel != ChannelType.WebFacebook && ApplicationDataManager.Channel != ChannelType.IPad)
-			{
-				return Application.isEditor;
-			}
-			return true;
+			return ApplicationDataManager.Channel == ChannelType.WebFacebook || ApplicationDataManager.Channel == ChannelType.IPad || Application.isEditor;
 		}
 	}
 }

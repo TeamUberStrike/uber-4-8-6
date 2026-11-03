@@ -155,15 +155,7 @@ public static class GUITools
 			_repeatButtonPressed = 0f;
 		}
 		_lastRepeatClick = Time.time;
-		if (_repeatButtonPressed != 0f)
-		{
-			if (_repeatButtonPressed > 0.5f)
-			{
-				return SaveClickIn(vel);
-			}
-			return false;
-		}
-		return true;
+		return _repeatButtonPressed == 0f || (_repeatButtonPressed > 0.5f && SaveClickIn(vel));
 	}
 
 	public static bool SaveClickIn(float t)
@@ -236,7 +228,7 @@ public static class GUITools
 	{
 		if (GUI.Button(rect, content, style) && AutoMonoBehaviour<SfxManager>.Instance != null)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(soundEffect, 0uL);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(soundEffect, 0uL, 1f, 1f);
 			return true;
 		}
 		return false;
@@ -401,7 +393,7 @@ public static class GUITools
 	{
 		float num = 0f;
 		int num2 = 0;
-		if (buttons.Length != 0)
+		if (buttons.Length > 0)
 		{
 			num = (buttons.Length - 1) * buttonHeight;
 		}

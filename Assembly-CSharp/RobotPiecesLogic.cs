@@ -14,14 +14,12 @@ internal class RobotPiecesLogic : MonoBehaviour
 		if (_robotPieces != null)
 		{
 			Rigidbody[] componentsInChildren = _robotPieces.GetComponentsInChildren<Rigidbody>();
-			Rigidbody[] array = componentsInChildren;
-			Rigidbody[] array2 = array;
-			foreach (Rigidbody rigidbody in array2)
+			foreach (Rigidbody rigidbody in componentsInChildren)
 			{
 				rigidbody.AddExplosionForce(5f, base.transform.position, 2f, 0f, ForceMode.Impulse);
 			}
 		}
-		if (_robotScrapsDestructionAudios != null && _robotScrapsDestructionAudios.Length != 0)
+		if (_robotScrapsDestructionAudios != null && _robotScrapsDestructionAudios.Length > 0)
 		{
 			AudioClip audioClip = _robotScrapsDestructionAudios[Random.Range(0, _robotScrapsDestructionAudios.Length)];
 			if ((bool)audioClip)
@@ -35,7 +33,7 @@ internal class RobotPiecesLogic : MonoBehaviour
 
 	public void PlayRobotScrapsDestructionAudio()
 	{
-		if (_robotScrapsDestructionAudios != null && _robotScrapsDestructionAudios.Length != 0)
+		if (_robotScrapsDestructionAudios != null && _robotScrapsDestructionAudios.Length > 0)
 		{
 			AudioClip audioClip = _robotScrapsDestructionAudios[Random.Range(0, _robotScrapsDestructionAudios.Length)];
 			if ((bool)audioClip)

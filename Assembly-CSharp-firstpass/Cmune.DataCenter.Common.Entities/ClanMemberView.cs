@@ -30,7 +30,7 @@ namespace Cmune.DataCenter.Common.Entities
 
 		public override string ToString()
 		{
-			return "[Clan member: [Name: " + Name + "][Cmid: " + Cmid + "][Position: " + Position.ToString() + "][JoiningDate: " + JoiningDate.ToString() + "][Lastlogin: " + Lastlogin.ToString() + "]]";
+			return string.Concat("[Clan member: [Name: ", Name, "][Cmid: ", Cmid, "][Position: ", Position, "][JoiningDate: ", JoiningDate, "][Lastlogin: ", Lastlogin, "]]");
 		}
 	}
 }

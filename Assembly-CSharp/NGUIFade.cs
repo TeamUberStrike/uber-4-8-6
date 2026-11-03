@@ -45,11 +45,11 @@ public class NGUIFade : MonoBehaviour
 	private IEnumerator Animate(bool immediate, float targetAlpha, Action onFinished)
 	{
 		UICamera uiCamera = null;
-		Transform parent = base.transform;
-		while (uiCamera == null && parent != null)
+		Transform tr = base.transform;
+		while (uiCamera == null && tr != null)
 		{
-			uiCamera = parent.GetComponent<UICamera>();
-			parent = parent.parent;
+			uiCamera = tr.GetComponent<UICamera>();
+			tr = tr.parent;
 		}
 		uiCamera.enabled = false;
 		if (sprite != null)

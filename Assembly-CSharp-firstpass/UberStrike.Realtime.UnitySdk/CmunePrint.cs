@@ -23,9 +23,7 @@ namespace UberStrike.Realtime.UnitySdk
 			{
 				stringBuilder.AppendFormat("[Class={0}] ", instance.GetType().Name);
 				PropertyInfo[] properties = instance.GetType().GetProperties((!publicOnly) ? (BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) : (BindingFlags.Instance | BindingFlags.Public));
-				PropertyInfo[] array = properties;
-				PropertyInfo[] array2 = array;
-				foreach (PropertyInfo propertyInfo in array2)
+				foreach (PropertyInfo propertyInfo in properties)
 				{
 					stringBuilder.AppendFormat("[{0}={1}],", propertyInfo.Name, Object(propertyInfo.GetValue(instance, null)));
 				}
@@ -226,7 +224,7 @@ namespace UberStrike.Realtime.UnitySdk
 			}
 			catch
 			{
-				return type.Name + " unsupported: " + ((underlyingType != null) ? underlyingType.ToString() : null);
+				return type.Name + " unsupported: " + underlyingType;
 			}
 		}
 

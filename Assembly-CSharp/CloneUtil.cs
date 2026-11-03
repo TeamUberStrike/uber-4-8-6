@@ -14,7 +14,7 @@ public static class CloneUtil
 			CopyAllFields(val, instance);
 			return val;
 		}
-		return null;
+		return (T)null;
 	}
 
 	public static void CopyAllFields<T>(T destination, T source) where T : class
@@ -28,9 +28,7 @@ public static class CloneUtil
 	public static void CopyFields(object dst, object src)
 	{
 		PropertyInfo[] properties = src.GetType().GetProperties();
-		PropertyInfo[] array = properties;
-		PropertyInfo[] array2 = array;
-		foreach (PropertyInfo propertyInfo in array2)
+		foreach (PropertyInfo propertyInfo in properties)
 		{
 			if (propertyInfo.CanWrite)
 			{

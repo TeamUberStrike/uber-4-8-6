@@ -47,11 +47,7 @@ public static class ShopSorting
 				InventoryItemGUI inventoryItemGUI2 = b as InventoryItemGUI;
 				return CompareDuration(inventoryItemGUI.InventoryItem, inventoryItemGUI2.InventoryItem, base.Ascending);
 			}
-			if (base.Ascending)
-			{
-				return a.Item.View.ItemClass.CompareTo(b.Item.View.ItemClass);
-			}
-			return b.Item.View.ItemClass.CompareTo(a.Item.View.ItemClass);
+			return (!base.Ascending) ? b.Item.View.ItemClass.CompareTo(a.Item.View.ItemClass) : a.Item.View.ItemClass.CompareTo(b.Item.View.ItemClass);
 		}
 	}
 
@@ -63,35 +59,19 @@ public static class ShopSorting
 		}
 		if (a.IsPermanent)
 		{
-			if (!ascending)
-			{
-				return -1;
-			}
-			return 1;
+			return ascending ? 1 : (-1);
 		}
 		if (b.IsPermanent)
 		{
-			if (ascending)
-			{
-				return -1;
-			}
-			return 1;
+			return (!ascending) ? 1 : (-1);
 		}
 		if (a.DaysRemaining > b.DaysRemaining)
 		{
-			if (!ascending)
-			{
-				return -1;
-			}
-			return 1;
+			return ascending ? 1 : (-1);
 		}
 		if (a.DaysRemaining < b.DaysRemaining)
 		{
-			if (ascending)
-			{
-				return -1;
-			}
-			return 1;
+			return (!ascending) ? 1 : (-1);
 		}
 		return CompareName(a.Item, b.Item, ascending);
 	}
@@ -100,19 +80,11 @@ public static class ShopSorting
 	{
 		if (a.View.LevelLock < b.View.LevelLock)
 		{
-			if (ascending)
-			{
-				return -1;
-			}
-			return 1;
+			return (!ascending) ? 1 : (-1);
 		}
 		if (a.View.LevelLock > b.View.LevelLock)
 		{
-			if (!ascending)
-			{
-				return -1;
-			}
-			return 1;
+			return ascending ? 1 : (-1);
 		}
 		return CompareName(a, b, ascending);
 	}
@@ -216,11 +188,7 @@ public static class ShopSorting
 		{
 			return 0;
 		}
-		if (num2 > num3)
-		{
-			return num;
-		}
-		return num * -1;
+		return (num2 <= num3) ? (num * -1) : num;
 	}
 
 	private static int CompareName(IUnityItem a, IUnityItem b, bool ascending)

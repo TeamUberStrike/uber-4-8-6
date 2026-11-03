@@ -44,11 +44,7 @@ namespace UberStrike.Core.Models.Views
 		{
 			get
 			{
-				if (Prices != null)
-				{
-					return Prices.Count > 0;
-				}
-				return false;
+				return Prices != null && Prices.Count > 0;
 			}
 		}
 

@@ -86,11 +86,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.bmFont;
-			}
-			return mFont;
+			return (!(mReplacement != null)) ? mFont : mReplacement.bmFont;
 		}
 	}
 
@@ -98,15 +94,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (!(mReplacement != null))
-			{
-				if (mFont != null)
-				{
-					return mFont.texWidth;
-				}
-				return 1;
-			}
-			return mReplacement.texWidth;
+			return (mReplacement != null) ? mReplacement.texWidth : ((mFont == null) ? 1 : mFont.texWidth);
 		}
 	}
 
@@ -114,15 +102,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (!(mReplacement != null))
-			{
-				if (mFont != null)
-				{
-					return mFont.texHeight;
-				}
-				return 1;
-			}
-			return mReplacement.texHeight;
+			return (mReplacement != null) ? mReplacement.texHeight : ((mFont == null) ? 1 : mFont.texHeight);
 		}
 	}
 
@@ -130,11 +110,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.hasSymbols;
-			}
-			return mSymbols.Count != 0;
+			return (!(mReplacement != null)) ? (mSymbols.Count != 0) : mReplacement.hasSymbols;
 		}
 	}
 
@@ -142,11 +118,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.symbols;
-			}
-			return mSymbols;
+			return (!(mReplacement != null)) ? mSymbols : mReplacement.symbols;
 		}
 	}
 
@@ -154,11 +126,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.atlas;
-			}
-			return mAtlas;
+			return (!(mReplacement != null)) ? mAtlas : mReplacement.atlas;
 		}
 		set
 		{
@@ -296,11 +264,7 @@ public class UIFont : MonoBehaviour
 				return mReplacement.texture;
 			}
 			Material material = this.material;
-			if (material != null)
-			{
-				return material.mainTexture as Texture2D;
-			}
-			return null;
+			return (!(material != null)) ? null : (material.mainTexture as Texture2D);
 		}
 	}
 
@@ -356,11 +320,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.spriteName;
-			}
-			return mFont.spriteName;
+			return (!(mReplacement != null)) ? mFont.spriteName : mReplacement.spriteName;
 		}
 		set
 		{
@@ -380,11 +340,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.horizontalSpacing;
-			}
-			return mSpacingX;
+			return (!(mReplacement != null)) ? mSpacingX : mReplacement.horizontalSpacing;
 		}
 		set
 		{
@@ -404,11 +360,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.verticalSpacing;
-			}
-			return mSpacingY;
+			return (!(mReplacement != null)) ? mSpacingY : mReplacement.verticalSpacing;
 		}
 		set
 		{
@@ -428,11 +380,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (!(mDynamicFont != null))
-			{
-				return mFont.isValid;
-			}
-			return true;
+			return mDynamicFont != null || mFont.isValid;
 		}
 	}
 
@@ -440,15 +388,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (!(mReplacement != null))
-			{
-				if (isDynamic)
-				{
-					return mDynamicFontSize;
-				}
-				return mFont.charSize;
-			}
-			return mReplacement.size;
+			return (mReplacement != null) ? mReplacement.size : ((!isDynamic) ? mFont.charSize : mDynamicFontSize);
 		}
 	}
 
@@ -530,11 +470,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.dynamicFont;
-			}
-			return mDynamicFont;
+			return (!(mReplacement != null)) ? mDynamicFont : mReplacement.dynamicFont;
 		}
 		set
 		{
@@ -558,11 +494,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.dynamicFontSize;
-			}
-			return mDynamicFontSize;
+			return (!(mReplacement != null)) ? mDynamicFontSize : mReplacement.dynamicFontSize;
 		}
 		set
 		{
@@ -584,11 +516,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mReplacement != null)
-			{
-				return mReplacement.dynamicFontStyle;
-			}
-			return mDynamicFontStyle;
+			return (!(mReplacement != null)) ? mDynamicFontStyle : mReplacement.dynamicFontStyle;
 		}
 		set
 		{
@@ -645,11 +573,7 @@ public class UIFont : MonoBehaviour
 		{
 			return true;
 		}
-		if (mReplacement != null)
-		{
-			return mReplacement.References(font);
-		}
-		return false;
+		return mReplacement != null && mReplacement.References(font);
 	}
 
 	public static bool CheckIfRelated(UIFont a, UIFont b)
@@ -662,11 +586,7 @@ public class UIFont : MonoBehaviour
 		{
 			return true;
 		}
-		if (!(a == b) && !a.References(b))
-		{
-			return b.References(a);
-		}
-		return true;
+		return a == b || a.References(b) || b.References(a);
 	}
 
 	public void MarkAsDirty()

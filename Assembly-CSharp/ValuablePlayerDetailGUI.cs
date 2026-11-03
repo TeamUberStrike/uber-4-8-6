@@ -72,8 +72,8 @@ internal class ValuablePlayerDetailGUI
 			_curAchievementIndex = 0;
 			while (Singleton<PreemptiveCoroutineManager>.Instance.IsCurrent(StartBadgeShow, coroutineId))
 			{
-				AchievementType achievementType = _achievementList[_curAchievementIndex];
-				SetCurrentAchievementBadge(achievementType, _curPlayerStats.Achievements[(byte)achievementType], string.Empty);
+				AchievementType type = _achievementList[_curAchievementIndex];
+				SetCurrentAchievementBadge(type, _curPlayerStats.Achievements[(byte)type], string.Empty);
 				yield return new WaitForSeconds(2f);
 				if (_achievementList.Count > 0)
 				{

@@ -29,9 +29,7 @@ public class SecretTrigger : BaseGameProp
 	private void OnDisable()
 	{
 		Renderer[] visuals = _visuals;
-		Renderer[] array = visuals;
-		Renderer[] array2 = array;
-		foreach (Renderer renderer in array2)
+		foreach (Renderer renderer in visuals)
 		{
 			renderer.material.SetColor("_Color", Color.black);
 		}
@@ -42,9 +40,7 @@ public class SecretTrigger : BaseGameProp
 		if (_showVisualsEndTime > Time.time)
 		{
 			Renderer[] visuals = _visuals;
-			Renderer[] array = visuals;
-			Renderer[] array2 = array;
-			foreach (Renderer renderer in array2)
+			foreach (Renderer renderer in visuals)
 			{
 				renderer.material.SetColor("_Color", new Color((Mathf.Sin(Time.time * 4f) + 1f) * 0.3f, 0f, 0f));
 			}

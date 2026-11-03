@@ -65,7 +65,7 @@ public class EnergyProjectile : Projectile
 	{
 		if (!base.IsProjectileExploded && LayerUtil.IsLayerInMask(base.CollisionMask, c.gameObject.layer))
 		{
-			if (c.contacts.Length != 0)
+			if (c.contacts.Length > 0)
 			{
 				Explode(c.contacts[0].point, c.contacts[0].normal, TagUtil.GetTag(c.collider));
 			}

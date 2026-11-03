@@ -46,11 +46,7 @@ public class HealthBuffConfiguration : QuickItemConfiguration
 	{
 		get
 		{
-			if (!IsHealNeedCharge)
-			{
-				return !IsHealOverTime;
-			}
-			return false;
+			return !IsHealNeedCharge && !IsHealOverTime;
 		}
 	}
 

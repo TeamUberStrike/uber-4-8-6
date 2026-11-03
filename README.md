@@ -23,11 +23,14 @@ The server side of the skins is xavgru12/UberServer PR #85 (shop rows 2077-2280)
 
 ## Proof
 
-- Files: identical to the QA-approved build (constripacity/UberSteam-client-4-7-1 `patcher` 4fe21870 = uber-4-8-6
-  `unity465` ad73fc6e) apart from the folder layout (18,100 files equal; differences = .gitignore layout block, the
-  setup-links line in two tools, IpReputationView.cs moved to UberClient's folder).
-- Build: `Assembly-CSharp.dll` and `Assembly-CSharp-firstpass.dll` IL-identical to that QA build (all classes, fields,
-  methods, strings, float constants), same size.
+- Same game as the QA-approved build (constripacity/UberSteam-client-4-7-1 `patcher` 4fe21870 = uber-4-8-6 `unity465`
+  ad73fc6e). Assets identical apart from the folder layout.
+- No-op changes removed from the diff: 205 C# files where the v4.8.6 decompile only differs from the Steam decompile in
+  compiler output (same code) use `original`'s text. Proof: both branches built with the same compiler (MSBuild) and
+  decompiled; per file, every difference is a no-op form (temporaries, array copies before foreach, string.Concat vs +,
+  ToString(), (bool) casts, x += y, empty static constructors). Re-check after the change: 1,506 types, 0 real differences.
+- Build: IL facts vs that QA build equal except the reverted no-op forms (empty static constructor of SteamAPI,
+  `dir + '\0'` vs `dir + "\0"` in gameserveritem_t).
 
 ## Production
 
