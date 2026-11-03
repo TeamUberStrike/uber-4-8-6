@@ -172,6 +172,7 @@
     <Compile Include="CustomBundleMapManager.cs" />
     <Compile Include="CustomPropertyAttribute.cs" />
     <Compile Include="CustomUberstikeMap.cs" />
+    <Compile Include="CyberNeonWeaponEffect.cs" />
     <Compile Include="DailyPointsPopupDialog.cs" />
     <Compile Include="DamageEffect.cs" />
     <Compile Include="DamageEffectType.cs" />
@@ -203,6 +204,7 @@
     <Compile Include="DoorBehaviour.cs" />
     <Compile Include="DoorTrigger.cs" />
     <Compile Include="DragAndDrop.cs" />
+    <Compile Include="DragonsMawWeaponEffect.cs" />
     <Compile Include="DynamicTexture.cs" />
     <Compile Include="EaseType.cs" />
     <Compile Include="EndOfMatchState.cs" />
@@ -448,6 +450,7 @@
     <Compile Include="MobileShadow.cs" />
     <Compile Include="MobileShadowReceiver.cs" />
     <Compile Include="ModerationPanelGUI.cs" />
+    <Compile Include="MoltenInfernoWeaponEffect.cs" />
     <Compile Include="MouseInput.cs" />
     <Compile Include="MouseInputChannel.cs" />
     <Compile Include="MouseOrbit.cs" />
@@ -529,6 +532,7 @@
     <Compile Include="PregameLoadoutState.cs" />
     <Compile Include="PrepareNextRoundState.cs" />
     <Compile Include="PresenceType.cs" />
+    <Compile Include="PrismSplatterWeaponEffect.cs" />
     <Compile Include="ProgressPopupDialog.cs" />
     <Compile Include="Projectile.cs" />
     <Compile Include="ProjectileDetonator.cs" />
@@ -643,6 +647,7 @@
     <Compile Include="TouchFollow.cs" />
     <Compile Include="TouchInput.cs" />
     <Compile Include="TouchShooter.cs" />
+    <Compile Include="ToxicVenomWeaponEffect.cs" />
     <Compile Include="TrailParticleConfiguration.cs" />
     <Compile Include="TrainingPageGUI.cs" />
     <Compile Include="TrainingPageScene.cs" />
@@ -675,6 +680,13 @@
     <Compile Include="UberstrikeLayerMasks.cs" />
     <Compile Include="UberstrikeMap.cs" />
     <Compile Include="UberstrikeTag.cs" />
+    <Compile Include="UberversePlanetCamera.cs" />
+    <Compile Include="UberverseRibbonCamera.cs" />
+    <Compile Include="UberverseV12Effect.cs" />
+    <Compile Include="UberverseV12RibbonCamera.cs" />
+    <Compile Include="UberverseV1Effect.cs" />
+    <Compile Include="UberverseV1RibbonCamera.cs" />
+    <Compile Include="UberverseWeaponEffect.cs" />
     <Compile Include="UIAnchor.cs" />
     <Compile Include="UIAtlas.cs" />
     <Compile Include="UIAudio.cs" />
@@ -756,6 +768,7 @@
     <Compile Include="Vector2Anim.cs" />
     <Compile Include="Vector3Helper.cs" />
     <Compile Include="VectorExtentions.cs" />
+    <Compile Include="VoidglassWeaponEffect.cs" />
     <Compile Include="VolumeEnviromentSettings.cs" />
     <Compile Include="WaitingForPlayersState.cs" />
     <Compile Include="WaitingTexture.cs" />
@@ -766,7 +779,9 @@
     <Compile Include="WeaponConfigurationHelper.cs" />
     <Compile Include="WeaponController.cs" />
     <Compile Include="WeaponDataManager.cs" />
+    <Compile Include="WeaponEmitterEffect.cs" />
     <Compile Include="WeaponFeedbackManager.cs" />
+    <Compile Include="WeaponFlameAnimator.cs" />
     <Compile Include="WeaponHeadAnimation.cs" />
     <Compile Include="WeaponImpactEffectConfiguration.cs" />
     <Compile Include="WeaponInputHandler.cs" />
@@ -780,8 +795,10 @@
     <Compile Include="WeaponShootAnimator.cs" />
     <Compile Include="WeaponShootEvent.cs" />
     <Compile Include="WeaponSimulator.cs" />
+    <Compile Include="WeaponSkinHelper.cs" />
     <Compile Include="WeaponSlot.cs" />
     <Compile Include="WeaponTailSound.cs" />
+    <Compile Include="WeaponTracerTinter.cs" />
     <Compile Include="WeekendChallengePopupDialog.cs" />
     <Compile Include="WindowsUpdater.cs" />
     <Compile Include="XPBarView.cs" />
@@ -794,6 +811,12 @@
       <Project>{fa2878ab-26c6-4a1d-8c38-8f8981e7ba33}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
     </ProjectReference>
+  </ItemGroup>
+  <!-- Skin art embedded like xavgru12/UberClient (kept outside the code folder so Unity does not import it) -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\EmbeddedResources\Assembly-CSharp\*">
+      <LogicalName>%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

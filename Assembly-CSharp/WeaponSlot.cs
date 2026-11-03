@@ -68,6 +68,10 @@ public class WeaponSlot
 			Decorator.EnableShootAnimation = false;
 			Decorator.DefaultPosition = Vector3.zero;
 		}
+		if (Decorator != null)
+		{
+			WeaponSkinHelper.ApplyToWeapon(Decorator.gameObject, View.ID);
+		}
 	}
 
 	private void CreateWeaponLogic(UberStrikeItemWeaponView view, IWeaponController controller)

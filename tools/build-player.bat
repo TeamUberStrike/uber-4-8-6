@@ -33,11 +33,21 @@ if exist "%UBERSTRIKE_STEAM_DIR%\uberdaemon.exe" (
   echo NOTE: uberdaemon.exe not found in "%UBERSTRIKE_STEAM_DIR%".
   echo       Copy it from your Steam UberStrike folder next to UberStrike.exe, or set UBERSTRIKE_STEAM_DIR.
 )
+if exist "%REPO_ROOT%\EmbeddedResources\Assembly-CSharp" call :embed || exit /b 1
 rem UberKill.BoxLoader copies sharedassets7.normal or .bluebox over sharedassets7.assets when a room or training starts.
 if exist "%REPO_ROOT%\Assets\Scripts\Assembly-CSharp\UberKill.cs" call :bluebox || exit /b 1
 type "%BUILD_DIR%\build_result.txt"
 echo.
 echo Done: %BUILD_DIR%\UberStrike.exe   - start it with tools\launch-client.bat
+exit /b 0
+
+:embed
+rem Unity cannot embed resources when compiling scripts; add them to the built Assembly-CSharp.dll like the team build.
+set "CSC=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\csc.exe"
+for %%I in ("%UNITY465_EXE%") do set "UNITY_MANAGED=%%~dpIData\Managed"
+if not exist "%~dp0Mono.Cecil.dll" copy /y "%UNITY_MANAGED%\Mono.Cecil.dll" "%~dp0" >nul
+if not exist "%~dp0EmbedResources.exe" "%CSC%" /nologo /out:"%~dp0EmbedResources.exe" /r:"%~dp0Mono.Cecil.dll" "%~dp0EmbedResources.cs" || ( echo Could not compile tools\EmbedResources.cs & exit /b 1 )
+"%~dp0EmbedResources.exe" "%BUILD_DIR%\UberStrike_Data\Managed\Assembly-CSharp.dll" "%REPO_ROOT%\EmbeddedResources\Assembly-CSharp" || ( echo Embedding resources failed & exit /b 1 )
 exit /b 0
 
 :bluebox
