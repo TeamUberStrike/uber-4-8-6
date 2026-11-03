@@ -114,7 +114,8 @@ public class NameChangePanelGUI : PanelGuiBase
 				break;
 			case MemberOperationResult.Ok:
 				PlayerDataManager.Name = newName;
-				AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+				GameState.Current.Avatar.Decorator.HudInformation.SetAvatarLabel(PlayerDataManager.NameAndTag);
+				AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 				StartCoroutine(Singleton<ItemManager>.Instance.StartGetInventory(false));
 				PopupSystem.ShowMessage("Congratulations", "You successfully changed your name to:\n" + newName, PopupSystem.AlertType.OK, "YEAH", delegate
 				{

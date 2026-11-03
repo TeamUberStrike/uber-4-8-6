@@ -27,16 +27,13 @@ public class GUIPageBase : MonoBehaviour
 
 	public IEnumerator AnimateAlpha(float to, float duration, params UIPanel[] buttons)
 	{
-		TweenAlpha[] tweens = Array.ConvertAll(buttons, (UIPanel uIPanel) =>
+		TweenAlpha[] array = Array.ConvertAll(buttons, (UIPanel uIPanel) => TweenAlpha.Begin(uIPanel.gameObject, duration, to));
+		TweenAlpha[] array2 = array;
+		TweenAlpha[] array3 = array2;
+		TweenAlpha[] array4 = array3;
+		foreach (TweenAlpha el2 in array4)
 		{
-			float duration2 = default(float);
-			float to2 = default(float);
-			return TweenAlpha.Begin(uIPanel.gameObject, duration2, to2);
-		});
-		TweenAlpha[] array = tweens;
-		foreach (TweenAlpha el in array)
-		{
-			while (el.enabled)
+			while (el2.enabled)
 			{
 				yield return 0;
 			}

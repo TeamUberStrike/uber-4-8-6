@@ -75,7 +75,7 @@ public class InboxPageGUI : MonoBehaviour
 		{
 			float num = Mathf.Max(Singleton<InboxManager>.Instance.NextRequestRefresh - Time.time, 0f);
 			GUITools.PushGUIState();
-			GUI.enabled &= num == 0f;
+			GUI.enabled = GUI.enabled && num == 0f;
 			if (GUITools.Button(new Rect(rect.width - 131f, 80f, 123f, 24f), new GUIContent(string.Format(LocalizedStrings.Refresh + " {0}", (!(num > 0f)) ? string.Empty : ("(" + num.ToString("N0") + ")"))), BlueStonez.buttondark_medium))
 			{
 				Singleton<InboxManager>.Instance.RefreshAllRequests();
@@ -94,7 +94,7 @@ public class InboxPageGUI : MonoBehaviour
 		if (GUI.changed)
 		{
 			GUI.changed = false;
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		if (num != _selectedTab)
 		{
@@ -134,7 +134,7 @@ public class InboxPageGUI : MonoBehaviour
 		}
 		float num = Mathf.Max(Singleton<InboxManager>.Instance.NextInboxRefresh - Time.time, 0f);
 		GUITools.PushGUIState();
-		GUI.enabled &= num == 0f;
+		GUI.enabled = GUI.enabled && num == 0f;
 		if (GUITools.Button(new Rect(rect.width - 114f, 8f, 106f, 24f), new GUIContent(string.Format(LocalizedStrings.CheckMail + " {0}", (!(num > 0f)) ? string.Empty : ("(" + num.ToString("N0") + ")"))), BlueStonez.buttondark_medium))
 		{
 			Singleton<InboxManager>.Instance.LoadNextPageThreads();

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Cmune.DataCenter.Common.Entities;
 using UberStrike.Core.Types;
@@ -18,9 +19,15 @@ public class ShopPageGUI : PageGUI
 			}
 		}
 
-		public IUnityItem Item { get; set; }
+		public IUnityItem Item
+		{
+			get;
+			set; }
 
-		public LoadoutSlotType Slot { get; set; }
+		public LoadoutSlotType Slot
+		{
+			get;
+			set; }
 	}
 
 	private const int SlotHeight = 70;
@@ -145,7 +152,9 @@ public class ShopPageGUI : PageGUI
 		if (_showRenewLoadoutButton)
 		{
 			LoadoutSlotType[] weaponSlots = LoadoutManager.WeaponSlots;
-			foreach (LoadoutSlotType loadoutSlotType in weaponSlots)
+			LoadoutSlotType[] array = weaponSlots;
+			LoadoutSlotType[] array2 = array;
+			foreach (LoadoutSlotType loadoutSlotType in array2)
 			{
 				InventoryItem item;
 				if (Singleton<LoadoutManager>.Instance.TryGetItemInSlot(loadoutSlotType, out item))
@@ -154,7 +163,9 @@ public class ShopPageGUI : PageGUI
 				}
 			}
 			LoadoutSlotType[] gearSlots = LoadoutManager.GearSlots;
-			foreach (LoadoutSlotType loadoutSlotType2 in gearSlots)
+			LoadoutSlotType[] array3 = gearSlots;
+			LoadoutSlotType[] array4 = array3;
+			foreach (LoadoutSlotType loadoutSlotType2 in array4)
 			{
 				InventoryItem item2;
 				if (Singleton<LoadoutManager>.Instance.TryGetItemInSlot(loadoutSlotType2, out item2))
@@ -392,7 +403,7 @@ public class ShopPageGUI : PageGUI
 		if (itemClass == UberstrikeItemClass.GearFace || itemClass == UberstrikeItemClass.GearHolo)
 		{
 			Singleton<TemporaryLoadoutManager>.Instance.ResetLoadout(slot);
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.EquipGear, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.EquipGear, 0uL);
 			if (GameState.Current.Avatar != null)
 			{
 				GameState.Current.Avatar.HideWeapons();
@@ -509,7 +520,7 @@ public class ShopPageGUI : PageGUI
 		if (num != _loadoutAreaSelection.Index)
 		{
 			_loadoutAreaSelection.SetIndex(num);
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		Rect position = new Rect(0f, 76f, rect.width, rect.height - 76f);
 		switch (_loadoutAreaSelection.Current)
@@ -581,7 +592,7 @@ public class ShopPageGUI : PageGUI
 		{
 			_shopAreaSelection.SetIndex(num);
 			_searchBar.ClearFilter();
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 	}
 
@@ -591,7 +602,7 @@ public class ShopPageGUI : PageGUI
 		if (num != _typeSelection.Index)
 		{
 			_typeSelection.SetIndex(num);
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 		if (_typeSelection.Current == UberstrikeItemType.Weapon)
 		{
@@ -624,7 +635,7 @@ public class ShopPageGUI : PageGUI
 			{
 				_weaponClassSelection.SetIndex(num);
 			}
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 	}
 
@@ -643,7 +654,7 @@ public class ShopPageGUI : PageGUI
 			{
 				_gearClassSelection.SetIndex(num);
 			}
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.ButtonClick, 0uL);
 		}
 	}
 
@@ -680,39 +691,48 @@ public class ShopPageGUI : PageGUI
 		int num7 = -num4;
 		for (int i = 0; i < list.Count; i++)
 		{
-			if (!_searchBar.CheckIfPassFilter(list[i].Item.Name))
+			SearchBarGUI searchBar = _searchBar;
+			T val = list[i];
+			if (!searchBar.CheckIfPassFilter(val.Item.Name))
 			{
 				_skippedDefaultGearCount++;
 				continue;
 			}
-			if (_itemFilter != null && !_itemFilter.CanPass(list[i].Item))
+			if (_itemFilter != null)
 			{
-				_skippedDefaultGearCount++;
-				continue;
+				IShopItemFilter itemFilter = _itemFilter;
+				val = list[i];
+				if (!itemFilter.CanPass(val.Item))
+				{
+					_skippedDefaultGearCount++;
+					continue;
+				}
 			}
 			num7 += num4;
 			if (!((float)(num7 + num4) < _labScroll.y) && !((float)num7 > _labScroll.y + position2.height))
 			{
 				Rect rect = new Rect(0f, num7 + ((num2 != -1) ? (num3 - 20) : 0), position.width - (float)num6, num4);
 				Rect rect2 = new Rect(rect.x, rect.y, rect.width - 100f, rect.height);
-				T val = list[i];
+				T val2 = list[i];
 				GUITools.PushGUIState();
-				if (!Singleton<InventoryManager>.Instance.Contains(val.Item.View.ID) && val.Item.View.LevelLock > PlayerDataManager.PlayerLevel)
+				if (!Singleton<InventoryManager>.Instance.Contains(val2.Item.View.ID) && val2.Item.View.LevelLock > PlayerDataManager.PlayerLevel)
 				{
 					GUI.enabled = false;
 				}
-				val.Draw(rect, rect.Contains(Event.current.mousePosition));
+				val2.Draw(rect, rect.Contains(Event.current.mousePosition));
 				GUITools.PopGUIState();
-				list2.Add(val.Item.View.PrefabName);
+				list2.Add(val2.Item.View.PrefabName);
 				if (flag && rect2.Contains(Event.current.mousePosition) && !Singleton<DragAndDrop>.Instance.IsDragging)
 				{
-					AutoMonoBehaviour<ItemToolTip>.Instance.SetItem(val.Item, rect, PopupViewSide.Left);
+					AutoMonoBehaviour<ItemToolTip>.Instance.SetItem(val2.Item, rect, PopupViewSide.Left);
 				}
-				Singleton<DragAndDrop>.Instance.DrawSlot(rect, new ShopDragSlot
-				{
-					Item = list[i].Item,
-					Slot = LoadoutSlotType.Shop
-				}, OnDropShop, null, true);
+				DragAndDrop instance = Singleton<DragAndDrop>.Instance;
+				Rect rect3 = rect;
+				ShopDragSlot item = default(ShopDragSlot);
+				val = list[i];
+				item.Item = val.Item;
+				item.Slot = LoadoutSlotType.Shop;
+				instance.DrawSlot(rect3, item, OnDropShop, null, true);
 			}
 		}
 		GUITools.EndScrollView();
@@ -1061,19 +1081,19 @@ public class ShopPageGUI : PageGUI
 			EquipItemFromArea(item.Item, (LoadoutSlotType)slotId, ShopArea.Shop);
 			return;
 		}
-		switch ((LoadoutSlotType)slotId)
+		switch (slotId)
 		{
-		case LoadoutSlotType.WeaponPrimary:
-		case LoadoutSlotType.WeaponSecondary:
-		case LoadoutSlotType.WeaponTertiary:
+		case 8:
+		case 9:
+		case 10:
 			if (item.Slot >= LoadoutSlotType.WeaponPrimary && item.Slot <= LoadoutSlotType.WeaponTertiary)
 			{
 				SwapWeapons(item.Slot, (LoadoutSlotType)slotId);
 			}
 			break;
-		case LoadoutSlotType.QuickUseItem1:
-		case LoadoutSlotType.QuickUseItem2:
-		case LoadoutSlotType.QuickUseItem3:
+		case 11:
+		case 12:
+		case 13:
 			SwapQuickItems(item.Slot, (LoadoutSlotType)slotId);
 			break;
 		}

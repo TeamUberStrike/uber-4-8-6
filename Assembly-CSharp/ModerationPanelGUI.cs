@@ -360,7 +360,6 @@ public class ModerationPanelGUI : PanelGuiBase
 			break;
 		case Actions.MUTE_PLAYER:
 			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.Operations.SendModerationMutePlayer(_banDurationIndex, _selectedCommUser.Cmid, true);
-			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.Operations.SendModerationMutePlayer(_banDurationIndex, _selectedCommUser.Cmid, false);
 			PopupSystem.ShowMessage("Action Executed", string.Format("The Player '{0}' was muted for {1} minutes.", _selectedCommUser.Name, _banDurationIndex));
 			break;
 		case Actions.KICK_FROM_GAME:

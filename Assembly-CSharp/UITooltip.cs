@@ -103,8 +103,18 @@ public class UITooltip : MonoBehaviour
 				mSize = text.relativeSize;
 				mSize.x *= localScale.x;
 				mSize.y *= localScale.y;
-				mSize.x += background.border.x + background.border.z + (localPosition.x - background.border.x) * 2f;
-				mSize.y += background.border.y + background.border.w + (0f - localPosition.y - background.border.y) * 2f;
+				UITooltip uITooltip = this;
+				float x = uITooltip.mSize.x;
+				float x2 = background.border.x;
+				float num = x2 + background.border.z;
+				float x3 = localPosition.x;
+				uITooltip.mSize.x = x + (num + (x3 - background.border.x) * 2f);
+				UITooltip uITooltip2 = this;
+				float y = uITooltip2.mSize.y;
+				float y2 = background.border.y;
+				float num2 = y2 + background.border.w;
+				float num3 = 0f - localPosition.y;
+				uITooltip2.mSize.y = y + (num2 + (num3 - background.border.y) * 2f);
 				mSize.z = 1f;
 				transform.localScale = mSize;
 			}

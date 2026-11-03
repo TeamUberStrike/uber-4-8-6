@@ -20,10 +20,11 @@ public class UIOrthoCamera : MonoBehaviour
 	{
 		float num = mCam.rect.yMin * (float)Screen.height;
 		float num2 = mCam.rect.yMax * (float)Screen.height;
-		float num3 = (num2 - num) * 0.5f * mTrans.lossyScale.y;
-		if (!Mathf.Approximately(mCam.orthographicSize, num3))
+		float num3 = (num2 - num) * 0.5f;
+		float num4 = num3 * mTrans.lossyScale.y;
+		if (!Mathf.Approximately(mCam.orthographicSize, num4))
 		{
-			mCam.orthographicSize = num3;
+			mCam.orthographicSize = num4;
 		}
 	}
 }

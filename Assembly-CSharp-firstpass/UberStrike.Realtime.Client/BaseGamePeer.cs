@@ -3,6 +3,7 @@ using System.IO;
 using Cmune.Core.Models;
 using UberStrike.Core.Models;
 using UberStrike.Core.Serialization;
+using UnityEngine;
 
 namespace UberStrike.Realtime.Client
 {
@@ -54,6 +55,9 @@ namespace UberStrike.Realtime.Client
 			case 11:
 				DisconnectAndDisablePhoton(data);
 				break;
+			case 12:
+				OnWeekendChallengeAchivement();
+				break;
 			}
 		}
 
@@ -62,6 +66,8 @@ namespace UberStrike.Realtime.Client
 		protected abstract void OnRoomEntered(GameRoomData game);
 
 		protected abstract void OnRoomEnterFailed(string server, int roomId, string message);
+
+		protected abstract void OnRoomRejoin(GameRoomData data, string password);
 
 		protected abstract void OnRequestPasswordForRoom(string server, int roomId);
 
@@ -79,6 +85,8 @@ namespace UberStrike.Realtime.Client
 
 		protected abstract void OnDisconnectAndDisablePhoton(string message);
 
+		protected abstract void OnWeekendChallengeAchivement();
+
 		private void HeartbeatChallenge(byte[] _bytes)
 		{
 			using (MemoryStream bytes = new MemoryStream(_bytes))
@@ -92,8 +100,20 @@ namespace UberStrike.Realtime.Client
 		{
 			using (MemoryStream bytes = new MemoryStream(_bytes))
 			{
-				GameRoomData game = GameRoomDataProxy.Deserialize(bytes);
-				OnRoomEntered(game);
+				GameRoomData gameRoomData = GameRoomDataProxy.Deserialize(bytes);
+				if (BooleanProxy.Deserialize(bytes))
+				{
+					string password = "";
+					if (gameRoomData.IsPasswordProtected)
+					{
+						password = StringProxy.Deserialize(bytes);
+					}
+					OnRoomRejoin(gameRoomData, password);
+				}
+				else
+				{
+					OnRoomEntered(gameRoomData);
+				}
 			}
 		}
 
@@ -120,6 +140,7 @@ namespace UberStrike.Realtime.Client
 
 		private void RoomLeft(byte[] _bytes)
 		{
+			Debug.LogError("OnRoomLeft call");
 			using (new MemoryStream(_bytes))
 			{
 				OnRoomLeft();

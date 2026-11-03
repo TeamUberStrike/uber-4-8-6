@@ -40,7 +40,7 @@ public class CommConnectionManager : AutoMonoBehaviour<CommConnectionManager>
 	{
 		while (true)
 		{
-			yield return new WaitForSeconds(5f);
+			yield return new WaitForSeconds(1f);
 			if (Client.IsEnabled && !Client.IsConnected && Singleton<GameServerManager>.Instance.CommServer.IsValid && PlayerDataManager.IsPlayerLoggedIn)
 			{
 				Client.Connect(Singleton<GameServerManager>.Instance.CommServer.ConnectionString);

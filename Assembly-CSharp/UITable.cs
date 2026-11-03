@@ -105,17 +105,33 @@ public class UITable : MonoBehaviour
 			Bounds bounds3 = array2[num5];
 			Bounds bounds4 = array3[num6];
 			Vector3 localPosition = transform2.localPosition;
-			localPosition.x = num + bounds2.extents.x - bounds2.center.x;
-			localPosition.x += bounds2.min.x - bounds3.min.x + padding.x;
+			float num7 = num;
+			float num8 = num7 + bounds2.extents.x;
+			localPosition.x = num8 - bounds2.center.x;
+			float x = localPosition.x;
+			float x2 = bounds2.min.x;
+			localPosition.x = x + (x2 - bounds3.min.x + padding.x);
 			if (direction == Direction.Down)
 			{
-				localPosition.y = 0f - num2 - bounds2.extents.y - bounds2.center.y;
-				localPosition.y += (bounds2.max.y - bounds2.min.y - bounds4.max.y + bounds4.min.y) * 0.5f - padding.y;
+				float num9 = 0f - num2;
+				float num10 = num9 - bounds2.extents.y;
+				localPosition.y = num10 - bounds2.center.y;
+				float y = localPosition.y;
+				float y2 = bounds2.max.y;
+				float num11 = y2 - bounds2.min.y;
+				float num12 = num11 - bounds4.max.y;
+				localPosition.y = y + ((num12 + bounds4.min.y) * 0.5f - padding.y);
 			}
 			else
 			{
-				localPosition.y = num2 + bounds2.extents.y - bounds2.center.y;
-				localPosition.y += (bounds2.max.y - bounds2.min.y - bounds4.max.y + bounds4.min.y) * 0.5f - padding.y;
+				float num13 = num2;
+				float num14 = num13 + bounds2.extents.y;
+				localPosition.y = num14 - bounds2.center.y;
+				float y3 = localPosition.y;
+				float y4 = bounds2.max.y;
+				float num15 = y4 - bounds2.min.y;
+				float num16 = num15 - bounds4.max.y;
+				localPosition.y = y3 + ((num16 + bounds4.min.y) * 0.5f - padding.y);
 			}
 			num += bounds3.max.x - bounds3.min.x + padding.x * 2f;
 			transform2.localPosition = localPosition;

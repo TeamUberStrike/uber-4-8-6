@@ -40,7 +40,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(1, customOpParameters);
+					sendOperation(1, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -54,7 +54,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(2, customOpParameters);
+					sendOperation(2, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -69,7 +69,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(3, customOpParameters);
+					sendOperation(3, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -83,12 +83,12 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(4, customOpParameters);
+					sendOperation(4, customOpParameters, true, 0);
 				}
 			}
 		}
 
-		public void SendEnterRoom(int roomId, string password, string clientVersion, string authToken, string magicHash)
+		public void SendEnterRoom(int roomId, string password, string clientVersion, string authToken, string magicHash, bool isMac)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
@@ -97,17 +97,18 @@ namespace UberStrike.Realtime.Client
 				StringProxy.Serialize(memoryStream, clientVersion);
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, magicHash);
+				BooleanProxy.Serialize(memoryStream, isMac);
 				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
 				dictionary.Add(__id, memoryStream.ToArray());
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(5, customOpParameters);
+					sendOperation(5, customOpParameters, true, 0);
 				}
 			}
 		}
 
-		public void SendCreateRoom(GameRoomData metaData, string password, string clientVersion, string authToken, string magicHash)
+		public void SendCreateRoom(GameRoomData metaData, string password, string clientVersion, string authToken, string magicHash, bool isMac)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
@@ -116,12 +117,13 @@ namespace UberStrike.Realtime.Client
 				StringProxy.Serialize(memoryStream, clientVersion);
 				StringProxy.Serialize(memoryStream, authToken);
 				StringProxy.Serialize(memoryStream, magicHash);
+				BooleanProxy.Serialize(memoryStream, isMac);
 				Dictionary<byte, object> dictionary = new Dictionary<byte, object>();
 				dictionary.Add(__id, memoryStream.ToArray());
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(6, customOpParameters);
+					sendOperation(6, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -135,7 +137,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(7, customOpParameters);
+					sendOperation(7, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -152,7 +154,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(8, customOpParameters);
+					sendOperation(8, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -168,7 +170,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(9, customOpParameters);
+					sendOperation(9, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -184,7 +186,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(10, customOpParameters);
+					sendOperation(10, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -201,7 +203,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(11, customOpParameters);
+					sendOperation(11, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -215,7 +217,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(12, customOpParameters);
+					sendOperation(12, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -230,7 +232,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(13, customOpParameters);
+					sendOperation(13, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -245,7 +247,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(14, customOpParameters);
+					sendOperation(14, customOpParameters, true, 0);
 				}
 			}
 		}
@@ -261,7 +263,7 @@ namespace UberStrike.Realtime.Client
 				Dictionary<byte, object> customOpParameters = dictionary;
 				if (sendOperation != null)
 				{
-					sendOperation(15, customOpParameters);
+					sendOperation(15, customOpParameters, true, 0);
 				}
 			}
 		}

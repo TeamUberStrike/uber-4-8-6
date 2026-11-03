@@ -353,11 +353,17 @@ public class UIInput : MonoBehaviour
 		{
 			if (label.multiLine)
 			{
-				text = label.font.WrapText(text, (float)label.lineWidth / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
+				UIFont font = label.font;
+				string text2 = text;
+				float num = label.lineWidth;
+				text = font.WrapText(text2, num / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
 			}
 			else
 			{
-				string endOfLineThatFits = label.font.GetEndOfLineThatFits(text, (float)label.lineWidth / label.cachedTransform.localScale.x, false, UIFont.SymbolStyle.None);
+				UIFont font2 = label.font;
+				string text3 = text;
+				float num2 = label.lineWidth;
+				string endOfLineThatFits = font2.GetEndOfLineThatFits(text3, num2 / label.cachedTransform.localScale.x, false, UIFont.SymbolStyle.None);
 				if (endOfLineThatFits != text)
 				{
 					text = endOfLineThatFits;

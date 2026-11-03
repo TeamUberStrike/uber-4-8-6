@@ -62,8 +62,8 @@ public class DeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 		};
 		GameState.Current.Actions.DirectHitDamage = delegate(int targetCmid, ushort damage, BodyPart part, Vector3 force, byte slot, byte bullets)
 		{
-			base.Operations.SendDirectHitDamage(targetCmid, (byte)part, bullets);
-			if (PlayerDataManager.Cmid == targetCmid)
+			base.Operations.SendDirectHitDamage(targetCmid, (byte)part, bullets, slot);
+			if (PlayerDataManager.Cmid == targetCmid && GameState.Current.IsMatchRunning)
 			{
 				GameStateHelper.PlayerHit(targetCmid, damage, part, force);
 			}
@@ -71,7 +71,7 @@ public class DeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 		GameState.Current.Actions.ExplosionHitDamage = delegate(int targetCmid, ushort damage, Vector3 force, byte slot, byte distance)
 		{
 			base.Operations.SendExplosionDamage(targetCmid, slot, distance, force);
-			if (PlayerDataManager.Cmid == targetCmid)
+			if (PlayerDataManager.Cmid == targetCmid && GameState.Current.IsMatchRunning)
 			{
 				GameStateHelper.PlayerHit(targetCmid, damage, BodyPart.Body, force);
 			}
@@ -224,15 +224,15 @@ public class DeathMatchRoom : BaseGameRoom, IDisposable, IGameMode
 		{
 		case PlayerLeadAudio.LeadState.Me:
 			GameData.Instance.OnNotification.Fire("YOU WIN");
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.YouWin, 1000uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.YouWin, 1000uL);
 			break;
 		case PlayerLeadAudio.LeadState.Others:
 			GameData.Instance.OnNotification.Fire("Game Over");
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GameOver, 1000uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.GameOver, 1000uL);
 			break;
 		default:
 			GameData.Instance.OnNotification.Fire("Draw");
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Draw, 1000uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.Draw, 1000uL);
 			break;
 		}
 	}

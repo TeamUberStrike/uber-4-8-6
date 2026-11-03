@@ -120,9 +120,9 @@ public class LocalPlayer : MonoBehaviour
 		{
 			if (Screen.lockCursor)
 			{
-				UserInput.UpdateMouse();
+				UserInputt.UpdateMouse();
 			}
-			UserInput.UpdateDirections();
+			UserInputt.UpdateDirections();
 			if (Screen.lockCursor)
 			{
 				UpdateRotation();
@@ -130,7 +130,7 @@ public class LocalPlayer : MonoBehaviour
 		}
 		else
 		{
-			UserInput.ResetDirection();
+			UserInputt.ResetDirection();
 		}
 	}
 
@@ -141,7 +141,7 @@ public class LocalPlayer : MonoBehaviour
 
 	private void UpdateRotation()
 	{
-		_cameraTarget.localRotation = UserInput.Rotation;
+		_cameraTarget.localRotation = UserInputt.Rotation;
 	}
 
 	private IEnumerator StartPlayerIdentification()
@@ -153,20 +153,20 @@ public class LocalPlayer : MonoBehaviour
 			{
 				continue;
 			}
-			Vector3 start = GameState.Current.PlayerData.ShootingPoint + GameState.Current.Player.EyePosition;
-			Vector3 end = start + GameState.Current.PlayerData.ShootingDirection * 1000f;
-			RaycastHit hit;
-			if (Physics.Linecast(start, end, out hit, UberstrikeLayerMasks.IdentificationMask))
+			Vector3 vector = GameState.Current.PlayerData.ShootingPoint + GameState.Current.Player.EyePosition;
+			Vector3 end = vector + GameState.Current.PlayerData.ShootingDirection * 1000f;
+			RaycastHit hitInfo;
+			if (Physics.Linecast(vector, end, out hitInfo, UberstrikeLayerMasks.IdentificationMask))
 			{
-				CharacterHitArea hitArea = hit.collider.GetComponent<CharacterHitArea>();
-				if ((bool)hitArea && hitArea.Shootable != null && !hitArea.Shootable.IsLocal)
+				CharacterHitArea component = hitInfo.collider.GetComponent<CharacterHitArea>();
+				if ((bool)component && component.Shootable != null && !component.Shootable.IsLocal)
 				{
-					CharacterConfig character = (CharacterConfig)hitArea.Shootable;
-					character.AimTrigger.HudInfo.Show();
-					GameState.Current.PlayerData.FocusedPlayerTeam.Value = character.Team;
+					CharacterConfig characterConfig = (CharacterConfig)component.Shootable;
+					characterConfig.AimTrigger.HudInfo.Show();
+					GameState.Current.PlayerData.FocusedPlayerTeam.Value = characterConfig.Team;
 					if (!_didPlayTargetSound)
 					{
-						AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.FocusEnemy, 0uL, 1f, 1f);
+						AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.FocusEnemy, 0uL);
 						_didPlayTargetSound = true;
 					}
 				}
@@ -222,7 +222,7 @@ public class LocalPlayer : MonoBehaviour
 			WeaponFeedbackManager.SetBobMode(LevelCamera.BobMode.Swim);
 			break;
 		case MoveStates.Grounded | MoveStates.Ducked:
-			if (UserInput.IsWalking)
+			if (UserInputt.IsWalking)
 			{
 				if (Singleton<WeaponController>.Instance.IsSecondaryAction)
 				{
@@ -246,7 +246,7 @@ public class LocalPlayer : MonoBehaviour
 			WeaponFeedbackManager.SetBobMode(LevelCamera.BobMode.Fly);
 			break;
 		case MoveStates.Grounded:
-			if (UserInput.IsWalking)
+			if (UserInputt.IsWalking)
 			{
 				if (Singleton<WeaponController>.Instance.IsSecondaryAction)
 				{
@@ -261,13 +261,13 @@ public class LocalPlayer : MonoBehaviour
 			{
 				WeaponFeedbackManager.SetBobMode(LevelCamera.BobMode.None);
 			}
-			else if (!UserInput.IsWalking || MoveController.Velocity.y < -300f)
+			else if (!UserInputt.IsWalking || MoveController.Velocity.y < -300f)
 			{
 				WeaponFeedbackManager.SetBobMode(LevelCamera.BobMode.Idle);
 			}
 			break;
 		default:
-			if (!UserInput.IsWalking || MoveController.Velocity.y < -300f)
+			if (!UserInputt.IsWalking || MoveController.Velocity.y < -300f)
 			{
 				WeaponFeedbackManager.SetBobMode(LevelCamera.BobMode.None);
 			}
@@ -306,7 +306,7 @@ public class LocalPlayer : MonoBehaviour
 		{
 			base.transform.position = pos + Vector3.up;
 			_cameraTarget.localRotation = rot;
-			UserInput.SetRotation(rot.eulerAngles.y, 0f);
+			UserInputt.SetRotation(rot.eulerAngles.y);
 			LevelCamera.ResetFeedback();
 			MoveController.ResetEnviroment();
 			MoveController.Platform = null;
@@ -315,6 +315,13 @@ public class LocalPlayer : MonoBehaviour
 		{
 			Debug.LogException(exception);
 		}
+	}
+
+	public void ResetShopCharPos(Quaternion rot)
+	{
+		_cameraTarget.localRotation = rot;
+		Vector3 eulerAngles = rot.eulerAngles;
+		UserInputt.SetRotation(rot.eulerAngles.y);
 	}
 
 	public void SetCurrentCharacterConfig(CharacterConfig character)

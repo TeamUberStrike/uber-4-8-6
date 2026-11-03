@@ -1519,19 +1519,19 @@ public static class LocalizedStrings
 
 	public static string UberStrikeIsOutOfDatePleaseDownloadClient = "UberStrike v{0} out of date, latest is v{1}.\nDownload the new client from:\n{2}";
 
-	public static string UberStrikeIsOutOfDateVisitWebsite = "UberStrike v{0} out of date.\nVisit UberStrike.com to get v{1}!";
+	public static string UberStrikeIsOutOfDateVisitWebsite = "UberStrike v{0} is out of date.\nVisit https://discord.gg/hhxZCBamRT to get v{1}!";
 
-	public static string UberStrikeIsOutOfDateUpdateMacApp = "UberStrike v{0} out of date, latest is v{1}.\nPlease update from the Mac App Store.";
+	public static string UberStrikeIsOutOfDateUpdateMacApp = "UberStrike v{0} is out of date, latest version is v{1}.\nVisit https://discord.gg/hhxZCBamRT to get the latest version.";
 
 	public static string ConnectionProblem = "Connection Problem";
 
 	public static string ErrorInternetConnection = "No active internet connection detected.\nAn internet connection is required to play UberStrike.\nPlease check your connection and try again.";
 
-	public static string ErrorWebservices = "There seems to be a problem with our service. Please restart Uberstrike and try to sign in again. If this problem persists please visit support.uberstrike.com. Thank you!";
+	public static string ErrorWebservices = "There seems to be a problem with our service. Please restart Uberstrike and try to sign in again. Please try again later or contact us at https://discord.gg/hhxZCBamRT";
 
 	public static string ErrorReadingConfiguration = "Error Reading Configuration";
 
-	public static string ThereWasProblemRetrievingWebplayerConfiguration = "There was a problem retrieving the webplayer configuration. Please email support.uberstrike.com";
+	public static string ThereWasProblemRetrievingWebplayerConfiguration = "There was a problem retrieving the webplayer configuration. Please try again later or contact us at https://discord.gg/hhxZCBamRT";
 
 	public static string RefreshWallet = "Refresh Wallet";
 
@@ -1617,29 +1617,29 @@ public static class LocalizedStrings
 
 	public static string ErrorLoadingMaps = "There was an error loading the maps.";
 
-	public static string ErrorLoadingMapsSupport = "There was an error getting the Maps.\nPlease visit support.uberstrike.com";
+	public static string ErrorLoadingMapsSupport = "There was an error getting the Maps.\nPlease try again later or contact us at https://discord.gg/hhxZCBamRT";
 
 	public static string LoadingWeaponAndGear = "Loading Weapons and Gear";
 
 	public static string ErrorGettingShopData = "Error Getting Shop Data";
 
-	public static string ErrorGettingShopDataSupport = "There was an error getting the Shop Data.\nPlease visit support.uberstrike.com";
+	public static string ErrorGettingShopDataSupport = "There was an error getting the Shop Data.\nPlease try again later or contact us at https://discord.gg/hhxZCBamRT";
 
 	public static string LoadingPlayerInventory = "Loading Player Inventory";
 
-	public static string ErrorLoadingPlayerInventory = "It looks like you're trying to login with an old account.\nPlease visit support.uberstrike.com to upgrade.";
+	public static string ErrorLoadingPlayerInventory = "It looks like you're trying to login with an old account.\nPlease try again later or contact us at https://discord.gg/hhxZCBamRT";
 
 	public static string GettingPlayerLoadout = "Getting Player Loadout";
 
 	public static string ErrorGettingPlayerLoadout = "Error Getting Player Loadout";
 
-	public static string ErrorGettingPlayerLoadoutSupport = "There was an error getting the Player Loadout.\nPlease visit support.uberstrike.com";
+	public static string ErrorGettingPlayerLoadoutSupport = "There was an error getting the Player Loadout.\nPlease try again later or contact us at https://discord.gg/hhxZCBamRT";
 
 	public static string LoadingPlayerStatistics = "Loading Player Statistics";
 
 	public static string ErrorGettingPlayerStatistics = "Error Getting Player Statistics";
 
-	public static string ErrorPlayerStatisticsSupport = "There was an error getting the Player Statistics.\nPlease visit support.uberstrike.com";
+	public static string ErrorPlayerStatisticsSupport = "There was an error getting the Player Statistics.\nPlease try again later or contact us at https://discord.gg/hhxZCBamRT";
 
 	public static string LoadingClanData = "Loading Clan Data";
 
@@ -1800,6 +1800,7 @@ public static class LocalizedStrings
 						dictionary[attribute] = value;
 					}
 				}
+				return dictionary;
 			}
 			finally
 			{

@@ -101,19 +101,19 @@ public class GameServerManager : Singleton<GameServerManager>
 
 	internal string GetServerName(GameRoomData room)
 	{
-		string result = string.Empty;
+		string empty = string.Empty;
 		if (room != null && room.Server != null)
 		{
 			foreach (PhotonServer value in _gameServers.Values)
 			{
 				if (value.ConnectionString == room.Server.ConnectionString)
 				{
-					result = value.Name;
-					break;
+					return value.Name;
 				}
 			}
+			return empty;
 		}
-		return result;
+		return empty;
 	}
 
 	public void SortServers(IComparer<PhotonServer> comparer, bool reverse = false)
@@ -165,20 +165,20 @@ public class GameServerManager : Singleton<GameServerManager>
 
 	public IEnumerator StartUpdatingServerLoads()
 	{
-		foreach (PhotonServer server in _gameServers.Values)
+		foreach (PhotonServer value2 in _gameServers.Values)
 		{
-			ServerLoadRequest request;
-			if (!_loadRequests.TryGetValue(server.Id, out request))
+			ServerLoadRequest value;
+			if (!_loadRequests.TryGetValue(value2.Id, out value))
 			{
-				request = ServerLoadRequest.Run(server, delegate
+				value = ServerLoadRequest.Run(value2, delegate
 				{
 					UpdateGamesAndPlayerCount();
 				});
-				_loadRequests.Add(server.Id, request);
+				_loadRequests.Add(value2.Id, value);
 			}
-			if (request.RequestState != ServerLoadRequest.RequestStateType.Waiting)
+			if (value.RequestState != ServerLoadRequest.RequestStateType.Waiting)
 			{
-				request.Run();
+				value.Run();
 			}
 			yield return new WaitForSeconds(0.1f);
 		}
@@ -189,20 +189,20 @@ public class GameServerManager : Singleton<GameServerManager>
 		yield return UnityRuntime.StartRoutine(StartUpdatingServerLoads());
 		float minTimeout = Time.time + 4f;
 		float maxTimeout = Time.time + 10f;
-		int count = 0;
-		while (count != _loadRequests.Count)
+		int num = 0;
+		while (num != _loadRequests.Count)
 		{
 			yield return new WaitForSeconds(1f);
-			count = 0;
-			foreach (ServerLoadRequest r in _loadRequests.Values)
+			num = 0;
+			foreach (ServerLoadRequest value in _loadRequests.Values)
 			{
-				if (r.RequestState != ServerLoadRequest.RequestStateType.Waiting)
+				if (value.RequestState != ServerLoadRequest.RequestStateType.Waiting)
 				{
-					count++;
+					num++;
 				}
 			}
-			progressCallback((float)count / (float)_loadRequests.Count);
-			if ((count > 0 && Time.time > minTimeout) || Time.time > maxTimeout)
+			progressCallback((float)num / (float)_loadRequests.Count);
+			if ((num > 0 && Time.time > minTimeout) || Time.time > maxTimeout)
 			{
 				break;
 			}

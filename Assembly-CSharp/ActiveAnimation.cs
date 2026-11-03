@@ -37,21 +37,20 @@ public class ActiveAnimation : IgnoreTimeScale
 				}
 				if (mLastDirection == Direction.Forward)
 				{
-					if (!(item.time < item.length))
+					if (item.time < item.length)
 					{
-						continue;
+						return true;
 					}
-					return true;
+					continue;
 				}
-				if (mLastDirection == Direction.Reverse)
+				if (mLastDirection != Direction.Reverse)
 				{
-					if (!(item.time > 0f))
-					{
-						continue;
-					}
 					return true;
 				}
-				return true;
+				if (item.time > 0f)
+				{
+					return true;
+				}
 			}
 			return false;
 		}

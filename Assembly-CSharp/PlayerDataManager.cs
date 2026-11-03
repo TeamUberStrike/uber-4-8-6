@@ -26,7 +26,13 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 
 	private float _updateLoadoutTime;
 
+	public static bool IsLoadoutUpdating;
+
+	public static MemberOperationResult result;
+
 	public static string MagicHash { get; set; }
+
+	public static int LoginStreak { get; set; }
 
 	public static bool IsTestBuild
 	{
@@ -202,7 +208,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (Singleton<PlayerDataManager>.Instance._playerClanData == null) ? string.Empty : Singleton<PlayerDataManager>.Instance._playerClanData.Name;
+			if (Singleton<PlayerDataManager>.Instance._playerClanData != null)
+			{
+				return Singleton<PlayerDataManager>.Instance._playerClanData.Name;
+			}
+			return string.Empty;
 		}
 	}
 
@@ -210,7 +220,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (Singleton<PlayerDataManager>.Instance._playerClanData == null) ? string.Empty : Singleton<PlayerDataManager>.Instance._playerClanData.Tag;
+			if (Singleton<PlayerDataManager>.Instance._playerClanData != null)
+			{
+				return Singleton<PlayerDataManager>.Instance._playerClanData.Tag;
+			}
+			return string.Empty;
 		}
 	}
 
@@ -218,7 +232,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (Singleton<PlayerDataManager>.Instance._playerClanData == null) ? string.Empty : Singleton<PlayerDataManager>.Instance._playerClanData.Motto;
+			if (Singleton<PlayerDataManager>.Instance._playerClanData != null)
+			{
+				return Singleton<PlayerDataManager>.Instance._playerClanData.Motto;
+			}
+			return string.Empty;
 		}
 	}
 
@@ -226,7 +244,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (Singleton<PlayerDataManager>.Instance._playerClanData == null) ? DateTime.Now : Singleton<PlayerDataManager>.Instance._playerClanData.FoundingDate;
+			if (Singleton<PlayerDataManager>.Instance._playerClanData != null)
+			{
+				return Singleton<PlayerDataManager>.Instance._playerClanData.FoundingDate;
+			}
+			return DateTime.Now;
 		}
 	}
 
@@ -234,7 +256,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (Singleton<PlayerDataManager>.Instance._playerClanData == null) ? string.Empty : Singleton<PlayerDataManager>.Instance._playerClanData.OwnerName;
+			if (Singleton<PlayerDataManager>.Instance._playerClanData != null)
+			{
+				return Singleton<PlayerDataManager>.Instance._playerClanData.OwnerName;
+			}
+			return string.Empty;
 		}
 	}
 
@@ -242,7 +268,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (Singleton<PlayerDataManager>.Instance._playerClanData != null) ? Singleton<PlayerDataManager>.Instance._playerClanData.MembersLimit : 0;
+			if (Singleton<PlayerDataManager>.Instance._playerClanData == null)
+			{
+				return 0;
+			}
+			return Singleton<PlayerDataManager>.Instance._playerClanData.MembersLimit;
 		}
 	}
 
@@ -250,7 +280,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (_playerClanData != null) ? _playerClanData.Members.Count : 0;
+			if (_playerClanData == null)
+			{
+				return 0;
+			}
+			return _playerClanData.Members.Count;
 		}
 	}
 
@@ -258,7 +292,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (_playerClanData == null) ? new List<ClanMemberView>(0) : _playerClanData.Members;
+			if (_playerClanData != null)
+			{
+				return _playerClanData.Members;
+			}
+			return new List<ClanMemberView>(0);
 		}
 	}
 
@@ -266,7 +304,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return Singleton<PlayerDataManager>.Instance.RankInClan == GroupPosition.Leader || Singleton<PlayerDataManager>.Instance.RankInClan == GroupPosition.Officer;
+			if (Singleton<PlayerDataManager>.Instance.RankInClan != GroupPosition.Leader)
+			{
+				return Singleton<PlayerDataManager>.Instance.RankInClan == GroupPosition.Officer;
+			}
+			return true;
 		}
 	}
 
@@ -274,7 +316,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 	{
 		get
 		{
-			return (!IsPlayerInClan) ? Name : string.Format("[{0}] {1}", ClanTag, Name);
+			if (IsPlayerInClan)
+			{
+				return "[" + ClanTag + "] " + Name;
+			}
+			return Name;
 		}
 	}
 
@@ -340,7 +386,7 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 		if (Cmid < 1)
 		{
 			Debug.LogError("Player CMID is invalid! Have you called AuthenticationManager.StartAuthenticateMember?");
-			ApplicationDataManager.LockApplication("The authentication process failed. Please sign in on www.uberstrike.com and restart UberStrike.");
+			ApplicationDataManager.LockApplication("The authentication process failed. Please try again later or contact us at https://discord.gg/hhxZCBamRT");
 			yield break;
 		}
 		IPopupDialog popupDialog = PopupSystem.ShowMessage("Updating", "Updating your points and credits balance...", PopupSystem.AlertType.None);
@@ -353,31 +399,32 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 
 	public IEnumerator StartSetLoadout()
 	{
-		if (_updateLoadoutTime == 0f)
+		if (AutoMonoBehaviour<CommConnectionManager>.Instance.Client.IsConnected)
 		{
-			_updateLoadoutTime = Time.time + 5f;
-			while (_updateLoadoutTime > Time.time)
+			ProgressPopupDialog popup = new ProgressPopupDialog("Authentication", "Connecting to Server & Syncing Loadout");
+			PopupSystem.Show(popup);
+			IsLoadoutUpdating = true;
+			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Operations.SendUpdateLoadout(AuthToken, CreateLocalPlayerLoadoutView());
+			while (IsLoadoutUpdating)
 			{
 				yield return new WaitForEndOfFrame();
 			}
-			_updateLoadoutTime = 0f;
-			yield return UserWebServiceClient.SetLoadout(AuthToken, CreateLocalPlayerLoadoutView(), delegate(MemberOperationResult ev)
+			yield return StartGetLoadout();
+			if (result != MemberOperationResult.Ok)
 			{
-				if (Singleton<GameStateController>.Instance.Client.IsConnected)
-				{
-					Singleton<GameStateController>.Instance.Client.Operations.SendUpdateLoadout();
-				}
-				if (ev != MemberOperationResult.Ok)
-				{
-					Debug.LogError("SetLoadout failed with error=" + ev);
-				}
-			}, delegate
+				PopupSystem.HideMessage(popup);
+				PopupSystem.ShowMessage(null, string.Format("Error updating your loadout {0}", result));
+			}
+			else
 			{
-			});
+				PopupSystem.HideMessage(popup);
+			}
+			Singleton<GameStateController>.Instance.Client.Operations.SendUpdateLoadout();
 		}
 		else
 		{
-			_updateLoadoutTime = Time.time + 5f;
+			yield return StartGetLoadout();
+			ApplicationDataManager.LockApplication("Client and server data out of sync, please restart");
 		}
 	}
 
@@ -399,7 +446,7 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 			}
 			else
 			{
-				ApplicationDataManager.LockApplication("It seems that you account is corrupted. Please visit support.uberstrike.com for advice.");
+				ApplicationDataManager.LockApplication("It seems that you account is corrupted. Please try again later or contact us at https://discord.gg/hhxZCBamRT");
 			}
 		}, delegate
 		{
@@ -442,7 +489,11 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 
 	public bool ValidateMemberData()
 	{
-		return Cmid > 0 && _serverLocalPlayerPlayerStatisticsView.Cmid > 0;
+		if (Cmid > 0)
+		{
+			return _serverLocalPlayerPlayerStatisticsView.Cmid > 0;
+		}
+		return false;
 	}
 
 	public void AttributeXp(int xp)
@@ -486,11 +537,19 @@ public class PlayerDataManager : Singleton<PlayerDataManager>
 
 	public static bool TryGetFriend(int cmid, out PublicProfileView view)
 	{
-		return Singleton<PlayerDataManager>.Instance._friends.TryGetValue(cmid, out view) && view != null;
+		if (Singleton<PlayerDataManager>.Instance._friends.TryGetValue(cmid, out view))
+		{
+			return view != null;
+		}
+		return false;
 	}
 
 	public static bool TryGetClanMember(int cmid, out ClanMemberView view)
 	{
-		return Singleton<PlayerDataManager>.Instance._clanMembers.TryGetValue(cmid, out view) && view != null;
+		if (Singleton<PlayerDataManager>.Instance._clanMembers.TryGetValue(cmid, out view))
+		{
+			return view != null;
+		}
+		return false;
 	}
 }

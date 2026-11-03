@@ -11,7 +11,8 @@ namespace UberStrike.Realtime.UnitySdk
 			LowGravity = 1,
 			NoArmor = 2,
 			QuickSwitch = 4,
-			MeleeOnly = 8
+			MeleeOnly = 8,
+			KnockBack = 0x10
 		}
 
 		private GAME_FLAGS gameFlags;
@@ -25,6 +26,18 @@ namespace UberStrike.Realtime.UnitySdk
 			set
 			{
 				SetFlag(GAME_FLAGS.LowGravity, value);
+			}
+		}
+
+		public bool KnockBack
+		{
+			get
+			{
+				return IsFlagSet(GAME_FLAGS.KnockBack);
+			}
+			set
+			{
+				SetFlag(GAME_FLAGS.KnockBack, value);
 			}
 		}
 

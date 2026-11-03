@@ -16,7 +16,7 @@ public class AvatarDecoratorConfig : MonoBehaviour
 
 	private void Awake()
 	{
-		_skinColor = Color.magenta;
+		_skinColor = PlayerDataManager.SkinColor;
 		AvatarBone[] avatarBones = _avatarBones;
 		foreach (AvatarBone avatarBone in avatarBones)
 		{

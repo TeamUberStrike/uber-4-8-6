@@ -43,8 +43,6 @@ public class CharacterMoveController
 
 	public const float StrafeJumpMultiplier = 3f;
 
-	public bool IsLowGravity;
-
 	private readonly CharacterController _controller;
 
 	private readonly Transform _transform;
@@ -85,7 +83,11 @@ public class CharacterMoveController
 	{
 		get
 		{
-			return (!GameState.Current.PlayerData.Is(MoveStates.Ducked)) ? 2f : 1f;
+			if (GameState.Current.PlayerData.Is(MoveStates.Ducked))
+			{
+				return 1f;
+			}
+			return 2f;
 		}
 	}
 
@@ -115,7 +117,7 @@ public class CharacterMoveController
 	{
 		get
 		{
-			return ((!IsLowGravity) ? 1f : 0.4f) * _currentEnviroment.Gravity * Time.deltaTime;
+			return ((!UberKill.IsLowGravity) ? 1f : 0.4f) * _currentEnviroment.Gravity * Time.deltaTime;
 		}
 	}
 
@@ -366,7 +368,7 @@ public class CharacterMoveController
 	{
 		if (AutoMonoBehaviour<InputManager>.Instance.IsInputEnabled && GameState.Current.Player != null && GameState.Current.Player.IsWalkingEnabled)
 		{
-			GameState.Current.PlayerData.Set(UserInput.GetkeyState(ev.Key), ev.IsDown);
+			GameState.Current.PlayerData.Set(UserInputt.GetkeyState(ev.Key), ev.IsDown);
 		}
 	}
 
@@ -417,17 +419,17 @@ public class CharacterMoveController
 		}
 		if (GameState.Current.PlayerData.Is(MoveStates.Flying))
 		{
-			float num2 = Mathf.Max(_currentEnviroment.StopSpeed, magnitude);
-			num += num2 * _currentEnviroment.FlyFriction;
+			float num3 = Mathf.Max(_currentEnviroment.StopSpeed, magnitude);
+			num += num3 * _currentEnviroment.FlyFriction;
 		}
 		num *= Time.deltaTime;
-		float num3 = magnitude - num;
-		if (num3 < 0f)
+		float num4 = magnitude - num;
+		if (num4 < 0f)
 		{
-			num3 = 0f;
+			num4 = 0f;
 		}
-		num3 /= magnitude;
-		_velocity *= num3;
+		num4 /= magnitude;
+		_velocity *= num4;
 	}
 
 	private void ApplyAcceleration(Vector3 wishdir, float wishspeed, float accel, bool clamp = false)
@@ -465,13 +467,13 @@ public class CharacterMoveController
 	{
 		if (WaterLevel < 3 && GameState.Current.PlayerData.Is(MoveStates.Grounded))
 		{
-			if (UserInput.IsPressed(KeyState.Crouch) && !GameState.Current.PlayerData.Is(MoveStates.Ducked))
+			if (UserInputt.IsPressed(KeyState.Crouch) && !GameState.Current.PlayerData.Is(MoveStates.Ducked))
 			{
 				GameState.Current.PlayerData.Set(MoveStates.Ducked, true);
 				_controller.height = 1f;
 				_controller.center = new Vector3(0f, -0.5f, 0f);
 			}
-			else if (!UserInput.IsPressed(KeyState.Crouch) && GameState.Current.PlayerData.Is(MoveStates.Ducked) && !HasCollision(GetFeetPosition(), 2f))
+			else if (!UserInputt.IsPressed(KeyState.Crouch) && GameState.Current.PlayerData.Is(MoveStates.Ducked) && !HasCollision(GetFeetPosition(), 2f))
 			{
 				GameState.Current.PlayerData.Set(MoveStates.Ducked, false);
 				_controller.height = 2f;
@@ -503,7 +505,7 @@ public class CharacterMoveController
 			Jump(15f);
 			return true;
 		}
-		UserInput.HorizontalDirection.y = 0f;
+		UserInputt.HorizontalDirection.y = 0f;
 		return false;
 	}
 
@@ -513,7 +515,7 @@ public class CharacterMoveController
 		{
 			if (!_canJump)
 			{
-				UserInput.HorizontalDirection.y = 0f;
+				UserInputt.HorizontalDirection.y = 0f;
 				return false;
 			}
 			_velocity.y = 15f;
@@ -526,13 +528,13 @@ public class CharacterMoveController
 	{
 		ApplyFriction();
 		Vector3 wishdir = Vector3.zero;
-		if (UserInput.IsWalking)
+		if (UserInputt.IsWalking)
 		{
-			wishdir = UserInput.Rotation * UserInput.HorizontalDirection;
+			wishdir = UserInputt.Rotation * UserInputt.HorizontalDirection;
 		}
-		if (UserInput.VerticalDirection.y != 0f)
+		if (UserInputt.VerticalDirection.y != 0f)
 		{
-			wishdir.y = UserInput.VerticalDirection.y;
+			wishdir.y = UserInputt.VerticalDirection.y;
 		}
 		ApplyAcceleration(wishdir, 7.6f - GetSpeedModifier(), _currentEnviroment.FlyAcceleration);
 	}
@@ -541,22 +543,21 @@ public class CharacterMoveController
 	{
 		ApplyFriction();
 		Vector3 wishdir = Vector3.zero;
-		if (UserInput.IsWalking)
+		if (UserInputt.IsWalking)
 		{
-			wishdir = UserInput.Rotation * UserInput.HorizontalDirection;
+			wishdir = UserInputt.Rotation * UserInputt.HorizontalDirection;
 		}
-		if (UserInput.IsMovingVertically)
+		if (UserInputt.IsMovingVertically)
 		{
-			wishdir.y = UserInput.VerticalDirection.y;
+			wishdir.y = UserInputt.VerticalDirection.y;
 		}
 		ApplyAcceleration(wishdir, 7.6f - GetSpeedModifier(), _currentEnviroment.WaterAcceleration);
 		if (_velocity[1] > -3f)
 		{
 			CharacterMoveController characterMoveController = this;
-			CharacterMoveController obj = characterMoveController;
 			int index2;
 			int index = (index2 = 1);
-			float num = obj._velocity[index2];
+			float num = characterMoveController._velocity[index2];
 			characterMoveController._velocity[index] = num - Gravity * 0.1f;
 		}
 		else
@@ -569,13 +570,13 @@ public class CharacterMoveController
 	{
 		ApplyFriction();
 		Vector3 wishdir = Vector3.zero;
-		if (UserInput.IsWalking)
+		if (UserInputt.IsWalking)
 		{
-			wishdir = UserInput.Rotation * UserInput.HorizontalDirection;
+			wishdir = UserInputt.Rotation * UserInputt.HorizontalDirection;
 		}
-		if (UserInput.IsMovingVertically)
+		if (UserInputt.IsMovingVertically)
 		{
-			wishdir.y = UserInput.VerticalDirection.y;
+			wishdir.y = UserInputt.VerticalDirection.y;
 		}
 		ApplyAcceleration(wishdir, 7.6f - GetSpeedModifier(), _currentEnviroment.GroundAcceleration);
 	}
@@ -584,32 +585,31 @@ public class CharacterMoveController
 	{
 		ApplyFriction();
 		Vector3 wishdir = Vector3.zero;
-		if (UserInput.IsWalking)
+		if (UserInputt.IsWalking)
 		{
-			wishdir = UserInput.Rotation * UserInput.HorizontalDirection;
+			wishdir = UserInputt.Rotation * UserInputt.HorizontalDirection;
 		}
-		if (UserInput.IsMovingDown)
+		if (UserInputt.IsMovingDown)
 		{
-			wishdir.y = UserInput.VerticalDirection.y;
+			wishdir.y = UserInputt.VerticalDirection.y;
 		}
-		else if (UserInput.IsMovingUp && _waterEnclosure > 0.8f)
+		else if (UserInputt.IsMovingUp && _waterEnclosure > 0.8f)
 		{
-			wishdir.y = UserInput.VerticalDirection.y * 0.5f;
+			wishdir.y = UserInputt.VerticalDirection.y * 0.5f;
 		}
 		else
 		{
 			wishdir.y = 0f;
 		}
 		ApplyAcceleration(wishdir, 7.6f - GetSpeedModifier(), _currentEnviroment.WaterAcceleration, true);
-		if (_waterEnclosure < 0.7f || !UserInput.IsMovingVertically)
+		if (_waterEnclosure < 0.7f || !UserInputt.IsMovingVertically)
 		{
 			if (_velocity[1] > -3f)
 			{
 				CharacterMoveController characterMoveController = this;
-				CharacterMoveController obj = characterMoveController;
 				int index2;
 				int index = (index2 = 1);
-				float num = obj._velocity[index2];
+				float num = characterMoveController._velocity[index2];
 				characterMoveController._velocity[index] = num - Gravity * 0.1f;
 			}
 			else
@@ -627,14 +627,13 @@ public class CharacterMoveController
 	private void MoveInAir()
 	{
 		ApplyFriction();
-		Vector3 wishdir = UserInput.Rotation * UserInput.HorizontalDirection;
+		Vector3 wishdir = UserInputt.Rotation * UserInputt.HorizontalDirection;
 		wishdir[1] = 0f;
 		ApplyAcceleration(wishdir, 7.6f - GetSpeedModifier(), _currentEnviroment.AirAcceleration);
 		CharacterMoveController characterMoveController = this;
-		CharacterMoveController obj = characterMoveController;
 		int index2;
 		int index = (index2 = 1);
-		float num = obj._velocity[index2];
+		float num = characterMoveController._velocity[index2];
 		characterMoveController._velocity[index] = num - Gravity;
 	}
 
@@ -653,7 +652,7 @@ public class CharacterMoveController
 			return;
 		}
 		ApplyFriction();
-		Vector3 wishdir = GameState.Current.PlayerData.HorizontalRotation * UserInput.HorizontalDirection;
+		Vector3 wishdir = GameState.Current.PlayerData.HorizontalRotation * UserInputt.HorizontalDirection;
 		wishdir[1] = 0f;
 		if (wishdir.sqrMagnitude > 1f)
 		{

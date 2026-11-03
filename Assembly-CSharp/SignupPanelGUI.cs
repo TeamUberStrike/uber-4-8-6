@@ -86,7 +86,7 @@ public class SignupPanelGUI : PanelGuiBase
 		}
 		Rect position = new Rect((float)(Screen.width - 500) * 0.5f, ((float)Screen.height - _height) * 0.5f - _keyboardOffset, 500f, _height);
 		GUI.BeginGroup(position, GUIContent.none, BlueStonez.window);
-		GUI.Label(new Rect(0f, 0f, position.width, 56f), LocalizedStrings.Welcome, BlueStonez.tab_strip);
+		GUI.Label(new Rect(0f, 0f, position.width, 56f), "Welcome to UberStrike!", BlueStonez.tab_strip);
 		Rect position2 = new Rect(20f, 55f, position.width - 40f, position.height - 78f);
 		GUI.Label(position2, GUIContent.none, BlueStonez.window_standard_grey38);
 		GUI.BeginGroup(position2);
@@ -124,13 +124,6 @@ public class SignupPanelGUI : PanelGuiBase
 		GUI.Label(new Rect(0f, 175f, position2.width, 40f), _errorMessage, BlueStonez.label_interparkbold_11pt);
 		GUI.contentColor = Color.white;
 		GUI.EndGroup();
-		GUI.Label(new Rect(100f, position.height - 42f - 22f, 300f, 16f), "By clicking OK you agree to the", BlueStonez.label_interparkbold_11pt);
-		if (GUI.Button(new Rect(185f, position.height - 30f - 12f, 130f, 20f), "Terms of Service", BlueStonez.buttondark_small))
-		{
-			ApplicationDataManager.OpenUrl("Terms Of Service", "http://www.cmune.com/index.php/terms-of-service/");
-			HideKeyboard();
-		}
-		GUI.Label(new Rect(207f, position.height - 15f - 22f, 90f, 20f), GUIContent.none, BlueStonez.horizontal_line_grey95);
 		GUI.enabled = _enableGUI;
 		if (GUITools.Button(new Rect(position.width - 150f, position.height - 42f - 22f, 120f, 32f), new GUIContent(LocalizedStrings.OkCaps), BlueStonez.button_green))
 		{

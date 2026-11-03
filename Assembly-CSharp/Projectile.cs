@@ -107,10 +107,14 @@ public abstract class Projectile : MonoBehaviour, IProjectile
 
 	protected virtual void Update()
 	{
-		if (GameState.Current.Map != null && GameState.Current.Map.HasWaterPlane && _positionSign != Mathf.Sign(_transform.position.y - GameState.Current.Map.WaterPlaneHeight))
+		if (GameState.Current.Map != null && GameState.Current.Map.HasWaterPlane)
 		{
-			_positionSign = Mathf.Sign(_transform.position.y - GameState.Current.Map.WaterPlaneHeight);
-			ParticleEffectController.ProjectileWaterRipplesEffect(ExplosionEffect, _transform.position);
+			float positionSign = _positionSign;
+			if (positionSign != Mathf.Sign(_transform.position.y - GameState.Current.Map.WaterPlaneHeight))
+			{
+				_positionSign = Mathf.Sign(_transform.position.y - GameState.Current.Map.WaterPlaneHeight);
+				ParticleEffectController.ProjectileWaterRipplesEffect(ExplosionEffect, _transform.position);
+			}
 		}
 	}
 
@@ -156,7 +160,7 @@ public abstract class Projectile : MonoBehaviour, IProjectile
 		{
 			clip = GameAudio.LauncherBounce2;
 		}
-		AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, position, 1f);
+		AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, position);
 	}
 
 	public Vector3 Explode()
@@ -165,21 +169,20 @@ public abstract class Projectile : MonoBehaviour, IProjectile
 		try
 		{
 			RaycastHit hitInfo;
-			if (Physics.Raycast(base.transform.position - base.transform.forward, base.transform.forward, out hitInfo, 2f, CollisionMask))
-			{
-				vector = hitInfo.point - base.transform.forward * 0.01f;
-				Explode(vector, hitInfo.normal, TagUtil.GetTag(hitInfo.collider));
-			}
-			else
+			if (!Physics.Raycast(base.transform.position - base.transform.forward, base.transform.forward, out hitInfo, 2f, CollisionMask))
 			{
 				vector = base.transform.position;
 				Explode(vector, -base.transform.forward, string.Empty);
+				return vector;
 			}
+			vector = hitInfo.point - base.transform.forward * 0.01f;
+			Explode(vector, hitInfo.normal, TagUtil.GetTag(hitInfo.collider));
+			return vector;
 		}
 		catch (Exception message)
 		{
 			Debug.LogWarning(message);
+			return vector;
 		}
-		return vector;
 	}
 }

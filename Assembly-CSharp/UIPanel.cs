@@ -630,8 +630,10 @@ public class UIPanel : MonoBehaviour
 		float num2 = clipRange.w * 0.5f;
 		Vector2 minRect = new Vector2(min.x, min.y);
 		Vector2 maxRect = new Vector2(max.x, max.y);
-		Vector2 minArea = new Vector2(clipRange.x - num, clipRange.y - num2);
-		Vector2 maxArea = new Vector2(clipRange.x + num, clipRange.y + num2);
+		float x = clipRange.x - num;
+		Vector2 minArea = new Vector2(x, clipRange.y - num2);
+		float x2 = clipRange.x + num;
+		Vector2 maxArea = new Vector2(x2, clipRange.y + num2);
 		if (clipping == UIDrawCall.Clipping.SoftClip)
 		{
 			minArea.x += clipSoftness.x;

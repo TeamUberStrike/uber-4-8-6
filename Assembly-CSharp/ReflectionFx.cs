@@ -29,7 +29,8 @@ public class ReflectionFx : MonoBehaviour
 
 	private void Start()
 	{
-		initialReflectionTextures = new Texture2D[reflectiveMaterials.Length];
+		Texture[] array = new Texture2D[reflectiveMaterials.Length];
+		Texture[] array2 = (initialReflectionTextures = array);
 		for (int i = 0; i < reflectiveMaterials.Length; i++)
 		{
 			initialReflectionTextures[i] = reflectiveMaterials[i].GetTexture(reflectionSampler);
@@ -131,8 +132,9 @@ public class ReflectionFx : MonoBehaviour
 			reflectCamera.worldToCameraMatrix = cam.worldToCameraMatrix * zero;
 			Vector4 clipPlane = CameraSpacePlane(reflectCamera, position, up, 1f);
 			Matrix4x4 projectionMatrix = cam.projectionMatrix;
-			projectionMatrix = CalculateObliqueMatrix(projectionMatrix, clipPlane);
-			reflectCamera.projectionMatrix = projectionMatrix;
+			Matrix4x4 matrix4x = (reflectCamera.projectionMatrix = CalculateObliqueMatrix(projectionMatrix, clipPlane));
+			Matrix4x4 matrix4x3 = matrix4x;
+			projectionMatrix = matrix4x3;
 			reflectCamera.transform.position = position2;
 			Vector3 eulerAngles2 = cam.transform.eulerAngles;
 			reflectCamera.transform.eulerAngles = new Vector3(0f - eulerAngles2.x, eulerAngles2.y, eulerAngles2.z);

@@ -45,7 +45,15 @@ public class TransactionHistory : Singleton<TransactionHistory>
 		{
 			get
 			{
-				return CurrentPage == null || (CurrentPageIndex > 0 && CurrentPageIndex == PageCount - 1 && _refreshLastPage < Time.time);
+				if (CurrentPage != null)
+				{
+					if (CurrentPageIndex > 0 && CurrentPageIndex == PageCount - 1)
+					{
+						return _refreshLastPage < Time.time;
+					}
+					return false;
+				}
+				return true;
 			}
 		}
 
@@ -137,19 +145,19 @@ public class TransactionHistory : Singleton<TransactionHistory>
 		Rect headingRect = new Rect(panelRect.x + 5f, panelRect.y, panelRect.width - 10f, 25f);
 		Rect scrollViewRect = new Rect(panelRect.x + 5f, panelRect.y + 30f, panelRect.width - 10f, panelRect.height - 35f - 32f - 5f);
 		Rect rect = new Rect(0f, scrollViewRect.y + scrollViewRect.height, panelRect.width, panelRect.height - scrollViewRect.height);
-		switch ((TransactionType)_selectedTab)
+		switch (_selectedTab)
 		{
-		case TransactionType.Item:
+		case 0:
 			DrawItemsTableHeadingBar(headingRect);
 			DrawItemsTableContent(scrollViewRect);
 			DrawItemsButtons(rect);
 			break;
-		case TransactionType.Point:
+		case 1:
 			DrawPointsTableHeadingBar(headingRect);
 			DrawPointsTableContent(scrollViewRect);
 			DrawPointsButtons(rect);
 			break;
-		case TransactionType.Credit:
+		case 2:
 			DrawCreditsTableHeadingBar(headingRect);
 			DrawCreditsTableContent(scrollViewRect);
 			DrawCreditsButtons(rect);
@@ -483,15 +491,15 @@ public class TransactionHistory : Singleton<TransactionHistory>
 
 	public void GetCurrentTransactions()
 	{
-		switch ((TransactionType)_selectedTab)
+		switch (_selectedTab)
 		{
-		case TransactionType.Credit:
+		case 2:
 			AsyncGetCurrencyDeposits();
 			break;
-		case TransactionType.Item:
+		case 0:
 			AsyncGetItemTransactions();
 			break;
-		case TransactionType.Point:
+		case 1:
 			AsyncGetPointsDeposits();
 			break;
 		}

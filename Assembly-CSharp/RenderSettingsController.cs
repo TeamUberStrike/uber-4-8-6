@@ -176,7 +176,7 @@ public class RenderSettingsController : MonoBehaviour
 	private void UpdateSettings(float value)
 	{
 		float num = Mathf.Clamp01(value * 3f);
-		bool flag = ((0f < value) ? true : false);
+		bool flag = 0f < value;
 		if ((bool)underWaterEffect)
 		{
 			underWaterEffect.enabled = flag;

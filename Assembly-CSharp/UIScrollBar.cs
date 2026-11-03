@@ -342,7 +342,8 @@ public class UIScrollBar : MonoBehaviour
 		mScroll = Mathf.Clamp01(mScroll);
 		Vector4 border = mBG.border;
 		Vector4 border2 = mFG.border;
-		Vector2 vector = new Vector2(Mathf.Max(0f, mBG.cachedTransform.localScale.x - border.x - border.z), Mathf.Max(0f, mBG.cachedTransform.localScale.y - border.y - border.w));
+		float x = Mathf.Max(0f, mBG.cachedTransform.localScale.x - border.x - border.z);
+		Vector2 vector = new Vector2(x, Mathf.Max(0f, mBG.cachedTransform.localScale.y - border.y - border.w));
 		float num = ((!mInverted) ? mScroll : (1f - mScroll));
 		if (mDir == Direction.Horizontal)
 		{

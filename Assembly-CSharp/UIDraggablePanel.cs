@@ -106,9 +106,11 @@ public class UIDraggablePanel : IgnoreTimeScale
 			float num = bounds.size.x;
 			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 			{
-				num += mPanel.clipSoftness.x * 2f;
+				float num2 = num;
+				num = num2 + mPanel.clipSoftness.x * 2f;
 			}
-			return num > mPanel.clipRange.z;
+			float num3 = num;
+			return num3 > mPanel.clipRange.z;
 		}
 	}
 
@@ -119,9 +121,11 @@ public class UIDraggablePanel : IgnoreTimeScale
 			float num = bounds.size.y;
 			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 			{
-				num += mPanel.clipSoftness.y * 2f;
+				float num2 = num;
+				num = num2 + mPanel.clipSoftness.y * 2f;
 			}
-			return num > mPanel.clipRange.w;
+			float num3 = num;
+			return num3 > mPanel.clipRange.w;
 		}
 	}
 
@@ -274,30 +278,31 @@ public class UIDraggablePanel : IgnoreTimeScale
 			{
 				Vector4 clipRange = mPanel.clipRange;
 				float num = clipRange.z * 0.5f;
-				float num2 = clipRange.x - num - bounds.min.x;
-				float num3 = bounds.max.x - num - clipRange.x;
-				float num4 = vector2.x - vector.x;
-				num2 = Mathf.Clamp01(num2 / num4);
-				num3 = Mathf.Clamp01(num3 / num4);
-				float num5 = num2 + num3;
+				float num2 = clipRange.x - num;
+				float num3 = num2 - bounds.min.x;
+				float num4 = bounds.max.x - num - clipRange.x;
+				float num5 = vector2.x - vector.x;
+				num3 = Mathf.Clamp01(num3 / num5);
+				num4 = Mathf.Clamp01(num4 / num5);
+				float num6 = num3 + num4;
 				mIgnoreCallbacks = true;
-				horizontalScrollBar.barSize = 1f - num5;
-				horizontalScrollBar.scrollValue = ((!(num5 > 0.001f)) ? 0f : (num2 / num5));
+				horizontalScrollBar.barSize = 1f - num6;
+				horizontalScrollBar.scrollValue = ((!(num6 > 0.001f)) ? 0f : (num3 / num6));
 				mIgnoreCallbacks = false;
 			}
 			if (verticalScrollBar != null && vector2.y > vector.y)
 			{
 				Vector4 clipRange2 = mPanel.clipRange;
-				float num6 = clipRange2.w * 0.5f;
-				float num7 = clipRange2.y - num6 - vector.y;
-				float num8 = vector2.y - num6 - clipRange2.y;
-				float num9 = vector2.y - vector.y;
-				num7 = Mathf.Clamp01(num7 / num9);
-				num8 = Mathf.Clamp01(num8 / num9);
-				float num10 = num7 + num8;
+				float num7 = clipRange2.w * 0.5f;
+				float num8 = clipRange2.y - num7 - vector.y;
+				float num9 = vector2.y - num7 - clipRange2.y;
+				float num10 = vector2.y - vector.y;
+				num8 = Mathf.Clamp01(num8 / num10);
+				num9 = Mathf.Clamp01(num9 / num10);
+				float num11 = num8 + num9;
 				mIgnoreCallbacks = true;
-				verticalScrollBar.barSize = 1f - num10;
-				verticalScrollBar.scrollValue = ((!(num10 > 0.001f)) ? 0f : (1f - num7 / num10));
+				verticalScrollBar.barSize = 1f - num11;
+				verticalScrollBar.scrollValue = ((!(num11 > 0.001f)) ? 0f : (1f - num8 / num11));
 				mIgnoreCallbacks = false;
 			}
 		}
@@ -311,7 +316,13 @@ public class UIDraggablePanel : IgnoreTimeScale
 	{
 		DisableSpring();
 		Bounds bounds = this.bounds;
-		if (bounds.min.x == bounds.max.x || bounds.min.y == bounds.max.y)
+		float x2 = bounds.min.x;
+		if (x2 == bounds.max.x)
+		{
+			return;
+		}
+		float y2 = bounds.min.y;
+		if (y2 == bounds.max.y)
 		{
 			return;
 		}
@@ -324,28 +335,32 @@ public class UIDraggablePanel : IgnoreTimeScale
 		float num6 = bounds.max.y - num2;
 		if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 		{
-			num3 -= mPanel.clipSoftness.x;
-			num4 += mPanel.clipSoftness.x;
-			num5 -= mPanel.clipSoftness.y;
-			num6 += mPanel.clipSoftness.y;
+			float num7 = num3;
+			num3 = num7 - mPanel.clipSoftness.x;
+			float num8 = num4;
+			num4 = num8 + mPanel.clipSoftness.x;
+			float num9 = num5;
+			num5 = num9 - mPanel.clipSoftness.y;
+			float num10 = num6;
+			num6 = num10 + mPanel.clipSoftness.y;
 		}
-		float num7 = Mathf.Lerp(num3, num4, x);
-		float num8 = Mathf.Lerp(num6, num5, y);
+		float num11 = Mathf.Lerp(num3, num4, x);
+		float num12 = Mathf.Lerp(num6, num5, y);
 		if (!updateScrollbars)
 		{
 			Vector3 localPosition = mTrans.localPosition;
 			if (scale.x != 0f)
 			{
-				localPosition.x += clipRange.x - num7;
+				localPosition.x += clipRange.x - num11;
 			}
 			if (scale.y != 0f)
 			{
-				localPosition.y += clipRange.y - num8;
+				localPosition.y += clipRange.y - num12;
 			}
 			mTrans.localPosition = localPosition;
 		}
-		clipRange.x = num7;
-		clipRange.y = num8;
+		clipRange.x = num11;
+		clipRange.y = num12;
 		mPanel.clipRange = clipRange;
 		if (updateScrollbars)
 		{

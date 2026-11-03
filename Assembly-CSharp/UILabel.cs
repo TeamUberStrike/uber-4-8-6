@@ -95,7 +95,11 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			return mShouldBeProcessed || mLastText != text || mLastWidth != mMaxLineWidth || mLastEncoding != mEncoding || mLastCount != mMaxLineCount || mLastPass != mPassword || mLastShow != mShowLastChar || mLastEffect != mEffectStyle;
+			if (!mShouldBeProcessed && !(mLastText != text) && mLastWidth == mMaxLineWidth && mLastEncoding == mEncoding && mLastCount == mMaxLineCount && mLastPass == mPassword && mLastShow == mShowLastChar)
+			{
+				return mLastEffect != mEffectStyle;
+			}
+			return true;
 		}
 		set
 		{
@@ -384,7 +388,9 @@ public class UILabel : UIWidget
 			Material material = base.material;
 			if (material == null)
 			{
-				material = (this.material = ((!(mFont != null)) ? null : mFont.material));
+				Material material2 = (this.material = ((!(mFont != null)) ? null : mFont.material));
+				Material material4 = material2;
+				material = material4;
 			}
 			return material;
 		}
@@ -621,11 +627,25 @@ public class UILabel : UIWidget
 		case Pivot.TopRight:
 		case Pivot.Right:
 		case Pivot.BottomRight:
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Right, Mathf.RoundToInt(relativeSize.x * (float)mFont.size), mPremultiply);
+		{
+			UIFont uIFont2 = mFont;
+			string text2 = processedText;
+			Color32 color3 = color;
+			bool encoding2 = mEncoding;
+			UIFont.SymbolStyle symbolStyle2 = mSymbols;
+			uIFont2.Print(text2, color3, verts, uvs, cols, encoding2, symbolStyle2, UIFont.Alignment.Right, Mathf.RoundToInt(relativeSize.x * (float)mFont.size), mPremultiply);
 			break;
+		}
 		default:
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Center, Mathf.RoundToInt(relativeSize.x * (float)mFont.size), mPremultiply);
+		{
+			UIFont uIFont = mFont;
+			string text = processedText;
+			Color32 color2 = color;
+			bool encoding = mEncoding;
+			UIFont.SymbolStyle symbolStyle = mSymbols;
+			uIFont.Print(text, color2, verts, uvs, cols, encoding, symbolStyle, UIFont.Alignment.Center, Mathf.RoundToInt(relativeSize.x * (float)mFont.size), mPremultiply);
 			break;
+		}
 		}
 		if (effectStyle != Effect.None)
 		{

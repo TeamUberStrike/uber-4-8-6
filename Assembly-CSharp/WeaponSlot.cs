@@ -68,6 +68,10 @@ public class WeaponSlot
 			Decorator.EnableShootAnimation = false;
 			Decorator.DefaultPosition = Vector3.zero;
 		}
+		if (Decorator != null)
+		{
+			WeaponSkinHelper.ApplyToWeapon(Decorator.gameObject, View.ID);
+		}
 	}
 
 	private void CreateWeaponLogic(UberStrikeItemWeaponView view, IWeaponController controller)
@@ -157,24 +161,24 @@ public class WeaponSlot
 
 	private void CreateWeaponInputHandler(WeaponItem item, IWeaponLogic logic, BaseWeaponDecorator decorator, bool isLocal)
 	{
-		switch ((WeaponSecondaryAction)View.WeaponSecondaryAction)
+		switch (View.WeaponSecondaryAction)
 		{
-		case WeaponSecondaryAction.ExplosionTrigger:
+		case 3:
 			InputHandler = new DefaultWeaponInputHandler(logic, isLocal, View, new GrenadeExplosionHander());
 			break;
-		case WeaponSecondaryAction.SniperRifle:
+		case 1:
 		{
 			ZoomInfo zoomInfo2 = new ZoomInfo(View.DefaultZoomMultiplier, View.MinZoomMultiplier, View.MaxZoomMultiplier);
 			InputHandler = new SniperRifleInputHandler(logic, isLocal, zoomInfo2, View);
 			break;
 		}
-		case WeaponSecondaryAction.IronSight:
+		case 2:
 		{
 			ZoomInfo zoomInfo = new ZoomInfo(View.DefaultZoomMultiplier, View.MinZoomMultiplier, View.MaxZoomMultiplier);
 			InputHandler = new IronsightInputHandler(logic, isLocal, zoomInfo, View);
 			break;
 		}
-		case WeaponSecondaryAction.Minigun:
+		case 4:
 			InputHandler = new MinigunInputHandler(logic, isLocal, decorator as MinigunWeaponDecorator, View);
 			break;
 		default:

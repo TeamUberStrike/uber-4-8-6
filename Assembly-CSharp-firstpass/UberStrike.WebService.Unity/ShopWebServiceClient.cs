@@ -15,7 +15,7 @@ namespace UberStrike.WebService.Unity
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetShop", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetShop", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -36,7 +36,7 @@ namespace UberStrike.WebService.Unity
 				EnumProxy<UberstrikeItemType>.Serialize(memoryStream, itemType);
 				EnumProxy<BuyingLocationType>.Serialize(memoryStream, marketLocation);
 				EnumProxy<BuyingRecommendationType>.Serialize(memoryStream, recommendationType);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "BuyItem", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "BuyItem", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -57,7 +57,7 @@ namespace UberStrike.WebService.Unity
 				EnumProxy<UberstrikeItemType>.Serialize(memoryStream, itemType);
 				EnumProxy<BuyingLocationType>.Serialize(memoryStream, marketLocation);
 				EnumProxy<BuyingRecommendationType>.Serialize(memoryStream, recommendationType);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "BuyPack", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "BuyPack", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -72,7 +72,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				EnumProxy<ChannelType>.Serialize(memoryStream, channel);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetBundles", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetBundles", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -90,7 +90,7 @@ namespace UberStrike.WebService.Unity
 				Int32Proxy.Serialize(memoryStream, bundleId);
 				EnumProxy<ChannelType>.Serialize(memoryStream, channel);
 				StringProxy.Serialize(memoryStream, hashedReceipt);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "BuyBundle", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "BuyBundle", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -107,7 +107,7 @@ namespace UberStrike.WebService.Unity
 				Int32Proxy.Serialize(memoryStream, bundleId);
 				StringProxy.Serialize(memoryStream, steamId);
 				StringProxy.Serialize(memoryStream, authToken);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "BuyBundleSteam", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "BuyBundleSteam", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -122,7 +122,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, orderId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "FinishBuyBundleSteam", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "FinishBuyBundleSteam", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -137,7 +137,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, hashedReceipt);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "VerifyReceipt", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "VerifyReceipt", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -153,7 +153,7 @@ namespace UberStrike.WebService.Unity
 			{
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, itemId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "UseConsumableItem", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "UseConsumableItem", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -167,7 +167,7 @@ namespace UberStrike.WebService.Unity
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetAllMysteryBoxs_1", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetAllMysteryBoxs_1", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -182,7 +182,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				EnumProxy<BundleCategoryType>.Serialize(memoryStream, bundleCategoryType);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetAllMysteryBoxs_2", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetAllMysteryBoxs_2", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -197,7 +197,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				Int32Proxy.Serialize(memoryStream, mysteryBoxId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetMysteryBox", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetMysteryBox", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -214,7 +214,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, mysteryBoxId);
 				EnumProxy<ChannelType>.Serialize(memoryStream, channel);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "RollMysteryBox", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "RollMysteryBox", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -228,7 +228,7 @@ namespace UberStrike.WebService.Unity
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetAllLuckyDraws_1", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetAllLuckyDraws_1", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -243,7 +243,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				EnumProxy<BundleCategoryType>.Serialize(memoryStream, bundleCategoryType);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetAllLuckyDraws_2", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetAllLuckyDraws_2", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -258,7 +258,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				Int32Proxy.Serialize(memoryStream, luckyDrawId);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "GetLuckyDraw", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "GetLuckyDraw", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -275,7 +275,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, authToken);
 				Int32Proxy.Serialize(memoryStream, luckDrawId);
 				EnumProxy<ChannelType>.Serialize(memoryStream, channel);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ShopWebServiceContract.svc", "RollLuckyDraw", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IShopWebServiceContract", "ShopWebService", "RollLuckyDraw", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
