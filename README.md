@@ -125,6 +125,15 @@ folded into their owning class before comparing):
 | Real fields and method signatures (12,716 / 7,541) | identical except access modifiers on compiler-generated generic closure classes and an `[opt]` flag on a delegate |
 | Embedded resources | same 3 names and sizes as the team build |
 
+6. **`sharedassets7` safety:** `UberKill.BoxLoader` (called for CuberStrike when a room or menu training starts) deletes
+   `UberStrike_Data/sharedassets7.assets` and copies `sharedassets7.normal`/`.bluebox` over it - the patcher ships those
+   files, a plain build did not, so the first CuberStrike match left the game without that file. `toolsuild-player.bat`
+   now writes both as copies of the build's own file (CuberStrike's shared assets). Tested in game: BoxLoader ran, the
+   file hash was identical before and after, CuberStrike loaded. A real BlueBox variant needs its own build of those assets.
+7. **Bug fix (not in v4.8.6 / the Steam client):** the first quick-item icon (e.g. a spring grenade in slot 1) was
+   invisible until first use - `HUDDesktopQuickItems.Start` replayed the cooldown event's default (slot 0, progress 0)
+   after setting the real state. The two registrations are swapped; tested in game.
+
 **Still open:** the map bundles and `sharedassets7` normal/bluebox files the patcher also ships (HaZard: some
 "need to be reverse engineered"); `CustomBundleMapManager` loads its bundles from disk.
 
