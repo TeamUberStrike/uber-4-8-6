@@ -2,6 +2,16 @@ using UnityEngine;
 
 internal static class GraphicSettings
 {
+	public static void SetAntiAliasing(int samples, bool force = false)
+	{
+		if (!force && QualitySettings.antiAliasing == samples)
+		{
+			return;
+		}
+		QualitySettings.antiAliasing = samples;
+		Screen.SetResolution(Screen.width, Screen.height, Screen.fullScreen);
+	}
+
 	public static void SetQualityLevel(int level)
 	{
 		if (level > 2 || level < 0)

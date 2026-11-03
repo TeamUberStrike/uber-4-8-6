@@ -578,16 +578,16 @@ public class OptionsPanelGUI : PanelGuiBase
 		switch (_antiAliasing)
 		{
 		case 1:
-			QualitySettings.antiAliasing = 2;
+			GraphicSettings.SetAntiAliasing(2);
 			break;
 		case 2:
-			QualitySettings.antiAliasing = 4;
+			GraphicSettings.SetAntiAliasing(4);
 			break;
 		case 3:
-			QualitySettings.antiAliasing = 8;
+			GraphicSettings.SetAntiAliasing(8);
 			break;
 		default:
-			QualitySettings.antiAliasing = 0;
+			GraphicSettings.SetAntiAliasing(0);
 			break;
 		}
 		ApplicationDataManager.ApplicationOptions.VideoAntiAliasing = QualitySettings.antiAliasing;
