@@ -21,13 +21,11 @@ public class ShopPageGUI : PageGUI
 
 		public IUnityItem Item
 		{
-			[IsReadOnly]
 			get;
 			set; }
 
 		public LoadoutSlotType Slot
 		{
-			[IsReadOnly]
 			get;
 			set; }
 	}
