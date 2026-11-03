@@ -13,14 +13,6 @@ public class HUDDesktopQuickItems : MonoBehaviour
 
 	private void Start()
 	{
-		PropertyExt.AddEventAndFire(GameData.Instance.OnQuickItemsChanged, delegate
-		{
-			QuickItem[] quickItems = Singleton<QuickItemController>.Instance.QuickItems;
-			int currentSlotIndex = Singleton<QuickItemController>.Instance.CurrentSlotIndex;
-			item0.SetQuickItem((quickItems.Length == 0) ? null : quickItems[0], currentSlotIndex == 0);
-			item1.SetQuickItem((quickItems.Length <= 1) ? null : quickItems[1], 1 == currentSlotIndex);
-			item2.SetQuickItem((quickItems.Length <= 2) ? null : quickItems[2], 2 == currentSlotIndex);
-		}, this);
 		GameData.Instance.OnQuickItemsCooldown.AddEventAndFire(delegate(int index, float progress)
 		{
 			int currentSlotIndex = Singleton<QuickItemController>.Instance.CurrentSlotIndex;
@@ -36,6 +28,14 @@ public class HUDDesktopQuickItems : MonoBehaviour
 				item2.SetCooldown(progress, 2 == currentSlotIndex);
 				break;
 			}
+		}, this);
+		PropertyExt.AddEventAndFire(GameData.Instance.OnQuickItemsChanged, delegate
+		{
+			QuickItem[] quickItems = Singleton<QuickItemController>.Instance.QuickItems;
+			int currentSlotIndex = Singleton<QuickItemController>.Instance.CurrentSlotIndex;
+			item0.SetQuickItem((quickItems.Length == 0) ? null : quickItems[0], currentSlotIndex == 0);
+			item1.SetQuickItem((quickItems.Length <= 1) ? null : quickItems[1], 1 == currentSlotIndex);
+			item2.SetQuickItem((quickItems.Length <= 2) ? null : quickItems[2], 2 == currentSlotIndex);
 		}, this);
 	}
 
