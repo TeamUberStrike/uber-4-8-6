@@ -36,7 +36,7 @@ The address is the original `ws.uberstrike.com` (offline). To play, use `patcher
 |---|---|
 | **Step 1 — code = plain Steam client** | ✅ Done and proven: `Assembly-CSharp`, `Assembly-CSharp-firstpass`, and the image effects now use the original UnityScript DLL (see below). |
 | **Step 2 — code = team client v4.8.6 + QA server address** | ✅ Code applied, built and proven against a build of `v4.8.6` (see below). |
-| Connecting to the QA server | Waiting: steam-qa (and steam-dev) answer Cloudflare 522, origin not responding (2026-10-24 night). Steam login to lobby verified against our local server. |
+| Connecting to the QA server | ✅ **Logs in** (2026-10-24 night): Steam login → QA web service → lobby with the account's QA data. QA's Photon CommServer (UDP 5055) did not answer yet and QA returned 500 for the IP check (the client continues) — waiting on the server owner. |
 | Steam login | Stays as it is — the client logs in with a Steam auth ticket, Steam must be running. Moving the ~5,000 registered players to another login is a separate, later migration. |
 
 ## Proof
