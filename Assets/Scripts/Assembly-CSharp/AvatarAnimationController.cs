@@ -238,6 +238,11 @@ public class AvatarAnimationController : MonoBehaviour
 		}
 	}
 
+	private void LateUpdate()
+	{
+		ManualArmIK.ApplyManualIK(this);
+	}
+
 	private void OnAnimatorIK()
 	{
 		if ((bool)_AnchorChest && (bool)_IKAnchor)
