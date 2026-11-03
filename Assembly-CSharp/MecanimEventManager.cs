@@ -135,15 +135,19 @@ public static class MecanimEventManager
 		}
 		loadedData = new Dictionary<int, Dictionary<int, Dictionary<int, List<MecanimEvent>>>>();
 		MecanimEventData[] array = eventDataSources;
-		foreach (MecanimEventData mecanimEventData in array)
+		MecanimEventData[] array2 = array;
+		MecanimEventData[] array3 = array2;
+		foreach (MecanimEventData mecanimEventData in array3)
 		{
 			if (mecanimEventData == null)
 			{
 				continue;
 			}
 			MecanimEventDataEntry[] data = mecanimEventData.data;
-			MecanimEventDataEntry[] array2 = data;
-			foreach (MecanimEventDataEntry mecanimEventDataEntry in array2)
+			MecanimEventDataEntry[] array4 = data;
+			MecanimEventDataEntry[] array5 = array4;
+			MecanimEventDataEntry[] array6 = array5;
+			foreach (MecanimEventDataEntry mecanimEventDataEntry in array6)
 			{
 				int instanceID = mecanimEventDataEntry.animatorController.GetInstanceID();
 				if (!loadedData.ContainsKey(instanceID))

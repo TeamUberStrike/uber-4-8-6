@@ -92,7 +92,7 @@ public class AvatarDecorator : MonoBehaviour
 		{
 			_nextFootStepTime = Time.time + walkingSpeed;
 			_audio.clip = AutoMonoBehaviour<SfxManager>.Instance.GetFootStepAudioClip(sound);
-			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(_audio.clip, _transform.position, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(_audio.clip, _transform.position);
 		}
 	}
 
@@ -112,6 +112,6 @@ public class AvatarDecorator : MonoBehaviour
 			clip = GameAudio.NormalKill3;
 			break;
 		}
-		AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, _transform.position, 1f);
+		AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, _transform.position);
 	}
 }

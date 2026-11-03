@@ -94,14 +94,14 @@ public class ProjectileWeapon : BaseWeaponLogic
 			{
 				if ((bool)_decorator)
 				{
-					int shotCount = base.Controller.NextProjectileId();
+					int num = base.Controller.NextProjectileId();
 					ray.origin = _decorator.MuzzlePosition + Quaternion.AngleAxis(angle * (float)i, _decorator.transform.forward) * _decorator.transform.up * 0.2f;
-					Projectile p = EmitProjectile(ray, shotCount, base.Controller.Cmid);
-					if ((bool)p && this.OnProjectileShoot != null)
+					Projectile projectile = EmitProjectile(ray, num, base.Controller.Cmid);
+					if ((bool)projectile && this.OnProjectileShoot != null)
 					{
-						this.OnProjectileShoot(new ProjectileInfo(shotCount, ray)
+						this.OnProjectileShoot(new ProjectileInfo(num, ray)
 						{
-							Projectile = p
+							Projectile = projectile
 						});
 					}
 					yield return new WaitForSeconds(0.2f);
@@ -110,13 +110,13 @@ public class ProjectileWeapon : BaseWeaponLogic
 		}
 		else
 		{
-			int shotCount2 = base.Controller.NextProjectileId();
-			Projectile p2 = EmitProjectile(ray, shotCount2, base.Controller.Cmid);
-			if ((bool)p2 && this.OnProjectileShoot != null)
+			int num2 = base.Controller.NextProjectileId();
+			Projectile projectile2 = EmitProjectile(ray, num2, base.Controller.Cmid);
+			if ((bool)projectile2 && this.OnProjectileShoot != null)
 			{
-				this.OnProjectileShoot(new ProjectileInfo(shotCount2, ray)
+				this.OnProjectileShoot(new ProjectileInfo(num2, ray)
 				{
-					Projectile = p2
+					Projectile = projectile2
 				});
 			}
 		}
@@ -154,7 +154,9 @@ public class ProjectileWeapon : BaseWeaponLogic
 				if (GameState.Current != null && GameState.Current.TryGetPlayerAvatar(cmid, out character) && (bool)character.Avatar.Decorator && projectile.gameObject.activeSelf)
 				{
 					CharacterHitArea[] hitAreas = character.Avatar.Decorator.HitAreas;
-					foreach (CharacterHitArea characterHitArea in hitAreas)
+					CharacterHitArea[] array = hitAreas;
+					CharacterHitArea[] array2 = array;
+					foreach (CharacterHitArea characterHitArea in array2)
 					{
 						if (characterHitArea.gameObject.activeInHierarchy)
 						{

@@ -24,7 +24,11 @@ namespace UberStrike.Core.Models
 
 		public GameModeType GameMode { get; set; }
 
+		public GameBoxType BoxType { get; set; }
+
 		public bool IsPermanentGame { get; set; }
+
+		public bool IsRandomMap { get; set; }
 
 		public bool IsFull
 		{

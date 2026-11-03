@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Cmune.DataCenter.Common.Entities;
 using UberStrike.Core.Models;
@@ -31,6 +32,8 @@ public class GameState
 	private LocalPlayer player;
 
 	private int roundStartTime;
+
+	private static bool isLoading = false;
 
 	public LocalPlayer Player
 	{
@@ -114,7 +117,11 @@ public class GameState
 	{
 		get
 		{
-			return PlayerState.CurrentStateId == PlayerStateId.Killed || PlayerState.CurrentStateId == PlayerStateId.Spectating;
+			if (PlayerState.CurrentStateId != PlayerStateId.Killed)
+			{
+				return PlayerState.CurrentStateId == PlayerStateId.Spectating;
+			}
+			return true;
 		}
 	}
 
@@ -122,7 +129,11 @@ public class GameState
 	{
 		get
 		{
-			return PlayerState.CurrentStateId == PlayerStateId.Playing || PlayerState.CurrentStateId == PlayerStateId.Spectating;
+			if (PlayerState.CurrentStateId != PlayerStateId.Playing)
+			{
+				return PlayerState.CurrentStateId == PlayerStateId.Spectating;
+			}
+			return true;
 		}
 	}
 
@@ -170,7 +181,15 @@ public class GameState
 	{
 		get
 		{
-			return IsAccessAllowed || (!IsGameFull && RedTeamPlayerCount <= BlueTeamPlayerCount);
+			if (!IsAccessAllowed)
+			{
+				if (!IsGameFull)
+				{
+					return RedTeamPlayerCount <= BlueTeamPlayerCount;
+				}
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -178,7 +197,15 @@ public class GameState
 	{
 		get
 		{
-			return IsAccessAllowed || (!IsGameFull && BlueTeamPlayerCount <= RedTeamPlayerCount);
+			if (!IsAccessAllowed)
+			{
+				if (!IsGameFull)
+				{
+					return BlueTeamPlayerCount <= RedTeamPlayerCount;
+				}
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -186,7 +213,11 @@ public class GameState
 	{
 		get
 		{
-			return IsAccessAllowed || !IsGameFull;
+			if (!IsAccessAllowed)
+			{
+				return !IsGameFull;
+			}
+			return true;
 		}
 	}
 
@@ -194,7 +225,7 @@ public class GameState
 	{
 		get
 		{
-			return RoomData.ConnectedPlayers >= RoomData.PlayerLimit;
+			return Players.Count >= RoomData.PlayerLimit;
 		}
 	}
 
@@ -234,7 +265,11 @@ public class GameState
 	{
 		get
 		{
-			return GameMode == GameModeType.TeamDeathMatch || GameMode == GameModeType.EliminationMode;
+			if (GameMode != GameModeType.TeamDeathMatch)
+			{
+				return GameMode == GameModeType.EliminationMode;
+			}
+			return true;
 		}
 	}
 
@@ -296,12 +331,20 @@ public class GameState
 
 	public bool TryGetPlayerAvatar(int cmid, out CharacterConfig character)
 	{
-		return Avatars.TryGetValue(cmid, out character) && character != null;
+		if (Avatars.TryGetValue(cmid, out character))
+		{
+			return character != null;
+		}
+		return false;
 	}
 
 	public bool TryGetActorInfo(int cmid, out GameActorInfo player)
 	{
-		return Players.TryGetValue(cmid, out player) && player != null;
+		if (Players.TryGetValue(cmid, out player))
+		{
+			return player != null;
+		}
+		return false;
 	}
 
 	public void UnloadAvatar(int cmid)
@@ -337,8 +380,11 @@ public class GameState
 
 	public void UpdateTeamCounter()
 	{
-		int redTeamPlayerCount = (BlueTeamPlayerCount = 0);
-		RedTeamPlayerCount = redTeamPlayerCount;
+		int num = (BlueTeamPlayerCount = 0);
+		int num3 = num;
+		num = (RedTeamPlayerCount = num3);
+		int num5 = num;
+		int num6 = num5;
 		foreach (GameActorInfo value in Players.Values)
 		{
 			if (value.TeamID == TeamID.BLUE)
@@ -479,7 +525,8 @@ public class GameState
 		Singleton<GameStateController>.Instance.Client.Peer.FetchServerTimestamp();
 		CheatDetection.SyncSystemTime();
 		LevelCamera.ResetFeedback();
-		Current.PlayerData.RemainingKills.Value = RoomData.KillLimit;
+		int value = RoomData.KillLimit - Math.Max(Current.PlayerData.BlueTeamScore, Current.PlayerData.RedTeamScore);
+		Current.PlayerData.RemainingKills.Value = value;
 		Current.PlayerData.RemainingTime.Value = 0;
 	}
 
@@ -699,26 +746,23 @@ public class GameState
 		}
 	}
 
-	public void InstantiateAvatar(GameActorInfo info)
+	public void InstantiateAvatar(GameActorInfo info, bool isTraining = false)
 	{
-		if (!Avatars.ContainsKey(info.Cmid))
+		if (Avatars.ContainsKey(info.Cmid))
 		{
-			if (info.Cmid == PlayerDataManager.Cmid)
-			{
-				CharacterConfig characterConfig = PrefabManager.Instance.InstantiateLocalCharacter();
-				Avatars.Add(info.Cmid, characterConfig);
-				ConfigureAvatar(info, characterConfig, true);
-			}
-			else
-			{
-				CharacterConfig characterConfig2 = PrefabManager.Instance.InstantiateRemoteCharacter();
-				Avatars.Add(info.Cmid, characterConfig2);
-				ConfigureAvatar(info, characterConfig2, false);
-			}
+			Debug.LogError(string.Format("Skipping Avatar instantiation for cmid {0}", info.Cmid));
+		}
+		else if (info.Cmid == PlayerDataManager.Cmid)
+		{
+			CharacterConfig characterConfig = PrefabManager.Instance.InstantiateLocalCharacter();
+			Avatars.Add(info.Cmid, characterConfig);
+			ConfigureAvatar(info, characterConfig, true);
 		}
 		else
 		{
-			Debug.LogError(string.Format("Failed call of InstantiateAvatar {0} because already existing!", info.Cmid));
+			CharacterConfig characterConfig2 = PrefabManager.Instance.InstantiateRemoteCharacter();
+			Avatars.Add(info.Cmid, characterConfig2);
+			ConfigureAvatar(info, characterConfig2, false);
 		}
 	}
 
@@ -729,7 +773,7 @@ public class GameState
 			if (isLocal)
 			{
 				Player.SetCurrentCharacterConfig(character);
-				Player.MoveController.IsLowGravity = GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, RoomData.GameFlags);
+				UberKill.IsLowGravity = GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, RoomData.GameFlags);
 				character.Initialize(PlayerData, Avatar);
 			}
 			else
@@ -760,5 +804,47 @@ public class GameState
 			return true;
 		}
 		return false;
+	}
+
+	public IEnumerator ConfigureAvatarAsync(GameActorInfo info, CharacterConfig character, bool isLocal, bool isTraining)
+	{
+		while (isLoading)
+		{
+			yield return new WaitForSeconds(0.1f);
+		}
+		isLoading = true;
+		if (character != null && info != null)
+		{
+			if (isLocal)
+			{
+				Current.Player.SetCurrentCharacterConfig(character);
+				if (!isTraining)
+				{
+					UberKill.IsLowGravity = GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, Current.RoomData.GameFlags);
+				}
+				character.Initialize(Current.PlayerData, Current.Avatar);
+			}
+			else
+			{
+				AvatarGearParts avatargearparts = new AvatarGearParts();
+				Avatar avatar = new Avatar(new Loadout(info.Gear, info.Weapons), false);
+				yield return UnityRuntime.StartRoutine(avatar.Loadout.GetGearPart(delegate(AvatarGearParts callback)
+				{
+					avatargearparts = callback;
+				}));
+				avatar.SetDecorator(AvatarBuilder.CreateRemoteAvatar(avatargearparts, info.SkinColor));
+				character.Initialize(Current.RemotePlayerStates.GetState(info.PlayerId), avatar);
+				GameData.Instance.OnHUDStreamMessage.Fire(info, LocalizedStrings.JoinedTheGame, null);
+			}
+			if (!info.IsAlive)
+			{
+				character.SetDead(Vector3.zero);
+			}
+		}
+		else
+		{
+			Debug.LogError(string.Format("OnAvatarLoaded failed because loaded Avatar is {0} and Info is {1}", character != null, info != null));
+		}
+		isLoading = false;
 	}
 }

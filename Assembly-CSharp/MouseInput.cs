@@ -24,12 +24,20 @@ public static class MouseInput
 
 	public static bool IsDoubleClick()
 	{
-		return Time.time - Previous.Time < 0.3f && Current.Point == Previous.Point;
+		if (Time.time - Previous.Time < 0.3f)
+		{
+			return Current.Point == Previous.Point;
+		}
+		return false;
 	}
 
 	public static bool IsMouseClickIn(Rect rect, int mouse = 0)
 	{
-		return Event.current.type == EventType.MouseDown && Event.current.button == mouse && rect.Contains(Event.current.mousePosition);
+		if (Event.current.type == EventType.MouseDown && Event.current.button == mouse)
+		{
+			return rect.Contains(Event.current.mousePosition);
+		}
+		return false;
 	}
 
 	private static void OnGUI()

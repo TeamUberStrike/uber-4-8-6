@@ -42,7 +42,11 @@ public static class NGUITools
 	{
 		get
 		{
-			return Application.platform != RuntimePlatform.WindowsWebPlayer && Application.platform != RuntimePlatform.OSXWebPlayer;
+			if (Application.platform != RuntimePlatform.WindowsWebPlayer)
+			{
+				return Application.platform != RuntimePlatform.OSXWebPlayer;
+			}
+			return false;
 		}
 	}
 
@@ -51,7 +55,11 @@ public static class NGUITools
 		get
 		{
 			PropertyInfo systemCopyBufferProperty = GetSystemCopyBufferProperty();
-			return (systemCopyBufferProperty == null) ? null : ((string)systemCopyBufferProperty.GetValue(null, null));
+			if (systemCopyBufferProperty != null)
+			{
+				return (string)systemCopyBufferProperty.GetValue(null, null);
+			}
+			return null;
 		}
 		set
 		{
@@ -115,12 +123,13 @@ public static class NGUITools
 		try
 		{
 			result = new WWW(url);
+			return result;
 		}
 		catch (Exception ex)
 		{
 			Debug.LogError(ex.Message);
+			return result;
 		}
-		return result;
 	}
 
 	public static WWW OpenURL(string url, WWWForm form)
@@ -133,12 +142,13 @@ public static class NGUITools
 		try
 		{
 			result = new WWW(url, form);
+			return result;
 		}
 		catch (Exception ex)
 		{
 			Debug.LogError((ex == null) ? "<null>" : ex.Message);
+			return result;
 		}
-		return result;
 	}
 
 	public static int RandomRange(int min, int max)
@@ -285,7 +295,9 @@ public static class NGUITools
 			Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(go.transform);
 			boxCollider.isTrigger = true;
 			boxCollider.center = bounds.center + Vector3.back * ((float)num * 0.25f);
-			boxCollider.size = new Vector3(bounds.size.x, bounds.size.y, 0f);
+			BoxCollider boxCollider2 = boxCollider;
+			float x = bounds.size.x;
+			boxCollider2.size = new Vector3(x, bounds.size.y, 0f);
 			return boxCollider;
 		}
 		return null;
@@ -357,14 +369,14 @@ public static class NGUITools
 	public static T AddWidget<T>(GameObject go) where T : UIWidget
 	{
 		int depth = CalculateNextDepth(go);
-		T result = AddChild<T>(go);
-		result.depth = depth;
-		Transform transform = result.transform;
+		T val = AddChild<T>(go);
+		val.depth = depth;
+		Transform transform = val.transform;
 		transform.localPosition = Vector3.zero;
 		transform.localRotation = Quaternion.identity;
 		transform.localScale = new Vector3(100f, 100f, 1f);
-		result.gameObject.layer = go.layer;
-		return result;
+		val.gameObject.layer = go.layer;
+		return val;
 	}
 
 	public static UISprite AddSprite(GameObject go, UIAtlas atlas, string spriteName)
@@ -396,7 +408,7 @@ public static class NGUITools
 	{
 		if (go == null)
 		{
-			return (T)null;
+			return null;
 		}
 		object component = go.GetComponent<T>();
 		if (component == null)
@@ -546,7 +558,11 @@ public static class NGUITools
 
 	public static bool GetActive(GameObject go)
 	{
-		return (bool)go && go.activeInHierarchy;
+		if ((bool)go)
+		{
+			return go.activeInHierarchy;
+		}
+		return false;
 	}
 
 	public static void SetActiveSelf(GameObject go, bool state)

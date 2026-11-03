@@ -14,6 +14,10 @@ public class ItemByClassFilter : IShopItemFilter
 
 	public bool CanPass(IUnityItem item)
 	{
-		return item.View.ItemType == _itemType && item.View.ItemClass == _itemClass;
+		if (item.View.ItemType == _itemType)
+		{
+			return item.View.ItemClass == _itemClass;
+		}
+		return false;
 	}
 }

@@ -13,6 +13,11 @@ public class MuzzleLight : BaseWeaponEffect
 		}
 	}
 
+	private void OnEnable()
+	{
+		HideAllEffects();
+	}
+
 	public override void OnShoot()
 	{
 		if ((bool)_shootAnimation)

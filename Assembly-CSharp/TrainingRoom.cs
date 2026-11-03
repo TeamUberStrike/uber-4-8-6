@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UberStrike.Core.Models;
 using UberStrike.Core.Types;
+using UberStrike.Realtime.UnitySdk;
 using UnityEngine;
 
 public class TrainingRoom : IDisposable, IGameMode
@@ -24,8 +25,9 @@ public class TrainingRoom : IDisposable, IGameMode
 		}
 	}
 
-	public TrainingRoom()
+	public TrainingRoom(GameFlags.GAME_FLAGS flags)
 	{
+		TrainingRoom trainingRoom = this;
 		GameState.Current.MatchState.RegisterState(GameStateId.PregameLoadout, new PregameLoadoutState(GameState.Current.MatchState));
 		GameState.Current.MatchState.RegisterState(GameStateId.MatchRunning, new OfflineMatchState(GameState.Current.MatchState));
 		GameState.Current.PlayerState.RegisterState(PlayerStateId.Playing, new PlayerPlayingState(GameState.Current.PlayerState));
@@ -57,14 +59,16 @@ public class TrainingRoom : IDisposable, IGameMode
 			};
 			GameState.Current.PlayerData.Player = gameActorInfo;
 			GameState.Current.Players[gameActorInfo.Cmid] = gameActorInfo;
-			GameState.Current.InstantiateAvatar(gameActorInfo);
+			GameState.Current.InstantiateAvatar(gameActorInfo, true);
 			GameState.Current.MatchState.SetState(GameStateId.MatchRunning);
-			UnityRuntime.StartRoutine(ShowTrainingGameMessages());
+			GameState.Current.RoomData.GameFlags = (int)flags;
+			UnityRuntime.StartRoutine(trainingRoom.ShowTrainingGameMessages());
 		};
 		TabScreenPanelGUI.SortPlayersByRank = GameStateHelper.SortDeathMatchPlayers;
 		AutoMonoBehaviour<UnityRuntime>.Instance.OnUpdate += OnUpdate;
 		GameStateHelper.EnterGameMode();
 		GameState.Current.MatchState.SetState(GameStateId.PregameLoadout);
+		TrainingPageGUI.isPopup = false;
 	}
 
 	private IEnumerator ShowTrainingGameMessages()

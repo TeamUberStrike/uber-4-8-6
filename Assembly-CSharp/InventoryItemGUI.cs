@@ -19,15 +19,15 @@ public class InventoryItemGUI : BaseItemGUI
 		DrawIcon(new Rect(4f, 4f, 48f, 48f));
 		DrawName(new Rect(63f, 10f, 220f, 20f));
 		DrawDaysRemaining(new Rect(63f, 30f, 220f, 20f));
-		if (Item.View.ID == 1294)
+		if (base.Item.View.ID == 1294)
 		{
 			DrawUseButton(new Rect(rect.width - 50f, 7f, 46f, 46f));
 		}
-		else if (Item.Equippable && (InventoryItem.IsPermanent || InventoryItem.DaysRemaining > 0))
+		else if (base.Item.Equippable && (InventoryItem.IsPermanent || InventoryItem.DaysRemaining > 0))
 		{
 			DrawEquipButton(new Rect(rect.width - 50f, 7f, 46f, 46f), LocalizedStrings.Equip);
 		}
-		else if (Item.View.IsForSale)
+		else if (base.Item.View.IsForSale)
 		{
 			if (!InventoryItem.IsPermanent)
 			{
@@ -42,13 +42,13 @@ public class InventoryItemGUI : BaseItemGUI
 		if (selected)
 		{
 			GUI.color = new Color(1f, 1f, 1f, 0.5f);
-			if (Item.View.ItemType == UberstrikeItemType.Weapon)
+			if (base.Item.View.ItemType == UberstrikeItemType.Weapon)
 			{
-				GUI.Label(new Rect(12f, 60f, 32f, 32f), UberstrikeIconsHelper.GetIconForItemClass(Item.View.ItemClass), GUIStyle.none);
+				GUI.Label(new Rect(12f, 60f, 32f, 32f), UberstrikeIconsHelper.GetIconForItemClass(base.Item.View.ItemClass), GUIStyle.none);
 			}
-			else if (Item.View.ItemType == UberstrikeItemType.Gear)
+			else if (base.Item.View.ItemType == UberstrikeItemType.Gear)
 			{
-				GUI.Label(new Rect(12f, 60f, 32f, 32f), UberstrikeIconsHelper.GetIconForItemClass(Item.View.ItemClass), GUIStyle.none);
+				GUI.Label(new Rect(12f, 60f, 32f, 32f), UberstrikeIconsHelper.GetIconForItemClass(base.Item.View.ItemClass), GUIStyle.none);
 			}
 			GUI.color = Color.white;
 			DrawDescription(new Rect(55f, 60f, 255f, 52f));

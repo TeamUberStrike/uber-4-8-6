@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UberStrike.Core.Models.Views;
@@ -64,39 +65,96 @@ public static class WeaponConfigurationHelper
 		}
 	}
 
+	public static IEnumerator UpdateWeaponsStatistics(UberStrikeItemShopClientView shopView)
+	{
+		int count = 0;
+		if (shopView == null || shopView.WeaponItems.Count <= 0)
+		{
+			yield break;
+		}
+		MaxAmmo = shopView.WeaponItems.OrderByDescending((UberStrikeItemWeaponView item) => item.MaxAmmo).First().MaxAmmo;
+		MaxSplashRadius = (float)shopView.WeaponItems.OrderByDescending((UberStrikeItemWeaponView item) => item.SplashRadius).First().SplashRadius / 100f;
+		MaxRecoilKickback = shopView.WeaponItems.OrderByDescending((UberStrikeItemWeaponView item) => item.RecoilKickback).First().RecoilKickback;
+		MaxRateOfFire = (float)shopView.WeaponItems.OrderByDescending((UberStrikeItemWeaponView item) => item.RateOfFire).First().RateOfFire / 1000f;
+		MaxProjectileSpeed = shopView.WeaponItems.OrderByDescending((UberStrikeItemWeaponView item) => item.ProjectileSpeed).First().ProjectileSpeed;
+		MaxAccuracySpread = shopView.WeaponItems.OrderByDescending((UberStrikeItemWeaponView item) => item.AccuracySpread).First().AccuracySpread / 10;
+		MaxDamage = shopView.WeaponItems.OrderByDescending((UberStrikeItemWeaponView item) => item.DamagePerProjectile).First().DamagePerProjectile;
+		foreach (UberStrikeItemWeaponView weaponItem in shopView.WeaponItems)
+		{
+			count++;
+			if (count == 10)
+			{
+				count = 0;
+				yield return null;
+			}
+			rateOfFireCache[weaponItem.ID] = new SecureMemory<int>(weaponItem.RateOfFire);
+			spreadCache[weaponItem.ID] = new SecureMemory<int>(weaponItem.AccuracySpread);
+			speedCache[weaponItem.ID] = new SecureMemory<int>(weaponItem.ProjectileSpeed);
+			splashCache[weaponItem.ID] = new SecureMemory<int>(weaponItem.SplashRadius);
+		}
+	}
+
 	public static float GetAmmoNormalized(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.MaxAmmo / MaxAmmo);
+		if (view != null)
+		{
+			return (float)view.MaxAmmo / MaxAmmo;
+		}
+		return 0f;
 	}
 
 	public static float GetDamageNormalized(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)(view.DamagePerProjectile * view.ProjectilesPerShot) / MaxDamage);
+		if (view != null)
+		{
+			return (float)(view.DamagePerProjectile * view.ProjectilesPerShot) / MaxDamage;
+		}
+		return 0f;
 	}
 
 	public static float GetAccuracySpreadNormalized(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.AccuracySpread / 10f / MaxAccuracySpread);
+		if (view != null)
+		{
+			return (float)view.AccuracySpread / 10f / MaxAccuracySpread;
+		}
+		return 0f;
 	}
 
 	public static float GetProjectileSpeedNormalized(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.ProjectileSpeed / MaxProjectileSpeed);
+		if (view != null)
+		{
+			return (float)view.ProjectileSpeed / MaxProjectileSpeed;
+		}
+		return 0f;
 	}
 
 	public static float GetRateOfFireNormalized(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.RateOfFire / 1000f / MaxRateOfFire);
+		if (view != null)
+		{
+			return (float)view.RateOfFire / 1000f / MaxRateOfFire;
+		}
+		return 0f;
 	}
 
 	public static float GetRecoilKickbackNormalized(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.RecoilKickback / MaxRecoilKickback);
+		if (view != null)
+		{
+			return (float)view.RecoilKickback / MaxRecoilKickback;
+		}
+		return 0f;
 	}
 
 	public static float GetSplashRadiusNormalized(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.SplashRadius / 100f / MaxSplashRadius);
+		if (view != null)
+		{
+			return (float)view.SplashRadius / 100f / MaxSplashRadius;
+		}
+		return 0f;
 	}
 
 	public static float GetAmmo(UberStrikeItemWeaponView view)
@@ -116,22 +174,38 @@ public static class WeaponConfigurationHelper
 
 	public static float GetRecoilMovement(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.RecoilMovement / 100f);
+		if (view != null)
+		{
+			return (float)view.RecoilMovement / 100f;
+		}
+		return 0f;
 	}
 
 	public static float GetCriticalStrikeBonus(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)view.CriticalStrikeBonus / 100f);
+		if (view != null)
+		{
+			return (float)view.CriticalStrikeBonus / 100f;
+		}
+		return 0f;
 	}
 
 	public static float GetAccuracySpread(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)GetSecureSpread(view.ID) / 10f);
+		if (view != null)
+		{
+			return (float)GetSecureSpread(view.ID) / 10f;
+		}
+		return 0f;
 	}
 
 	public static float GetRateOfFire(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 1f : ((float)GetSecureRateOfFire(view.ID) / 1000f);
+		if (view != null)
+		{
+			return (float)GetSecureRateOfFire(view.ID) / 1000f;
+		}
+		return 1f;
 	}
 
 	public static float GetProjectileSpeed(UberStrikeItemWeaponView view)
@@ -141,7 +215,11 @@ public static class WeaponConfigurationHelper
 
 	public static float GetSplashRadius(UberStrikeItemWeaponView view)
 	{
-		return (view == null) ? 0f : ((float)GetSecureSplashRadius(view.ID) / 100f);
+		if (view != null)
+		{
+			return (float)GetSecureSplashRadius(view.ID) / 100f;
+		}
+		return 0f;
 	}
 
 	public static int GetSecureRateOfFire(int itemId)

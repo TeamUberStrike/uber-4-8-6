@@ -349,7 +349,7 @@ public class InboxManager : Singleton<InboxManager>
 		FriendRequests.Fire();
 		if (FriendRequests.Value.Count > 0)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewRequest, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewRequest, 0uL);
 		}
 	}
 
@@ -359,7 +359,7 @@ public class InboxManager : Singleton<InboxManager>
 		IncomingClanRequests.Fire();
 		if (IncomingClanRequests.Value.Count > 0)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewRequest, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.NewRequest, 0uL);
 		}
 	}
 

@@ -15,7 +15,7 @@ public static class MiscellaneousExtension
 		stringBuilder.AppendLine("CurrentWeapon: " + info.CurrentWeaponSlot + "/" + info.CurrentWeaponID);
 		stringBuilder.AppendLine("Life: " + info.Health + "/" + info.ArmorPoints);
 		stringBuilder.AppendLine("Team: " + info.TeamID);
-		stringBuilder.AppendLine("Color: " + info.SkinColor);
+		stringBuilder.AppendLine("Color: " + info.SkinColor.ToString());
 		stringBuilder.AppendLine("Weapons: " + CmunePrint.Values(info.Weapons));
 		stringBuilder.AppendLine("Gear: " + CmunePrint.Values(info.Gear));
 		return stringBuilder.ToString();
@@ -24,7 +24,9 @@ public static class MiscellaneousExtension
 	public static Transform FindChildWithName(this Transform tr, string name)
 	{
 		Transform[] componentsInChildren = tr.GetComponentsInChildren<Transform>(true);
-		foreach (Transform transform in componentsInChildren)
+		Transform[] array = componentsInChildren;
+		Transform[] array2 = array;
+		foreach (Transform transform in array2)
 		{
 			if (transform.name == name)
 			{

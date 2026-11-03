@@ -69,10 +69,10 @@ public class CheatDetection : MonoBehaviour
 			{
 				continue;
 			}
-			float avg = averageSpeedHackResults(timeDifference);
-			if (avg != -1f)
+			float num = averageSpeedHackResults(timeDifference);
+			if (num != -1f)
 			{
-				if ((double)avg >= 0.75)
+				if ((double)num >= 0.75)
 				{
 					break;
 				}

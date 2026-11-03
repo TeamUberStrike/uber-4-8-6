@@ -24,7 +24,27 @@ public static class ColorConverter
 	{
 		hue %= 6f;
 		Color white = Color.white;
-		return (hue < 1f) ? new Color(1f, hue, 0f) : ((hue < 2f) ? new Color(2f - hue, 1f, 0f) : ((hue < 3f) ? new Color(0f, 1f, hue - 2f) : ((hue < 4f) ? new Color(0f, 4f - hue, 1f) : ((!(hue < 5f)) ? new Color(1f, 0f, 6f - hue) : new Color(hue - 4f, 0f, 1f)))));
+		if (!(hue < 1f))
+		{
+			if (!(hue < 2f))
+			{
+				if (!(hue < 3f))
+				{
+					if (!(hue < 4f))
+					{
+						if (!(hue < 5f))
+						{
+							return new Color(1f, 0f, 6f - hue);
+						}
+						return new Color(hue - 4f, 0f, 1f);
+					}
+					return new Color(0f, 4f - hue, 1f);
+				}
+				return new Color(0f, 1f, hue - 2f);
+			}
+			return new Color(2f - hue, 1f, 0f);
+		}
+		return new Color(1f, hue, 0f);
 	}
 
 	public static Color HexToColor(string hexString)

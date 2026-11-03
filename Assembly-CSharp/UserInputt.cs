@@ -1,7 +1,7 @@
 using UberStrike.Core.Models;
 using UnityEngine;
 
-public static class UserInput
+public static class UserInputt
 {
 	public static float ZoomSpeed;
 
@@ -17,7 +17,11 @@ public static class UserInput
 	{
 		get
 		{
-			return (GameState.Current.PlayerData.KeyState & KeyState.Walking) != KeyState.Still && (GameState.Current.PlayerData.KeyState ^ KeyState.Horizontal) != KeyState.Still && (GameState.Current.PlayerData.KeyState ^ KeyState.Vertical) != KeyState.Still;
+			if ((GameState.Current.PlayerData.KeyState & KeyState.Walking) != KeyState.Still && (GameState.Current.PlayerData.KeyState ^ KeyState.Horizontal) != KeyState.Still)
+			{
+				return (GameState.Current.PlayerData.KeyState ^ KeyState.Vertical) != KeyState.Still;
+			}
+			return false;
 		}
 	}
 
@@ -25,7 +29,11 @@ public static class UserInput
 	{
 		get
 		{
-			return AutoMonoBehaviour<InputManager>.Instance.RawValue(GameInputKey.HorizontalLook) != 0f || AutoMonoBehaviour<InputManager>.Instance.RawValue(GameInputKey.VerticalLook) != 0f;
+			if (AutoMonoBehaviour<InputManager>.Instance.RawValue(GameInputKey.HorizontalLook) == 0f)
+			{
+				return AutoMonoBehaviour<InputManager>.Instance.RawValue(GameInputKey.VerticalLook) != 0f;
+			}
+			return true;
 		}
 	}
 
@@ -77,7 +85,7 @@ public static class UserInput
 		}
 	}
 
-	static UserInput()
+	static UserInputt()
 	{
 		ZoomSpeed = 1f;
 		TouchLookSensitivity = new Vector2(1f, 0.5f);

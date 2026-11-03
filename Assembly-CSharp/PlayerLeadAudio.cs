@@ -37,13 +37,13 @@ public class PlayerLeadAudio
 			switch (CurrentLead)
 			{
 			case LeadState.Me:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.TakenLead, 500uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.TakenLead, 500uL);
 				break;
 			case LeadState.Tied:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.TiedLead, 500uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.TiedLead, 500uL);
 				break;
 			case LeadState.Others:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.LostLead, 500uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.LostLead, 500uL);
 				break;
 			}
 		}
@@ -56,19 +56,19 @@ public class PlayerLeadAudio
 			switch (killsLeft)
 			{
 			case 1:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft1, 2000uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft1, 2000uL);
 				break;
 			case 2:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft2, 2000uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft2, 2000uL);
 				break;
 			case 3:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft3, 2000uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft3, 2000uL);
 				break;
 			case 4:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft4, 2000uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft4, 2000uL);
 				break;
 			case 5:
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft5, 2000uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.KillLeft5, 2000uL);
 				break;
 			}
 			lastKillsLeftPlayed = killsLeft;

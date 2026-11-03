@@ -29,7 +29,7 @@ namespace Cmune.DataCenter.Common.Entities
 		{
 			string text = "[MemberPositionUpdateView: [GroupId:" + GroupId + "][AuthToken:" + AuthToken + "][MemberCmid:" + MemberCmid;
 			string text2 = text;
-			return string.Concat(text2, "][Position:", Position, "]]");
+			return text2 + "][Position:" + Position.ToString() + "]]";
 		}
 	}
 }

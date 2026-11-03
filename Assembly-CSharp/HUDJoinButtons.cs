@@ -69,17 +69,23 @@ public class HUDJoinButtons : MonoBehaviour
 		joinRed.gameObject.SetActive(isTeamGame);
 		join.gameObject.SetActive(!isTeamGame);
 		UISprite[] array = blueBars;
-		foreach (UISprite uISprite in array)
+		UISprite[] array2 = array;
+		UISprite[] array3 = array2;
+		foreach (UISprite uISprite in array3)
 		{
 			uISprite.enabled = isTeamGame;
 		}
-		UISprite[] array2 = redBars;
-		foreach (UISprite uISprite2 in array2)
+		UISprite[] array4 = redBars;
+		UISprite[] array5 = array4;
+		UISprite[] array6 = array5;
+		foreach (UISprite uISprite2 in array6)
 		{
 			uISprite2.enabled = isTeamGame;
 		}
-		UISprite[] array3 = bars;
-		foreach (UISprite uISprite3 in array3)
+		UISprite[] array7 = bars;
+		UISprite[] array8 = array7;
+		UISprite[] array9 = array8;
+		foreach (UISprite uISprite3 in array9)
 		{
 			uISprite3.enabled = !isTeamGame;
 		}

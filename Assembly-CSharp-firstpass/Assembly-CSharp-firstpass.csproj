@@ -575,7 +575,7 @@
     <Compile Include="UberStrike.Core.Serialization\ContactRequestViewProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\CurrencyDepositsViewModelProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\CurrencyDepositViewProxy.cs" />
-    <Compile Include="UberStrike.Core.Serialization\DailyPointsViewProxy.cs" />
+    <Compile Include="UberStrike.Core.Serialization\DailyBonusViewProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\DamageEventProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\DateTimeProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\DecimalProxy.cs" />
@@ -592,6 +592,7 @@
     <Compile Include="UberStrike.Core.Serialization\Int16Proxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\Int32Proxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\Int64Proxy.cs" />
+    <Compile Include="UberStrike.Core.Serialization\IpReputationProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\ItemAssetBundleViewProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\ItemInventoryViewProxy.cs" />
     <Compile Include="UberStrike.Core.Serialization\ItemPriceProxy.cs" />
@@ -658,6 +659,7 @@
     <Compile Include="UberStrike.Core.Types\BIT_FLAGS.cs" />
     <Compile Include="UberStrike.Core.Types\ChannelElement.cs" />
     <Compile Include="UberStrike.Core.Types\DefinitionType.cs" />
+    <Compile Include="UberStrike.Core.Types\GameBoxType.cs" />
     <Compile Include="UberStrike.Core.Types\GameModeFlag.cs" />
     <Compile Include="UberStrike.Core.Types\GameModeType.cs" />
     <Compile Include="UberStrike.Core.Types\ItemShopHighlightType.cs" />
@@ -691,9 +693,10 @@
     <Compile Include="UberStrike.Core.ViewModel\UberstrikeUserViewModel.cs" />
     <Compile Include="UberStrike.DataCenter.Common.Entities\AccountCompletionResultView.cs" />
     <Compile Include="UberStrike.DataCenter.Common.Entities\AuthenticateApplicationView.cs" />
-    <Compile Include="UberStrike.DataCenter.Common.Entities\DailyPointsView.cs" />
+    <Compile Include="UberStrike.DataCenter.Common.Entities\DailyBonusView.cs" />
     <Compile Include="UberStrike.DataCenter.Common.Entities\EsnsBasicStatisticView.cs" />
     <Compile Include="UberStrike.DataCenter.Common.Entities\FacebookBasicStatisticView.cs" />
+    <Compile Include="UberStrike.DataCenter.Common.Entities\IpReputationView.cs" />
     <Compile Include="UberStrike.DataCenter.Common.Entities\ItemQuickUseConfigView.cs" />
     <Compile Include="UberStrike.DataCenter.Common.Entities\LastIpView.cs" />
     <Compile Include="UberStrike.DataCenter.Common.Entities\LinkedMemberView.cs" />

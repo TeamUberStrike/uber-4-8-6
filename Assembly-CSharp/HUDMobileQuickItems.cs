@@ -48,7 +48,7 @@ public class HUDMobileQuickItems : MonoBehaviour
 		{
 			QuickItem[] quickItems = Singleton<QuickItemController>.Instance.QuickItems;
 			int currentSlotIndex = Singleton<QuickItemController>.Instance.CurrentSlotIndex;
-			slot1.SetQuickItem((quickItems.Length <= 0) ? null : quickItems[0], 0 == currentSlotIndex);
+			slot1.SetQuickItem((quickItems.Length == 0) ? null : quickItems[0], currentSlotIndex == 0);
 			slot2.SetQuickItem((quickItems.Length <= 1) ? null : quickItems[1], 1 == currentSlotIndex);
 			slot3.SetQuickItem((quickItems.Length <= 2) ? null : quickItems[2], 2 == currentSlotIndex);
 		}, this);
@@ -59,7 +59,7 @@ public class HUDMobileQuickItems : MonoBehaviour
 			switch (index)
 			{
 			case 0:
-				slot1.SetCooldown(progress, 0 == currentSlotIndex);
+				slot1.SetCooldown(progress, currentSlotIndex == 0);
 				break;
 			case 1:
 				slot2.SetCooldown(progress, 1 == currentSlotIndex);

@@ -15,6 +15,9 @@ public class PickupBounce : MonoBehaviour
 	private void FixedUpdate()
 	{
 		base.transform.Rotate(new Vector3(0f, 2f, 0f));
-		base.transform.position = new Vector3(base.transform.position.x, origPosY + Mathf.Sin((startOffset + Time.realtimeSinceStartup) * 4f) * 0.08f, base.transform.position.z);
+		Transform transform = base.transform;
+		float x = base.transform.position.x;
+		float y = origPosY + Mathf.Sin((startOffset + Time.realtimeSinceStartup) * 4f) * 0.08f;
+		transform.position = new Vector3(x, y, base.transform.position.z);
 	}
 }

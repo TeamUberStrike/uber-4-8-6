@@ -30,6 +30,7 @@ internal class WaitingForPlayersState : IState
 
 	public void OnExit()
 	{
+		Singleton<QuickItemController>.Instance.IsEnabled = true;
 		GamePageManager.Instance.UnloadCurrentPage();
 		EventHandler.Global.RemoveListener<GameEvents.PlayerDied>(OnPlayerKilled);
 		EventHandler.Global.RemoveListener<GameEvents.PlayerRespawn>(OnPlayerRespawn);
@@ -37,8 +38,21 @@ internal class WaitingForPlayersState : IState
 
 	public void OnUpdate()
 	{
-		string empty = string.Empty;
-		PropertyExt.Fire(v2: (GameState.Current.GameMode != GameModeType.DeathMatch) ? "Get as many kills for your team as you can\nbefore the time runs out" : "Get as many kills as you can before the time runs out", property: GameData.Instance.OnNotificationFull, v1: LocalizedStrings.WaitingForOtherPlayers, v3: 0f);
+		Singleton<QuickItemController>.Instance.IsEnabled = false;
+		string v = string.Empty;
+		if (GameState.Current.GameMode == GameModeType.DeathMatch)
+		{
+			v = "Get as many kills as you can before the time runs out";
+		}
+		else if (GameState.Current.GameMode == GameModeType.EliminationMode)
+		{
+			v = "Eliminate all players on the enemy team.\nThe team with players standing at the end of the round wins.";
+		}
+		else if (GameState.Current.GameMode == GameModeType.TeamDeathMatch)
+		{
+			v = "Get as many kills for your team as you can\nbefore the time runs out";
+		}
+		GameData.Instance.OnNotificationFull.Fire(LocalizedStrings.WaitingForOtherPlayers, v, 0f);
 	}
 
 	private void OnPlayerRespawn(GameEvents.PlayerRespawn ev)

@@ -45,7 +45,11 @@ public class NGUIScrollList : MonoBehaviour
 	{
 		get
 		{
-			return (activeElements != null) ? activeElements : elements;
+			if (activeElements == null)
+			{
+				return elements;
+			}
+			return activeElements;
 		}
 	}
 
@@ -110,13 +114,21 @@ public class NGUIScrollList : MonoBehaviour
 	private int GetPreviousIndex(GameObject element)
 	{
 		int num = Mathf.Clamp(ActiveElements.IndexOf(element), 0, ActiveElements.Count - 1);
-		return (num != 0) ? (num - 1) : (ActiveElements.Count - 1);
+		if (num == 0)
+		{
+			return ActiveElements.Count - 1;
+		}
+		return num - 1;
 	}
 
 	private int GetNextIndex(GameObject element)
 	{
 		int num = Mathf.Clamp(ActiveElements.IndexOf(element), 0, ActiveElements.Count - 1);
-		return (num != ActiveElements.Count - 1) ? (num + 1) : 0;
+		if (num == ActiveElements.Count - 1)
+		{
+			return 0;
+		}
+		return num + 1;
 	}
 
 	public void Reposition()

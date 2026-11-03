@@ -15,22 +15,36 @@ public sealed class MeleeWeaponDecorator : BaseWeaponDecorator
 	[SerializeField]
 	private AudioClip _equipSound;
 
+	private static float speed = 1f;
+
 	protected override void Awake()
 	{
 		base.Awake();
 		base.IsMelee = true;
 	}
 
+	private void OnEnable()
+	{
+		speed = 10000f;
+		ShowShootEffect(null);
+		speed = 1f;
+	}
+
 	public override void ShowShootEffect(RaycastHit[] hits)
 	{
 		base.ShowShootEffect(hits);
-		if (base.EnableShootAnimation && (bool)_animation && _shootAnimClips.Length > 0)
+		if (!base.EnableShootAnimation || !_animation || _shootAnimClips.Length == 0)
 		{
-			int num = Random.Range(0, _shootAnimClips.Length);
-			_animation.clip = _shootAnimClips[num];
-			_animation.Rewind();
-			_animation.Play();
+			return;
 		}
+		foreach (AnimationState item in _animation)
+		{
+			item.speed = speed;
+		}
+		int num = Random.Range(0, _shootAnimClips.Length);
+		_animation.clip = _shootAnimClips[num];
+		_animation.Rewind();
+		_animation.Play();
 	}
 
 	public override void PlayHitSound()
@@ -48,13 +62,13 @@ public sealed class MeleeWeaponDecorator : BaseWeaponDecorator
 
 	protected override void EmitImpactSound(string impactType, Vector3 position)
 	{
-		if (_impactSounds != null && _impactSounds.Length > 0)
+		if (_impactSounds != null && _impactSounds.Length != 0)
 		{
 			int num = Random.Range(0, _impactSounds.Length);
 			AudioClip audioClip = _impactSounds[num];
 			if ((bool)audioClip)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(audioClip, position, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(audioClip, position);
 			}
 			else
 			{

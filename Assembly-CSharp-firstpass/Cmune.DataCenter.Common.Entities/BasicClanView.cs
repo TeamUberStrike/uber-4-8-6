@@ -75,9 +75,9 @@ namespace Cmune.DataCenter.Common.Entities
 			string text2 = text;
 			text = text2 + "[Name: " + Name + "][Motto: " + Name + "][Address: " + Address + "]";
 			text2 = text;
-			text = string.Concat(text2, "[Creation date: ", FoundingDate, "][Picture: ", Picture, "][Type: ", Type, "][Last updated: ", LastUpdated, "]");
+			text = text2 + "[Creation date: " + FoundingDate.ToString() + "][Picture: " + Picture + "][Type: " + Type.ToString() + "][Last updated: " + LastUpdated.ToString() + "]";
 			text2 = text;
-			text = string.Concat(text2, "[Tag: ", Tag, "][Members limit: ", MembersLimit, "][Color style: ", ColorStyle, "][Font style: ", FontStyle, "]");
+			text = text2 + "[Tag: " + Tag + "][Members limit: " + MembersLimit + "][Color style: " + ColorStyle.ToString() + "][Font style: " + FontStyle.ToString() + "]";
 			text2 = text;
 			return text2 + "[Application Id: " + ApplicationId + "][Owner Cmid: " + OwnerCmid + "][Owner name: " + OwnerName + "]]";
 		}

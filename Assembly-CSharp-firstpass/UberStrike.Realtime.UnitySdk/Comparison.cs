@@ -6,7 +6,7 @@ namespace UberStrike.Realtime.UnitySdk
 	{
 		public static bool IsEqual(object a, object b)
 		{
-			if (object.ReferenceEquals(a, b))
+			if (a == b)
 			{
 				return true;
 			}
@@ -30,7 +30,7 @@ namespace UberStrike.Realtime.UnitySdk
 				IEnumerator enumerator2 = a2.GetEnumerator();
 				while (flag && enumerator.MoveNext() && enumerator2.MoveNext())
 				{
-					flag = ((!(enumerator.Current is ICollection) || !(enumerator2.Current is ICollection)) ? (enumerator.Current != null && enumerator.Current.Equals(enumerator2.Current)) : IsSequenceEqual(enumerator.Current as ICollection, enumerator2.Current as ICollection));
+					flag = ((enumerator.Current is ICollection && enumerator2.Current is ICollection) ? IsSequenceEqual(enumerator.Current as ICollection, enumerator2.Current as ICollection) : (enumerator.Current != null && enumerator.Current.Equals(enumerator2.Current)));
 				}
 				return flag;
 			}

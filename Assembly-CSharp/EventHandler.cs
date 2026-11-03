@@ -63,27 +63,27 @@ public class EventHandler
 	public void AddListener<T>(Action<T> callback)
 	{
 		IEventContainer value;
-		if (!this.eventContainer.TryGetValue(typeof(T), out value))
+		if (!eventContainer.TryGetValue(typeof(T), out value))
 		{
 			value = new EventContainer<T>();
-			this.eventContainer.Add(typeof(T), value);
+			eventContainer.Add(typeof(T), value);
 		}
-		EventContainer<T> eventContainer = value as EventContainer<T>;
-		if (eventContainer != null)
+		EventContainer<T> obj = value as EventContainer<T>;
+		if (obj != null)
 		{
-			eventContainer.AddCallbackMethod(callback);
+			obj.AddCallbackMethod(callback);
 		}
 	}
 
 	public void RemoveListener<T>(Action<T> callback)
 	{
 		IEventContainer value;
-		if (this.eventContainer.TryGetValue(typeof(T), out value))
+		if (eventContainer.TryGetValue(typeof(T), out value))
 		{
-			EventContainer<T> eventContainer = value as EventContainer<T>;
-			if (eventContainer != null)
+			EventContainer<T> obj = value as EventContainer<T>;
+			if (obj != null)
 			{
-				eventContainer.RemoveCallbackMethod(callback);
+				obj.RemoveCallbackMethod(callback);
 			}
 		}
 	}

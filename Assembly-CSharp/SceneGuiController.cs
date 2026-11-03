@@ -45,7 +45,7 @@ public class SceneGuiController : MonoBehaviour
 
 	private void OnEnable()
 	{
-		if (_guiPages.Length > 0)
+		if (_guiPages.Length != 0)
 		{
 			SetCurrentPage(0);
 			_currentWidth.Value = _width;

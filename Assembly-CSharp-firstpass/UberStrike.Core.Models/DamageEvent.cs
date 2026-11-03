@@ -18,7 +18,11 @@ namespace UberStrike.Core.Models
 		{
 			get
 			{
-				return (Damage != null) ? Damage.Count : 0;
+				if (Damage == null)
+				{
+					return 0;
+				}
+				return Damage.Count;
 			}
 		}
 

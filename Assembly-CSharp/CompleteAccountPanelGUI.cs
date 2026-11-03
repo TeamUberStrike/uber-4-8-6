@@ -240,7 +240,7 @@ public class CompleteAccountPanelGUI : PanelGuiBase
 				list.Add(Singleton<ItemManager>.Instance.GetItemInShop(key));
 			}
 			PlayerDataManager.Name = name;
-			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Operations.SendAuthenticationRequest(PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			StartCoroutine(StartPreparingNewPlayersLoadout(list));
 			break;
 		}
@@ -265,38 +265,38 @@ public class CompleteAccountPanelGUI : PanelGuiBase
 	private IEnumerator StartPreparingNewPlayersLoadout(List<IUnityItem> items)
 	{
 		yield return StartCoroutine(Singleton<ItemManager>.Instance.StartGetInventory(false));
-		IUnityItem item = items.Find((IUnityItem i) => i.View.ID == 1000);
-		if (item != null)
+		IUnityItem unityItem = items.Find((IUnityItem i) => i.View.ID == 1);
+		if (unityItem != null)
 		{
-			InventoryItem melee = new InventoryItem(item);
-			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponMelee, melee.Item);
+			InventoryItem inventoryItem = new InventoryItem(unityItem);
+			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponMelee, inventoryItem.Item);
 		}
-		item = items.Find((IUnityItem i) => i.View.ID == 1002);
-		if (item != null)
+		unityItem = items.Find((IUnityItem i) => i.View.ID == 12);
+		if (unityItem != null)
 		{
-			InventoryItem machinegun = new InventoryItem(item);
-			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponPrimary, machinegun.Item);
+			InventoryItem inventoryItem2 = new InventoryItem(unityItem);
+			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponPrimary, inventoryItem2.Item);
 		}
-		item = items.Find((IUnityItem i) => i.View.ID == 1003);
-		if (item != null)
+		unityItem = items.Find((IUnityItem i) => i.View.ID == 44);
+		if (unityItem != null)
 		{
-			InventoryItem shotgun = new InventoryItem(item);
-			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponSecondary, shotgun.Item);
+			InventoryItem inventoryItem3 = new InventoryItem(unityItem);
+			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponSecondary, inventoryItem3.Item);
 		}
-		item = items.Find((IUnityItem i) => i.View.ID == 1004);
-		if (item != null)
+		unityItem = items.Find((IUnityItem i) => i.View.ID == 68);
+		if (unityItem != null)
 		{
-			InventoryItem sniper = new InventoryItem(item);
-			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponTertiary, sniper.Item);
+			InventoryItem inventoryItem4 = new InventoryItem(unityItem);
+			Singleton<LoadoutManager>.Instance.SetLoadoutItem(LoadoutSlotType.WeaponTertiary, inventoryItem4.Item);
 		}
 		if (items.Count > 0)
 		{
-			ItemListPopupDialog dialog = new ItemListPopupDialog("New Items", "You're now ready to start kicking ass!\nUse the PLAY button to join or create a game.", items, delegate
+			ItemListPopupDialog popup = new ItemListPopupDialog("New Items", "You're now ready to start kicking ass!\nUse the PLAY button to join or create a game.", items, delegate
 			{
 				Singleton<AuthenticationManager>.Instance.SetAuthComplete(true);
 				MenuPageManager.Instance.LoadPage(PageType.Home, true);
 			});
-			PopupSystem.Show(dialog);
+			PopupSystem.Show(popup);
 			Debug.Log("You've got new items: " + items.Count);
 		}
 	}

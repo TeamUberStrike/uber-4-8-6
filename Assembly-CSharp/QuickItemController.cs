@@ -19,7 +19,11 @@ public class QuickItemController : Singleton<QuickItemController>
 	{
 		get
 		{
-			return _isEnabled && GameState.Current.PlayerData.IsAlive;
+			if (_isEnabled)
+			{
+				return GameState.Current.PlayerData.IsAlive;
+			}
+			return false;
 		}
 		set
 		{
@@ -132,7 +136,9 @@ public class QuickItemController : Singleton<QuickItemController>
 	private bool IsCastingOrCooldown()
 	{
 		QuickItem[] quickItems = _quickItems;
-		foreach (QuickItem quickItem in quickItems)
+		QuickItem[] array = quickItems;
+		QuickItem[] array2 = array;
+		foreach (QuickItem quickItem in array2)
 		{
 			if (quickItem != null && quickItem.Behaviour.IsCoolingDown)
 			{
@@ -152,7 +158,7 @@ public class QuickItemController : Singleton<QuickItemController>
 		{
 			if (_quickItems[index].Behaviour.Run() && GameState.Current.Player.Character != null)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.WeaponSwitch);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.WeaponSwitch, 0uL);
 			}
 		}
 		else
@@ -196,14 +202,14 @@ public class QuickItemController : Singleton<QuickItemController>
 				UseQuickItem(2);
 				break;
 			case GameInputKey.NextQuickItem:
-				if (_quickItems.Length > 0)
+				if (_quickItems.Length != 0)
 				{
 					CurrentSlotIndex = GetNextAvailableSlotIndex(CurrentSlotIndex);
 					GameData.Instance.OnQuickItemsChanged.Fire();
 				}
 				break;
 			case GameInputKey.PrevQuickItem:
-				if (_quickItems.Length > 0)
+				if (_quickItems.Length != 0)
 				{
 					CurrentSlotIndex = GetPrevAvailableSlotIndex(CurrentSlotIndex);
 					GameData.Instance.OnQuickItemsChanged.Fire();

@@ -69,7 +69,6 @@ public class GlobalSceneLoader : MonoBehaviour
 		Application.runInBackground = true;
 		Application.LoadLevel("Menu");
 		Configuration.WebserviceBaseUrl = ApplicationDataManager.WebServiceBaseUrl;
-		yield return StartCoroutine(BeginAuthenticateApplication());
 		GlobalSceneProgress = 1f;
 		IsGlobalSceneLoaded = true;
 		ItemAssetBundleProgress = 1f;
@@ -81,18 +80,13 @@ public class GlobalSceneLoader : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 			_color.a = 1f - f / 1f;
 		}
+		if (Application.platform == RuntimePlatform.OSXPlayer)
+		{
+			ApplicationDataManager.LockApplication("MacOS is not supported anymore." + Environment.NewLine + "Kindly switch to Windows or Bootcamp to be able to play.");
+			yield break;
+		}
 		Debug.Log("Start LoginByChannel");
-		if (PlayerDataManager.IsTestBuild)
-		{
-			PopupSystem.ShowMessage("Warning", "This is a test build, do not distribute!", PopupSystem.AlertType.OK, delegate
-			{
-				Singleton<AuthenticationManager>.Instance.LoginByChannel();
-			});
-		}
-		else
-		{
-			Singleton<AuthenticationManager>.Instance.LoginByChannel();
-		}
+		Singleton<AuthenticationManager>.Instance.LoginByChannel();
 		yield return new WaitForSeconds(1f);
 		UnityEngine.Object.Destroy(base.gameObject);
 	}
@@ -119,20 +113,19 @@ public class GlobalSceneLoader : MonoBehaviour
 		AutoMonoBehaviour<InputManager>.Instance.ReadAllKeyMappings();
 	}
 
-	private IEnumerator BeginAuthenticateApplication()
+	public static IEnumerator BeginAuthenticateApplication(Action<bool> OnSuccess)
 	{
 		Debug.Log("BeginAuthenticateApplication " + Configuration.WebserviceBaseUrl);
-		yield return ApplicationWebServiceClient.AuthenticateApplication("4.7.1", ApplicationDataManager.Channel, string.Empty, delegate(AuthenticateApplicationView callback)
+		yield return ApplicationWebServiceClient.AuthenticateApplication(ApplicationDataManager.Version, ApplicationDataManager.Channel, string.Empty, delegate(AuthenticateApplicationView callback)
 		{
-			OnAuthenticateApplication(callback);
-		}, delegate(Exception exception)
+			OnAuthenticateApplication(callback, OnSuccess);
+		}, delegate(Exception ex)
 		{
-			OnAuthenticateApplicationException(exception);
+			OnAuthenticateException(ex, OnSuccess);
 		});
-		Debug.Log("Connected to : " + Configuration.WebserviceBaseUrl);
 	}
 
-	private void OnAuthenticateApplication(AuthenticateApplicationView ev)
+	private static void OnAuthenticateApplication(AuthenticateApplicationView ev, Action<bool> OnSuccess)
 	{
 		try
 		{
@@ -142,136 +135,28 @@ public class GlobalSceneLoader : MonoBehaviour
 				Configuration.EncryptionInitVector = ev.EncryptionInitVector;
 				Configuration.EncryptionPassPhrase = ev.EncryptionPassPhrase;
 				ApplicationDataManager.IsOnline = true;
-				if (!UseTestPhotonServers)
-				{
-					Singleton<GameServerManager>.Instance.CommServer = new PhotonServer(ev.CommServer);
-					Singleton<GameServerManager>.Instance.AddPhotonGameServers(ev.GameServers.FindAll((PhotonView i) => i.UsageType == PhotonUsageType.All));
-				}
-				else
-				{
-					Singleton<GameServerManager>.Instance.CommServer = new PhotonServer(TestCommServer, PhotonUsageType.CommServer);
-					Singleton<GameServerManager>.Instance.AddTestPhotonGameServer(1000, new PhotonServer(TestGameServer, PhotonUsageType.All));
-				}
-				if (ev.WarnPlayer)
-				{
-					HandleVersionWarning();
-				}
+				Singleton<GameServerManager>.Instance.CommServer = new PhotonServer(ev.CommServer);
+				Singleton<GameServerManager>.Instance.AddPhotonGameServers(ev.GameServers.FindAll((PhotonView i) => i.UsageType == PhotonUsageType.All));
+				OnSuccess(true);
 			}
 			else
 			{
-				Debug.Log(string.Concat("OnAuthenticateApplication failed with 4.7.1/", ApplicationDataManager.Channel, ": ", ErrorMessage));
-				ErrorMessage = "Please update.";
-				HandleVersionError();
+				Debug.Log("OnAuthenticateApplication failed with " + ApplicationDataManager.Version + "/ " + ApplicationDataManager.Channel.ToString() + ": " + ErrorMessage);
+				PopupSystem.ShowMessage("Out of date", "Game version " + ApplicationDataManager.Version + " is out of date, Contact support @https://discord.gg/hhxZCBamRT");
+				OnSuccess(false);
 			}
 		}
 		catch (Exception ex)
 		{
-			ErrorMessage = ex.Message + " " + ex.StackTrace;
-			Debug.LogError(string.Concat("OnAuthenticateApplication crashed with 4.7.1/", ApplicationDataManager.Channel, ": ", ErrorMessage));
-			HandleApplicationAuthenticationError("There was a problem loading UberStrike. Please check your internet connection and try again.");
+			OnAuthenticateException(ex, OnSuccess);
 		}
 	}
 
-	private void OnAuthenticateApplicationException(Exception exception)
+	private static void OnAuthenticateException(Exception ex, Action<bool> OnSuccess)
 	{
-		ErrorMessage = exception.Message;
-		Debug.LogError(string.Concat("An exception occurred while authenticating the application with 4.7.1/", ApplicationDataManager.Channel, ": ", exception.Message));
-		HandleApplicationAuthenticationError("There was a problem loading UberStrike. Please check your internet connection and try again.");
-	}
-
-	private void RetryAuthentiateApplication()
-	{
-		ErrorMessage = string.Empty;
-		StartCoroutine(BeginAuthenticateApplication());
-	}
-
-	private void HandleApplicationAuthenticationError(string message)
-	{
-		switch (ApplicationDataManager.Channel)
-		{
-		case ChannelType.WebPortal:
-		case ChannelType.WebFacebook:
-			PopupSystem.ShowError(LocalizedStrings.Error, message, PopupSystem.AlertType.None);
-			break;
-		case ChannelType.IPhone:
-		case ChannelType.IPad:
-		case ChannelType.Android:
-			PopupSystem.ShowError(LocalizedStrings.Error, message, PopupSystem.AlertType.OK, RetryAuthentiateApplication);
-			break;
-		default:
-			PopupSystem.ShowError(LocalizedStrings.Error, message + "This client type is not supported.", PopupSystem.AlertType.OK, Application.Quit);
-			break;
-		}
-	}
-
-	private void HandleConfigurationMissingError(string message)
-	{
-		switch (ApplicationDataManager.Channel)
-		{
-		case ChannelType.WebPortal:
-		case ChannelType.WebFacebook:
-			PopupSystem.ShowError(LocalizedStrings.Error, message, PopupSystem.AlertType.None);
-			break;
-		case ChannelType.IPhone:
-		case ChannelType.IPad:
-		case ChannelType.Android:
-			PopupSystem.ShowError(LocalizedStrings.Error, message, PopupSystem.AlertType.OK, Application.Quit);
-			break;
-		default:
-			PopupSystem.ShowError(LocalizedStrings.Error, message + "This client type is not supported.", PopupSystem.AlertType.OK, Application.Quit);
-			break;
-		}
-	}
-
-	private void HandleVersionWarning()
-	{
-		switch (ApplicationDataManager.Channel)
-		{
-		case ChannelType.WebPortal:
-		case ChannelType.WebFacebook:
-			PopupSystem.ShowError("Warning", "Your UberStrike client is out of date. You should refresh your browser.", PopupSystem.AlertType.OK, Singleton<AuthenticationManager>.Instance.LoginByChannel);
-			break;
-		case ChannelType.Android:
-			PopupSystem.ShowError("Warning", "Your UberStrike client is out of date. Click OK to update from our website.", PopupSystem.AlertType.OKCancel, OpenAndroidAppStoreUpdatesPage, Singleton<AuthenticationManager>.Instance.LoginByChannel);
-			break;
-		case ChannelType.IPhone:
-		case ChannelType.IPad:
-			PopupSystem.ShowError("Warning", "Your UberStrike client is out of date. Click OK to update from the App Store.", PopupSystem.AlertType.OKCancel, OpenIosAppStoreUpdatesPage, Singleton<AuthenticationManager>.Instance.LoginByChannel);
-			break;
-		default:
-			PopupSystem.ShowError(LocalizedStrings.Error, string.Concat("Your UberStrike client is not supported. Please update from our website.\n(Invalid Channel: ", ApplicationDataManager.Channel, ")"), PopupSystem.AlertType.OK);
-			break;
-		}
-	}
-
-	private void HandleVersionError()
-	{
-		switch (ApplicationDataManager.Channel)
-		{
-		case ChannelType.WebPortal:
-		case ChannelType.WebFacebook:
-			PopupSystem.ShowError(LocalizedStrings.Error, "Your UberStrike client is out of date. Please refresh your browser.", PopupSystem.AlertType.None);
-			break;
-		case ChannelType.Android:
-			PopupSystem.ShowError(LocalizedStrings.Error, "Your UberStrike client is out of date. Please update from our website.", PopupSystem.AlertType.OK, OpenAndroidAppStoreUpdatesPage);
-			break;
-		case ChannelType.IPhone:
-		case ChannelType.IPad:
-			PopupSystem.ShowError(LocalizedStrings.Error, "Your UberStrike client is out of date. Please update from the App Store.", PopupSystem.AlertType.OK, OpenIosAppStoreUpdatesPage);
-			break;
-		default:
-			PopupSystem.ShowError(LocalizedStrings.Error, string.Concat("Your UberStrike client is not supported. Please update from our website.\n(Invalid Channel: ", ApplicationDataManager.Channel, ")"), PopupSystem.AlertType.OK);
-			break;
-		}
-	}
-
-	private void OpenIosAppStoreUpdatesPage()
-	{
-		ApplicationDataManager.OpenUrl(string.Empty, "itms-apps://itunes.com/apps/uberstrike");
-	}
-
-	private void OpenAndroidAppStoreUpdatesPage()
-	{
-		ApplicationDataManager.OpenUrl(string.Empty, "market://details?id=com.cmune.uberstrike.android");
+		Debug.LogError(string.Format("OnAuthenticationException: {0} {1}", ApplicationDataManager.Version, ApplicationDataManager.Channel));
+		Debug.LogError(ex);
+		PopupSystem.ShowMessage("Error", "There was a problem connecting to UberStrike.\nKindly check your internet connectivity.\nIf the issue persists ,contact support @https://discord.gg/hhxZCBamRT", PopupSystem.AlertType.OK, Application.Quit);
+		OnSuccess(false);
 	}
 }

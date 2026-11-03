@@ -62,7 +62,11 @@ namespace Steamworks
 
 		public override bool Equals(object other)
 		{
-			return other is servernetadr_t && this == (servernetadr_t)other;
+			if (other is servernetadr_t)
+			{
+				return this == (servernetadr_t)other;
+			}
+			return false;
 		}
 
 		public override int GetHashCode()
@@ -72,7 +76,11 @@ namespace Steamworks
 
 		public bool Equals(servernetadr_t other)
 		{
-			return m_unIP == other.m_unIP && m_usQueryPort == other.m_usQueryPort && m_usConnectionPort == other.m_usConnectionPort;
+			if (m_unIP == other.m_unIP && m_usQueryPort == other.m_usQueryPort)
+			{
+				return m_usConnectionPort == other.m_usConnectionPort;
+			}
+			return false;
 		}
 
 		public int CompareTo(servernetadr_t other)
@@ -82,17 +90,37 @@ namespace Steamworks
 
 		public static bool operator <(servernetadr_t x, servernetadr_t y)
 		{
-			return x.m_unIP < y.m_unIP || (x.m_unIP == y.m_unIP && x.m_usQueryPort < y.m_usQueryPort);
+			if (x.m_unIP >= y.m_unIP)
+			{
+				if (x.m_unIP == y.m_unIP)
+				{
+					return x.m_usQueryPort < y.m_usQueryPort;
+				}
+				return false;
+			}
+			return true;
 		}
 
 		public static bool operator >(servernetadr_t x, servernetadr_t y)
 		{
-			return x.m_unIP > y.m_unIP || (x.m_unIP == y.m_unIP && x.m_usQueryPort > y.m_usQueryPort);
+			if (x.m_unIP <= y.m_unIP)
+			{
+				if (x.m_unIP == y.m_unIP)
+				{
+					return x.m_usQueryPort > y.m_usQueryPort;
+				}
+				return false;
+			}
+			return true;
 		}
 
 		public static bool operator ==(servernetadr_t x, servernetadr_t y)
 		{
-			return x.m_unIP == y.m_unIP && x.m_usQueryPort == y.m_usQueryPort && x.m_usConnectionPort == y.m_usConnectionPort;
+			if (x.m_unIP == y.m_unIP && x.m_usQueryPort == y.m_usQueryPort)
+			{
+				return x.m_usConnectionPort == y.m_usConnectionPort;
+			}
+			return false;
 		}
 
 		public static bool operator !=(servernetadr_t x, servernetadr_t y)

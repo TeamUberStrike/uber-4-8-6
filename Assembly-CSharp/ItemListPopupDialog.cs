@@ -18,8 +18,8 @@ public class ItemListPopupDialog : BasePopupDialog
 	public ItemListPopupDialog(string title, string text, List<IUnityItem> items, Action callbackOk = null)
 		: this()
 	{
-		Title = title;
-		Text = text;
+		base.Title = title;
+		base.Text = text;
 		_size.y = 320f;
 		_items = new List<IUnityItem>(items);
 		foreach (IUnityItem item in _items)
@@ -41,7 +41,7 @@ public class ItemListPopupDialog : BasePopupDialog
 	public ItemListPopupDialog(IUnityItem item, string customMessage = "")
 		: this()
 	{
-		Title = LocalizedStrings.NewItem;
+		base.Title = LocalizedStrings.NewItem;
 		_customMessage = customMessage;
 		if (item != null)
 		{
@@ -117,7 +117,7 @@ public class ItemListPopupDialog : BasePopupDialog
 		}
 		else
 		{
-			GUI.Label(new Rect(17f, 150f, _size.x - 34f, 20f), Text, BlueStonez.label_interparkbold_13pt);
+			GUI.Label(new Rect(17f, 150f, _size.x - 34f, 20f), base.Text, BlueStonez.label_interparkbold_13pt);
 		}
 	}
 
@@ -136,6 +136,6 @@ public class ItemListPopupDialog : BasePopupDialog
 			num++;
 			num2 = num / columns;
 		}
-		GUI.Label(new Rect(17f, 220f, _size.x - 34f, 40f), Text, BlueStonez.label_interparkmed_11pt);
+		GUI.Label(new Rect(17f, 220f, _size.x - 34f, 40f), base.Text, BlueStonez.label_interparkmed_11pt);
 	}
 }

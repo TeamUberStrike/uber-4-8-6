@@ -507,7 +507,7 @@ public class PlayPageGUI : MonoBehaviour
 				{
 					Singleton<GameServerController>.Instance.SelectedServer = photonServer;
 					SelectedServerUpdated(photonServer);
-					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL, 1f, 1f);
+					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL);
 				}
 				GUI.EndGroup();
 			}
@@ -531,7 +531,7 @@ public class PlayPageGUI : MonoBehaviour
 				{
 					_serverJoinDoubleClick = 0f;
 					SelectedServerUpdated(photonServer);
-					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL, 1f, 1f);
+					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL);
 				}
 				else
 				{
@@ -593,7 +593,7 @@ public class PlayPageGUI : MonoBehaviour
 		GUI.BeginGroup(rect);
 		GUI.Label(new Rect(0f, 0f, rect.width, 56f), LocalizedStrings.ChooseAGameCaps, BlueStonez.tab_strip);
 		GUI.color = new Color(1f, 1f, 1f, 0.5f);
-		GUI.Label(new Rect(10f, 28f, rect.width - 37f, 28f), string.Format("{0} ({1}ms)", Singleton<GameServerController>.Instance.SelectedServer.Name, Singleton<GameServerController>.Instance.SelectedServer.Latency.ToString()), BlueStonez.label_interparkbold_18pt_left);
+		GUI.Label(new Rect(10f, 28f, rect.width - 37f, 28f), Singleton<GameServerController>.Instance.SelectedServer.Name + " (" + Singleton<GameServerController>.Instance.SelectedServer.Latency + "ms)", BlueStonez.label_interparkbold_18pt_left);
 		GUI.Label(new Rect(0f, 28f, rect.width - 5f, 28f), string.Format("{0} {1}, {2} {3} ", Singleton<GameListManager>.Instance.PlayersCount, LocalizedStrings.PlayersOnline, _filteredActiveRoomCount, LocalizedStrings.Games), BlueStonez.label_interparkbold_18pt_right);
 		GUI.color = Color.white;
 		GUI.Box(new Rect(0f, 55f, rect.width, rect.height - 57f), string.Empty, BlueStonez.window_standard_grey38);
@@ -991,9 +991,30 @@ public class PlayPageGUI : MonoBehaviour
 		}
 		if (_showFilters)
 		{
-			return flag && flag2 && flag3 && flag4 && flag5 && _showFilters;
+			if (flag && flag2 && flag3 && flag4 && flag5)
+			{
+				return _showFilters;
+			}
+			return false;
 		}
 		return flag;
+	}
+
+	private string DisplayRandomMapIcon(Rect rect)
+	{
+		string text = "RandomMapMode";
+		string text2 = ApplicationDataManager.ImagePath + "maps/" + text + ".jpg";
+		if (_mapImages.ContainsKey(100))
+		{
+			_mapImages[100].Draw(rect);
+		}
+		else
+		{
+			DynamicTexture dynamicTexture = new DynamicTexture(text2);
+			_mapImages[100] = dynamicTexture;
+			dynamicTexture.Draw(rect);
+		}
+		return text2;
 	}
 
 	private string DisplayMapIcon(int mapId, Rect rect)
@@ -1055,7 +1076,7 @@ public class PlayPageGUI : MonoBehaviour
 			GUIStyle style = ((!flag) ? BlueStonez.label_interparkmed_10pt_left : BlueStonez.label_interparkbold_11pt_left);
 			GUI.color = ((!GameRoomHelper.HasLevelRestriction(cachedGame)) ? Color.white : new Color(1f, 0.7f, 0f));
 			int num3 = 0;
-			string item = DisplayMapIcon(cachedGame.MapID, new Rect(num3, num2, 110f, 70f));
+			string item = (cachedGame.IsRandomMap ? DisplayRandomMapIcon(new Rect(num3, num2, 110f, 70f)) : DisplayMapIcon(cachedGame.MapID, new Rect(num3, num2, 110f, 70f)));
 			list.Add(item);
 			if (cachedGame.IsPermanentGame && GameRoomHelper.HasLevelRestriction(cachedGame))
 			{
@@ -1095,10 +1116,10 @@ public class PlayPageGUI : MonoBehaviour
 			GUI.color = ((!GameRoomHelper.HasLevelRestriction(cachedGame)) ? Color.white : new Color(1f, 0.7f, 0f));
 			num3 = 120;
 			GUI.Label(new Rect(num3, num2, _gameNameWidth, 35f), cachedGame.Name, BlueStonez.label_interparkbold_13pt_left);
-			GUI.Label(new Rect(num3, num2 + 35, _gameNameWidth, 35f), Singleton<MapManager>.Instance.GetMapName(cachedGame.MapID) + " " + LevelRestrictionText(cachedGame), BlueStonez.label_interparkmed_10pt_left);
+			GUI.Label(new Rect(num3, num2 + 35, _gameNameWidth, 35f), Singleton<MapManager>.Instance.GetMapName(cachedGame.MapID) + " " + cachedGame.BoxType.ToString() + " - GameFlag: " + GetGameFlagText(cachedGame) + " " + LevelRestrictionText(cachedGame), BlueStonez.label_interparkmed_10pt_left);
 			num3 = 122 + _gameNameWidth - 4;
 			int num4 = cachedGame.TimeLimit / 60;
-			GUI.Label(new Rect(num3, num2, _gameModeWidth, 35f), GameStateHelper.GetModeName(cachedGame.GameMode) + " - " + num4 + " mins Mods: " + GetGameFlagText(cachedGame), BlueStonez.label_interparkmed_10pt_left);
+			GUI.Label(new Rect(num3, num2, _gameModeWidth, 35f), GameStateHelper.GetModeName(cachedGame.GameMode) + " - " + num4 + " mins", BlueStonez.label_interparkmed_10pt_left);
 			GUI.Label(new Rect(num3 + 64, num2 + 35, _gameModeWidth, 35f), string.Format("{0}/{1} players", cachedGame.ConnectedPlayers, cachedGame.PlayerLimit), style);
 			GUI.color = Color.white;
 			DrawProgressBarLarge(new Rect(num3, num2 + 35 + 5, 58f, 35f), (float)cachedGame.ConnectedPlayers / (float)cachedGame.PlayerLimit);
@@ -1107,7 +1128,7 @@ public class PlayPageGUI : MonoBehaviour
 			if (GUI.Button(new Rect(num3, num2 + 35 - height / 2, 90f, height), LocalizedStrings.JoinCaps, BlueStonez.button_white))
 			{
 				JoinGame(cachedGame);
-				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL, 1f, 1f);
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL);
 			}
 			if (GUI.Button(new Rect(0f, num2, rect.width, 70f), string.Empty, BlueStonez.label_interparkbold_11pt_left))
 			{
@@ -1116,7 +1137,7 @@ public class PlayPageGUI : MonoBehaviour
 				{
 					_gameJoinDoubleClick = 0f;
 					JoinGame(_selectedGame);
-					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL, 1f, 1f);
+					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.JoinServer, 0uL);
 				}
 				else
 				{
@@ -1141,24 +1162,37 @@ public class PlayPageGUI : MonoBehaviour
 
 	public static string GetGameFlagText(GameRoomData data)
 	{
-		string result = "None";
+		string text = "";
 		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.NoArmor, data.GameFlags))
 		{
-			result = "No Armor";
+			string text2 = "No Armor";
+			text = ((!(text == "")) ? (text + " , " + text2) : text2);
 		}
-		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, data.GameFlags))
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.LowGravity, data.GameFlags))
 		{
-			result = "Low Gravity";
+			string text3 = "Low Gravity";
+			text = ((!(text == "")) ? (text + " , " + text3) : text3);
 		}
-		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, data.GameFlags))
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.QuickSwitch, data.GameFlags))
 		{
-			result = "Quick Switching";
+			string text4 = "Quick Switching";
+			text = ((!(text == "")) ? (text + " , " + text4) : text4);
 		}
-		else if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.MeleeOnly, data.GameFlags))
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.MeleeOnly, data.GameFlags))
 		{
-			result = "Melee Only";
+			string text5 = "Melee Only";
+			text = ((!(text == "")) ? (text + " , " + text5) : text5);
 		}
-		return result;
+		if (GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.KnockBack, data.GameFlags))
+		{
+			string text6 = "Knockback";
+			text = ((!(text == "")) ? (text + " , " + text6) : text6);
+		}
+		if (text == "")
+		{
+			text = "None";
+		}
+		return text;
 	}
 
 	private string LevelRestrictionText(GameRoomData m)

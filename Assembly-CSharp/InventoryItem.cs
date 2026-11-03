@@ -17,7 +17,11 @@ public class InventoryItem
 	{
 		get
 		{
-			return (!IsPermanent && ExpirationDate.HasValue) ? Mathf.CeilToInt((float)ExpirationDate.Value.Subtract(ApplicationDataManager.ServerDateTime).TotalHours / 24f) : 0;
+			if (IsPermanent || !ExpirationDate.HasValue)
+			{
+				return 0;
+			}
+			return Mathf.CeilToInt((float)ExpirationDate.Value.Subtract(ApplicationDataManager.ServerDateTime).TotalHours / 24f);
 		}
 	}
 
@@ -33,7 +37,11 @@ public class InventoryItem
 	{
 		get
 		{
-			return IsPermanent || DaysRemaining > 0;
+			if (!IsPermanent)
+			{
+				return DaysRemaining > 0;
+			}
+			return true;
 		}
 	}
 

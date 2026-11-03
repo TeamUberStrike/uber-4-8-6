@@ -25,24 +25,30 @@ public static class LayerUtil
 
 	public static void ValidateUberstrikeLayers()
 	{
-		for (int i = 0; i < 32; i++)
+		int num = 0;
+		while (true)
 		{
-			if (i == 2)
+			if (num >= 32)
 			{
-				continue;
+				return;
 			}
-			if (!string.IsNullOrEmpty(LayerMask.LayerToName(i)))
+			if (num != 2)
 			{
-				if (Enum.GetName(typeof(UberstrikeLayer), i) != LayerMask.LayerToName(i))
+				if (!string.IsNullOrEmpty(LayerMask.LayerToName(num)))
 				{
-					Debug.LogError("Editor layer '" + LayerMask.LayerToName(i) + "' is not defined in the UberstrikeLayer enum!");
+					if (Enum.GetName(typeof(UberstrikeLayer), num) != LayerMask.LayerToName(num))
+					{
+						Debug.LogError("Editor layer '" + LayerMask.LayerToName(num) + "' is not defined in the UberstrikeLayer enum!");
+					}
+				}
+				else if (!string.IsNullOrEmpty(Enum.GetName(typeof(UberstrikeLayer), num)))
+				{
+					break;
 				}
 			}
-			else if (!string.IsNullOrEmpty(Enum.GetName(typeof(UberstrikeLayer), i)))
-			{
-				throw new Exception("UberstrikeLayer mismatch with Editor on layer: " + Enum.GetName(typeof(UberstrikeLayer), i));
-			}
+			num++;
 		}
+		throw new Exception("UberstrikeLayer mismatch with Editor on layer: " + Enum.GetName(typeof(UberstrikeLayer), num));
 	}
 
 	public static int CreateLayerMask(params UberstrikeLayer[] layers)
@@ -84,7 +90,9 @@ public static class LayerUtil
 	public static void SetLayerRecursively(Transform transform, int layer)
 	{
 		Transform[] componentsInChildren = transform.GetComponentsInChildren<Transform>(true);
-		foreach (Transform transform2 in componentsInChildren)
+		Transform[] array = componentsInChildren;
+		Transform[] array2 = array;
+		foreach (Transform transform2 in array2)
 		{
 			transform2.gameObject.layer = layer;
 		}

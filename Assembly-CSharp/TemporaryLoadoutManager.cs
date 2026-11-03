@@ -30,7 +30,11 @@ public class TemporaryLoadoutManager : Singleton<TemporaryLoadoutManager>
 	public bool IsGearLoadoutModifiedOnSlot(LoadoutSlotType slot)
 	{
 		IUnityItem item;
-		return GameState.Current.Avatar.Loadout.TryGetItem(slot, out item) && item != Singleton<LoadoutManager>.Instance.GetItemOnSlot(slot);
+		if (GameState.Current.Avatar.Loadout.TryGetItem(slot, out item))
+		{
+			return item != Singleton<LoadoutManager>.Instance.GetItemOnSlot(slot);
+		}
+		return false;
 	}
 
 	public void ResetLoadout(LoadoutSlotType slot)

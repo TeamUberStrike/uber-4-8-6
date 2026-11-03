@@ -115,7 +115,9 @@ public class ProjectileManager : Singleton<ProjectileManager>
 	public void RemoveAllProjectilesFromPlayer(byte playerNumber)
 	{
 		int[] array = _projectiles.KeyArray();
-		foreach (int num in array)
+		int[] array2 = array;
+		int[] array3 = array2;
+		foreach (int num in array3)
 		{
 			if ((num & 0xFF) == playerNumber)
 			{

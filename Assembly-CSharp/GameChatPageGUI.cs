@@ -130,7 +130,11 @@ public class GameChatPageGUI : PageGUI
 
 	private bool IsMobileChannel(ChannelType channel)
 	{
-		return channel == ChannelType.Android || channel == ChannelType.IPad || channel == ChannelType.IPhone;
+		if (channel != ChannelType.Android && channel != ChannelType.IPad)
+		{
+			return channel == ChannelType.IPhone;
+		}
+		return true;
 	}
 
 	public void DrawCommPane(Rect rect, ChatGroupPanel pane)
@@ -140,7 +144,9 @@ public class GameChatPageGUI : PageGUI
 		float height = Mathf.Max(pane.WindowHeight, pane.ContentHeight);
 		float num = 0f;
 		pane.Scroll = GUITools.BeginScrollView(new Rect(0f, 0f, rect.width, pane.WindowHeight), pane.Scroll, new Rect(0f, 0f, rect.width - 17f, height), false, true);
-		GUI.BeginGroup(new Rect(0f, 0f, rect.width, pane.WindowHeight + pane.Scroll.y));
+		float width = rect.width;
+		float windowHeight = pane.WindowHeight;
+		GUI.BeginGroup(new Rect(0f, 0f, width, windowHeight + pane.Scroll.y));
 		int num2 = 0;
 		string value = pane.SearchText.ToLower();
 		GUI.BeginGroup(new Rect(0f, num, rect.width - 17f, GameState.Current.Players.Count * 24));
@@ -388,21 +394,37 @@ public class GameChatPageGUI : PageGUI
 
 	private bool MenuChkReportPlayer(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && user.AccessLevel == MemberAccessLevel.Default;
+		if (user != null && user.Cmid != PlayerDataManager.Cmid)
+		{
+			return user.AccessLevel == MemberAccessLevel.Default;
+		}
+		return false;
 	}
 
 	private bool MenuChkAddFriend(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && user.AccessLevel <= PlayerDataManager.AccessLevel && !PlayerDataManager.IsFriend(user.Cmid);
+		if (user != null && user.Cmid != PlayerDataManager.Cmid && user.AccessLevel <= PlayerDataManager.AccessLevel)
+		{
+			return !PlayerDataManager.IsFriend(user.Cmid);
+		}
+		return false;
 	}
 
 	private bool MenuChkRemoveFriend(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && PlayerDataManager.IsFriend(user.Cmid);
+		if (user != null && user.Cmid != PlayerDataManager.Cmid)
+		{
+			return PlayerDataManager.IsFriend(user.Cmid);
+		}
+		return false;
 	}
 
 	private bool MenuChkInviteClan(CommUser user)
 	{
-		return user != null && user.Cmid != PlayerDataManager.Cmid && (user.AccessLevel <= PlayerDataManager.AccessLevel || PlayerDataManager.IsFriend(user.Cmid)) && PlayerDataManager.IsPlayerInClan && PlayerDataManager.CanInviteToClan && !PlayerDataManager.IsClanMember(user.Cmid);
+		if (user != null && user.Cmid != PlayerDataManager.Cmid && (user.AccessLevel <= PlayerDataManager.AccessLevel || PlayerDataManager.IsFriend(user.Cmid)) && PlayerDataManager.IsPlayerInClan && PlayerDataManager.CanInviteToClan)
+		{
+			return !PlayerDataManager.IsClanMember(user.Cmid);
+		}
+		return false;
 	}
 }

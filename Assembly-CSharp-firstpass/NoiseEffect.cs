@@ -55,7 +55,11 @@ public class NoiseEffect : MonoBehaviour
 				m_MaterialYUV = new Material(shaderYUV);
 				m_MaterialYUV.hideFlags = HideFlags.HideAndDontSave;
 			}
-			return (rgbFallback || monochrome) ? m_MaterialRGB : m_MaterialYUV;
+			if (!rgbFallback && !monochrome)
+			{
+				return m_MaterialYUV;
+			}
+			return m_MaterialRGB;
 		}
 	}
 

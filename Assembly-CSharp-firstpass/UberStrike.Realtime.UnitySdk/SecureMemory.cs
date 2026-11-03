@@ -56,7 +56,7 @@ namespace UberStrike.Realtime.UnitySdk
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(string.Format("SecureMemory failed encrypting Data: {0}", ex.Message), ex.InnerException);
+				throw new Exception("SecureMemory failed encrypting Data: " + ex.Message, ex.InnerException);
 			}
 		}
 
@@ -91,20 +91,20 @@ namespace UberStrike.Realtime.UnitySdk
 			try
 			{
 				byte[] array = Cryptography.RijndaelDecrypt(_encryptedData, "h&dk2Ks901HenM", "huSj39Dl)2kJ4nat");
-				if (array != null)
+				if (array == null)
 				{
-					object obj = Deserialize(array);
-					if (obj != null)
-					{
-						return (T)obj;
-					}
+					throw new Exception("SecureMemory failed decrypting Data becauase CmuneSecurity.Decrypt returned NULL");
+				}
+				object obj = Deserialize(array);
+				if (obj == null)
+				{
 					throw new Exception("SecureMemory failed decrypting Data becauase RealtimeSerialization.ToObject returned NULL");
 				}
-				throw new Exception("SecureMemory failed decrypting Data becauase CmuneSecurity.Decrypt returned NULL");
+				return (T)obj;
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(string.Format("SecureMemory failed decrypting Data: {0}", ex.Message), ex.InnerException);
+				throw new Exception("SecureMemory failed decrypting Data: " + ex.Message, ex.InnerException);
 			}
 		}
 

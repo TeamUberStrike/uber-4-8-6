@@ -84,7 +84,7 @@ namespace Cmune.DataCenter.Common.Entities
 		{
 			string text = "[Application: ";
 			string text2 = text;
-			text = string.Concat(text2, "[ID: ", ApplicationVersionId, "][version: ", Version, "][Build: ", Build, "][Channel: ", Channel, "][File name: ", FileName, "][Release date: ", ReleaseDate, "][Expiration date: ", ExpirationDate, "][Remaining time: ", RemainingTime, "][Is current: ", IsCurrent, "][Support URL: ", SupportUrl, "]");
+			text = text2 + "[ID: " + ApplicationVersionId + "][version: " + Version + "][Build: " + Build.ToString() + "][Channel: " + Channel.ToString() + "][File name: " + FileName + "][Release date: " + ReleaseDate.ToString() + "][Expiration date: " + ExpirationDate.ToString() + "][Remaining time: " + RemainingTime + "][Is current: " + IsCurrent + "][Support URL: " + SupportUrl + "]";
 			text += "[Servers]";
 			foreach (PhotonView server in Servers)
 			{

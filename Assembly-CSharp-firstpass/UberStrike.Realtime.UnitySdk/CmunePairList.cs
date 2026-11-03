@@ -8,12 +8,12 @@ namespace UberStrike.Realtime.UnitySdk
 		{
 			get
 			{
-				List<T1> l = new List<T1>(Count);
+				List<T1> i = new List<T1>(base.Count);
 				ForEach(delegate(KeyValuePair<T1, T2> p)
 				{
-					l.Add(p.Key);
+					i.Add(p.Key);
 				});
-				return l;
+				return i;
 			}
 		}
 
@@ -21,12 +21,12 @@ namespace UberStrike.Realtime.UnitySdk
 		{
 			get
 			{
-				List<T2> l = new List<T2>(Count);
+				List<T2> i = new List<T2>(base.Count);
 				ForEach(delegate(KeyValuePair<T1, T2> p)
 				{
-					l.Add(p.Value);
+					i.Add(p.Value);
 				});
-				return l;
+				return i;
 			}
 		}
 
@@ -71,9 +71,9 @@ namespace UberStrike.Realtime.UnitySdk
 
 		public void Clamp(int max)
 		{
-			if (Count > max)
+			if (base.Count > max)
 			{
-				RemoveRange(max, Count - max);
+				RemoveRange(max, base.Count - max);
 			}
 		}
 	}

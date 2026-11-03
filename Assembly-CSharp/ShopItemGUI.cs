@@ -24,13 +24,13 @@ public class ShopItemGUI : BaseItemGUI
 		DrawPromotionalTag();
 		DrawName(new Rect(63f, 10f, 220f, 20f));
 		DrawLevelRequirement();
-		if (Singleton<LoadoutManager>.Instance.IsItemEquipped(Item.View.ID))
+		if (Singleton<LoadoutManager>.Instance.IsItemEquipped(base.Item.View.ID))
 		{
 			DrawUnequipButton(new Rect(rect.width - 52f, 4f, 52f, 52f), LocalizedStrings.Unequip);
 		}
-		else if (Singleton<InventoryManager>.Instance.Contains(Item.View.ID))
+		else if (Singleton<InventoryManager>.Instance.Contains(base.Item.View.ID))
 		{
-			if (Item.Equippable)
+			if (base.Item.Equippable)
 			{
 				DrawEquipButton(new Rect(rect.width - 52f, 4f, 52f, 52f), LocalizedStrings.Equip);
 			}
@@ -39,7 +39,7 @@ public class ShopItemGUI : BaseItemGUI
 				DrawBuyButton(new Rect(rect.width - 52f, 4f, 52f, 52f), LocalizedStrings.Buy);
 			}
 		}
-		else if (PlayerDataManager.PlayerLevel < Item.View.LevelLock)
+		else if (PlayerDataManager.PlayerLevel < base.Item.View.LevelLock)
 		{
 			GUI.color = new Color(1f, 1f, 1f, 0.1f);
 			GUI.DrawTexture(new Rect(rect.width - 52f, 4f, 52f, 52f), ShopIcons.BlankItemFrame);
@@ -47,7 +47,7 @@ public class ShopItemGUI : BaseItemGUI
 		}
 		else
 		{
-			if (Item.View.ItemType == UberstrikeItemType.Gear && GameState.Current.MatchState.CurrentStateId == GameStateId.None)
+			if (base.Item.View.ItemType == UberstrikeItemType.Gear && GameState.Current.MatchState.CurrentStateId == GameStateId.None)
 			{
 				DrawTryButton(new Rect(rect.width - 106f, 4f, 52f, 52f));
 			}

@@ -117,18 +117,18 @@ public class LevelCamera : MonoBehaviour
 			bobData = new Dictionary<BobMode, BobData>();
 			foreach (int value in Enum.GetValues(typeof(BobMode)))
 			{
-				switch ((BobMode)value)
+				switch (value)
 				{
-				case BobMode.Idle:
+				case 1:
 					bobData[(BobMode)value] = new BobData(0.2f, 0f, 2f);
 					break;
-				case BobMode.Crouch:
+				case 6:
 					bobData[(BobMode)value] = new BobData(0.8f, 0.8f, 12f);
 					break;
-				case BobMode.Run:
+				case 3:
 					bobData[(BobMode)value] = new BobData(0.5f, 0.3f, 8f);
 					break;
-				case BobMode.Walk:
+				case 2:
 					bobData[(BobMode)value] = new BobData(0.3f, 0.3f, 6f);
 					break;
 				default:
@@ -331,8 +331,16 @@ public class LevelCamera : MonoBehaviour
 		{
 			if ((bool)levelCamera.MainCamera)
 			{
-				TargetFOV = 75f;
-				levelCamera.MainCamera.fieldOfView = 75f;
+				if (ApplicationDataManager.ApplicationOptions.FOVMode)
+				{
+					TargetFOV = 100f;
+					levelCamera.MainCamera.fieldOfView = 100f;
+				}
+				else
+				{
+					TargetFOV = 75f;
+					levelCamera.MainCamera.fieldOfView = 75f;
+				}
 			}
 		}
 	}
@@ -389,7 +397,7 @@ public class LevelCamera : MonoBehaviour
 		{
 			if (camera.TargetTransform != null)
 			{
-				camera.TargetTransform.localRotation = UserInput.Rotation;
+				camera.TargetTransform.localRotation = UserInputt.Rotation;
 			}
 		}
 
@@ -588,11 +596,11 @@ public class LevelCamera : MonoBehaviour
 		{
 			if (!GameData.Instance.HUDChatIsTyping && Screen.lockCursor)
 			{
-				int num = ((!UserInput.IsWalking) ? 4 : 6);
-				_speed = Mathf.Lerp(_speed, (!UserInput.IsWalking) ? 11 : 22, Time.deltaTime);
-				_targetPosition += (UserInput.Rotation * UserInput.HorizontalDirection + UserInput.VerticalDirection * 0.8f) * _speed * Time.deltaTime;
+				int num = ((!UserInputt.IsWalking) ? 4 : 6);
+				_speed = Mathf.Lerp(_speed, (!UserInputt.IsWalking) ? 11 : 22, Time.deltaTime);
+				_targetPosition += (UserInputt.Rotation * UserInputt.HorizontalDirection + UserInputt.VerticalDirection * 0.8f) * _speed * Time.deltaTime;
 				camera.Transform.position = Vector3.Lerp(camera.Transform.position, _targetPosition, Time.deltaTime * (float)num);
-				camera.Transform.rotation = UserInput.Rotation;
+				camera.Transform.rotation = UserInputt.Rotation;
 			}
 		}
 	}
@@ -601,7 +609,7 @@ public class LevelCamera : MonoBehaviour
 
 	public const int ZoomSpeed = 10;
 
-	private static LevelCamera _instance;
+	public static LevelCamera _instance;
 
 	private AudioLowPassFilter _lowpassFilter;
 
@@ -623,7 +631,11 @@ public class LevelCamera : MonoBehaviour
 	{
 		get
 		{
-			return (!_instance || !(_instance.MainCamera != null)) ? 65f : _instance.MainCamera.fieldOfView;
+			if ((bool)_instance && _instance.MainCamera != null)
+			{
+				return _instance.MainCamera.fieldOfView;
+			}
+			return 65f;
 		}
 	}
 
@@ -633,7 +645,11 @@ public class LevelCamera : MonoBehaviour
 	{
 		get
 		{
-			return (bool)_instance && Application.isWebPlayer && _instance._lowpassFilter.enabled;
+			if ((bool)_instance && Application.isWebPlayer)
+			{
+				return _instance._lowpassFilter.enabled;
+			}
+			return false;
 		}
 	}
 
@@ -693,8 +709,8 @@ public class LevelCamera : MonoBehaviour
 
 	private void InitUserInput()
 	{
-		Vector3 eulerAngles = UserInput.Rotation.eulerAngles;
-		_userInputCache = UserInput.Rotation;
+		Vector3 eulerAngles = UserInputt.Rotation.eulerAngles;
+		_userInputCache = UserInputt.Rotation;
 		eulerAngles.x = Mathf.Clamp(eulerAngles.x, 0f, 60f);
 		_userInputRotation = Quaternion.Euler(eulerAngles);
 	}
@@ -703,11 +719,11 @@ public class LevelCamera : MonoBehaviour
 	{
 		if (Input.GetMouseButton(0))
 		{
-			UserInput.UpdateMouse();
+			UserInputt.UpdateMouse();
 		}
-		Vector3 eulerAngles = UserInput.Rotation.eulerAngles;
+		Vector3 eulerAngles = UserInputt.Rotation.eulerAngles;
 		float num = _userInputCache.eulerAngles.x;
-		float num2 = UserInput.Rotation.eulerAngles.x;
+		float num2 = UserInputt.Rotation.eulerAngles.x;
 		if (num > 180f)
 		{
 			num -= 360f;
@@ -717,7 +733,7 @@ public class LevelCamera : MonoBehaviour
 			num2 -= 360f;
 		}
 		eulerAngles.x = Mathf.Clamp(_userInputRotation.eulerAngles.x + (num2 - num), 0f, 60f);
-		_userInputCache = UserInput.Rotation;
+		_userInputCache = UserInputt.Rotation;
 		_userInputRotation = Quaternion.Euler(eulerAngles);
 	}
 
@@ -808,7 +824,11 @@ public class LevelCamera : MonoBehaviour
 		Feedback.timeToEnd = 0f;
 		CurrentMode = mode;
 		_currentState.Finish();
-		if (IsZoomedIn)
+		if (IsZoomedIn && ApplicationDataManager.ApplicationOptions.FOVMode)
+		{
+			DoZoomOut(100f, 10f);
+		}
+		else
 		{
 			DoZoomOut(75f, 10f);
 		}

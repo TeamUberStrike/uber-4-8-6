@@ -6,10 +6,6 @@ namespace Steamworks
 	{
 		private static bool _initialized;
 
-		static SteamAPI()
-		{
-		}
-
 		public static bool RestartAppIfNecessary(AppId_t unOwnAppID)
 		{
 			InteropHelp.TestIfPlatformSupported();

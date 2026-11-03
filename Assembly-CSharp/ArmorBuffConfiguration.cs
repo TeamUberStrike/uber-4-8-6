@@ -43,7 +43,11 @@ public class ArmorBuffConfiguration : QuickItemConfiguration
 	{
 		get
 		{
-			return !IsNeedCharge && !IsOverTime;
+			if (!IsNeedCharge)
+			{
+				return !IsOverTime;
+			}
+			return false;
 		}
 	}
 

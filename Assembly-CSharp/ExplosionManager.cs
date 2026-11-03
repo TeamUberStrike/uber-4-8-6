@@ -16,7 +16,7 @@ public class ExplosionManager : Singleton<ExplosionManager>
 		}
 		if (clip != null)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, point, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(clip, point);
 		}
 	}
 

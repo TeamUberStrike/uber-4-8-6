@@ -23,27 +23,33 @@ public class TypewriterEffect : MonoBehaviour
 			mLabel = GetComponent<UILabel>();
 			mLabel.supportEncoding = false;
 			mLabel.symbolStyle = UIFont.SymbolStyle.None;
-			mText = mLabel.font.WrapText(mLabel.text, (float)mLabel.lineWidth / mLabel.cachedTransform.localScale.x, mLabel.maxLineCount, false, UIFont.SymbolStyle.None);
+			UIFont font = mLabel.font;
+			string text = mLabel.text;
+			float num = mLabel.lineWidth;
+			mText = font.WrapText(text, num / mLabel.cachedTransform.localScale.x, mLabel.maxLineCount, false, UIFont.SymbolStyle.None);
 		}
 		if (mOffset < mText.Length)
 		{
 			if (mNextChar <= Time.time)
 			{
 				charsPerSecond = Mathf.Max(1, charsPerSecond);
-				float num = 1f / (float)charsPerSecond;
+				float num2 = 1f / (float)charsPerSecond;
 				char c = mText[mOffset];
 				if (c == '.' || c == '\n' || c == '!' || c == '?')
 				{
-					num *= 4f;
+					num2 *= 4f;
 				}
-				mNextChar = Time.time + num;
+				mNextChar = Time.time + num2;
 				mLabel.text = mText.Substring(0, ++mOffset);
 			}
 		}
 		else if (loop)
 		{
 			mOffset = 0;
-			mText = mLabel.font.WrapText(mLabel.text, (float)mLabel.lineWidth / mLabel.cachedTransform.localScale.x, mLabel.maxLineCount, false, UIFont.SymbolStyle.None);
+			UIFont font2 = mLabel.font;
+			string text2 = mLabel.text;
+			float num3 = mLabel.lineWidth;
+			mText = font2.WrapText(text2, num3 / mLabel.cachedTransform.localScale.x, mLabel.maxLineCount, false, UIFont.SymbolStyle.None);
 		}
 		else
 		{

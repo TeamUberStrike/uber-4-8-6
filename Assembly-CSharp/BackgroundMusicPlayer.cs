@@ -20,7 +20,11 @@ public class BackgroundMusicPlayer : AutoMonoBehaviour<BackgroundMusicPlayer>
 	{
 		get
 		{
-			return (!toggle) ? musicFaderB : musicFaderA;
+			if (toggle)
+			{
+				return musicFaderA;
+			}
+			return musicFaderB;
 		}
 	}
 

@@ -82,7 +82,11 @@ public abstract class UITweener : IgnoreTimeScale
 	{
 		get
 		{
-			return (!(mAmountPerDelta < 0f)) ? Direction.Forward : Direction.Reverse;
+			if (mAmountPerDelta < 0f)
+			{
+				return Direction.Reverse;
+			}
+			return Direction.Forward;
 		}
 	}
 

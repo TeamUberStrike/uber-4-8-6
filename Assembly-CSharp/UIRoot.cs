@@ -67,7 +67,11 @@ public class UIRoot : MonoBehaviour
 	public static float GetPixelSizeAdjustment(GameObject go)
 	{
 		UIRoot uIRoot = NGUITools.FindInParents<UIRoot>(go);
-		return (!(uIRoot != null)) ? 1f : uIRoot.pixelSizeAdjustment;
+		if (uIRoot != null)
+		{
+			return uIRoot.pixelSizeAdjustment;
+		}
+		return 1f;
 	}
 
 	public float GetPixelSizeAdjustment(int height)

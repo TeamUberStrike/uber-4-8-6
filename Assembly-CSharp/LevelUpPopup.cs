@@ -46,7 +46,7 @@ public class LevelUpPopup : IPopupDialog
 		{
 			list.AddRange(GetItemsUnlocked(num));
 		}
-		AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.LevelUp, 0uL, 1f, 1f);
+		AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.LevelUp, 0uL);
 		_itemGrid = new ShopItemGrid(list);
 		_itemGrid.Show = true;
 	}
@@ -85,6 +85,7 @@ public class LevelUpPopup : IPopupDialog
 					list.Add(new ShopItemView(shopItem.View.ID));
 				}
 			}
+			return list;
 		}
 		return list;
 	}

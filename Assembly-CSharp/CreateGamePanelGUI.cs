@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Cmune.DataCenter.Common.Entities;
 using UberStrike.Core.Models.Views;
 using UberStrike.Core.Types;
@@ -46,9 +49,9 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 
 	private bool _viewingLeft = true;
 
-	private GameFlags.GAME_FLAGS _gameFlags;
+	private GameFlags _gameFlags = new GameFlags();
 
-	private UberstrikeMap _mapSelected;
+	private static UberstrikeMap _mapSelected;
 
 	private SelectionGroup<GameModeType> _modeSelection = new SelectionGroup<GameModeType>();
 
@@ -76,7 +79,23 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 	{
 		get
 		{
-			return _mapSelected != null && _mapSelected.IsGameModeSupported(_modeSelection.Current);
+			if (_mapSelected != null)
+			{
+				return _mapSelected.IsGameModeSupported(_modeSelection.Current);
+			}
+			return false;
+		}
+	}
+
+	private bool isValidBundle
+	{
+		get
+		{
+			if (_mapSelected != null)
+			{
+				return CustomBundleMapManager.IsSupportedGameMode(_modeSelection.Current, _mapSelected.Id);
+			}
+			return false;
 		}
 	}
 
@@ -85,6 +104,29 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 		get
 		{
 			return base.enabled;
+		}
+	}
+
+	public static bool BlueBoxSupportedMap
+	{
+		get
+		{
+			if (_mapSelected.View.BoxType == GameBoxType.NORMAL)
+			{
+				return false;
+			}
+			return true;
+		}
+		set
+		{
+			if (value)
+			{
+				_mapSelected.View.BoxType = GameBoxType.BLUE;
+			}
+			else
+			{
+				_mapSelected.View.BoxType = GameBoxType.NORMAL;
+			}
 		}
 	}
 
@@ -220,18 +262,50 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 		base.enabled = false;
 	}
 
+	public static bool BlueBoxSupport(int mapid)
+	{
+		List<int> list = new List<int>();
+		list.Add(1);
+		list.Add(17);
+		list.Add(18);
+		if (list.Contains(mapid))
+		{
+			return true;
+		}
+		return false;
+	}
+
 	private void SelectMap(UberstrikeMap map)
 	{
 		_mapSelected = map;
 		GameModeType[] items = _modeSelection.Items;
-		foreach (GameModeType gameModeType in items)
+		GameModeType[] array = items;
+		foreach (GameModeType gameModeType in array)
 		{
-			if (_mapSelected.IsGameModeSupported(gameModeType))
+			if (CustomBundleMapManager.Instance.IsBundleMap(_mapSelected.Id) && CustomBundleMapManager.IsSupportedGameMode(gameModeType, _mapSelected.Id))
 			{
 				_modeSelection.Select(gameModeType);
-				break;
+				return;
 			}
 		}
+		GameModeType[] items2 = _modeSelection.Items;
+		int num = 0;
+		GameModeType gameModeType2;
+		while (true)
+		{
+			if (num < items2.Length)
+			{
+				gameModeType2 = items2[num];
+				if (_mapSelected.IsGameModeSupported(gameModeType2))
+				{
+					break;
+				}
+				num++;
+				continue;
+			}
+			return;
+		}
+		_modeSelection.Select(gameModeType2);
 	}
 
 	private void DrawMapSelection(Rect rect)
@@ -249,20 +323,29 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 		int num2 = 0;
 		foreach (UberstrikeMap allMap2 in Singleton<MapManager>.Instance.AllMaps)
 		{
-			if (allMap2.IsVisible)
+			if (!allMap2.IsVisible)
 			{
-				if (_mapSelected == null)
-				{
-					SelectMap(allMap2);
-				}
-				GUIContent content = new GUIContent(allMap2.Name);
-				if (GUI.Toggle(new Rect(0f, num2 * 35, width, 35f), allMap2 == _mapSelected, content, BlueStonez.tab_large_left) && _mapSelected != allMap2)
-				{
-					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CreateGame, 0uL, 1f, 1f);
-					SelectMap(allMap2);
-				}
-				num2++;
+				continue;
 			}
+			if (_mapSelected == null)
+			{
+				SelectMap(allMap2);
+			}
+			GUIContent content = new GUIContent(allMap2.Name);
+			if (GUI.Toggle(new Rect(0f, num2 * 35, width, 35f), allMap2 == _mapSelected, content, BlueStonez.tab_large_left) && _mapSelected != allMap2)
+			{
+				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CreateGame, 0uL);
+				SelectMap(allMap2);
+				if (allMap2.View.MapId == 1 || allMap2.View.MapId == 17 || allMap2.View.MapId == 18)
+				{
+					BlueBoxSupportedMap = true;
+				}
+				else
+				{
+					BlueBoxSupportedMap = false;
+				}
+			}
+			num2++;
 		}
 		GUITools.EndScrollView();
 	}
@@ -273,7 +356,7 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 		for (int i = 0; i < _modeSelection.Items.Length; i++)
 		{
 			GUITools.PushGUIState();
-			if (_mapSelected != null && !_mapSelected.IsGameModeSupported(_modeSelection.Items[i]))
+			if ((_mapSelected != null && !_mapSelected.IsGameModeSupported(_modeSelection.Items[i])) || !CustomBundleMapManager.IsSupportedGameMode(_modeSelection.Items[i], _mapSelected.Id))
 			{
 				GUI.enabled = false;
 			}
@@ -283,7 +366,7 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 				if (GUI.changed)
 				{
 					GUI.changed = false;
-					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CreateGame, 0uL, 1f, 1f);
+					AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CreateGame, 0uL);
 				}
 			}
 			GUI.enabled = true;
@@ -381,10 +464,10 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 			int num = Mathf.RoundToInt(mapSettings.TimeCurrent / 60);
 			GUI.Label(new Rect(6f, 83f, 100f, 25f), LocalizedStrings.TimeLimit, BlueStonez.label_interparkbold_18pt_left);
 			GUI.Label(new Rect(130f, 83f, 33f, 15f), num.ToString(), BlueStonez.label_dropdown);
-			mapSettings.TimeCurrent = 60 * (int)GUI.HorizontalSlider(new Rect(170f, 86f, _sliderWidth, 15f), num, mapSettings.TimeMin / 60, 10f);
-			GUI.Label(new Rect(6f, 106f, 100f, 25f), LocalizedStrings.MaxKills, BlueStonez.label_interparkbold_18pt_left);
+			mapSettings.TimeCurrent = 60 * (int)GUI.HorizontalSlider(new Rect(170f, 86f, _sliderWidth, 15f), num, mapSettings.TimeMin / 60, (float)mapSettings.TimeMax / 60f);
+			GUI.Label(new Rect(6f, 106f, 100f, 25f), (_modeSelection.Current != GameModeType.EliminationMode) ? LocalizedStrings.MaxKills : LocalizedStrings.MaxRounds, BlueStonez.label_interparkbold_18pt_left);
 			GUI.Label(new Rect(130f, 106f, 33f, 15f), mapSettings.KillsCurrent.ToString(), BlueStonez.label_dropdown);
-			mapSettings.KillsCurrent = (int)GUI.HorizontalSlider(new Rect(170f, 109f, _sliderWidth, 15f), mapSettings.KillsCurrent, mapSettings.KillsMin, 200f);
+			mapSettings.KillsCurrent = (int)GUI.HorizontalSlider(new Rect(170f, 109f, _sliderWidth, 15f), mapSettings.KillsCurrent, mapSettings.KillsMin, mapSettings.KillsMax);
 			GUI.Label(new Rect(6f, 150f, 100f, 25f), "Min Level", BlueStonez.label_interparkbold_18pt_left);
 			GUI.Label(new Rect(130f, 150f, 33f, 15f), (_minLevelCurrent != 1) ? _minLevelCurrent.ToString() : "All", BlueStonez.label_dropdown);
 			int num2 = (int)GUI.HorizontalSlider(new Rect(170f, 153f, _sliderWidth, 15f), _minLevelCurrent, 1f, 80f);
@@ -413,23 +496,71 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 				GUI.Label(new Rect(170f, 190f, _sliderWidth, 25f), "MaxLevel is too low for you!", BlueStonez.label_interparkbold_11pt);
 				GUI.contentColor = Color.white;
 			}
+			int num4 = 1;
+			Array values = Enum.GetValues(typeof(GameFlags.GAME_FLAGS));
+			for (int num5 = 1; num5 < (int)values.GetValue(values.Length - 1) + 1; num5 *= 2)
+			{
+				GameFlags.GAME_FLAGS gAME_FLAGS = (GameFlags.GAME_FLAGS)num5;
+				string text = Regex.Replace(gAME_FLAGS.ToString(), "((?<=\\p{Ll})\\p{Lu})|((?!\\A)\\p{Lu}(?>\\p{Ll}))", " $0");
+				double num6 = 200.0 + 20.0 * Math.Ceiling((float)num4 / 2f);
+				int num7;
+				for (num7 = num4; num7 > 2; num7 -= 2)
+				{
+				}
+				float left = 8f + (float)(num7 - 1) * 165f;
+				switch (gAME_FLAGS)
+				{
+				case GameFlags.GAME_FLAGS.LowGravity:
+				{
+					bool flag2 = GUI.Toggle(new Rect(left, (float)num6, 160f, 16f), _gameFlags.LowGravity, text, BlueStonez.toggle);
+					if (_gameFlags.LowGravity != flag2)
+					{
+						_gameFlags.LowGravity = !_gameFlags.LowGravity;
+					}
+					break;
+				}
+				case GameFlags.GAME_FLAGS.QuickSwitch:
+				{
+					bool flag3 = GUI.Toggle(new Rect(left, (float)num6, 160f, 16f), _gameFlags.QuickSwitch, text, BlueStonez.toggle);
+					if (_gameFlags.QuickSwitch != flag3)
+					{
+						_gameFlags.QuickSwitch = !_gameFlags.QuickSwitch;
+					}
+					break;
+				}
+				case GameFlags.GAME_FLAGS.KnockBack:
+				{
+					bool flag = GUI.Toggle(new Rect(left, (float)num6, 160f, 16f), _gameFlags.KnockBack, "Knockback", BlueStonez.toggle);
+					if (_gameFlags.KnockBack != flag)
+					{
+						_gameFlags.KnockBack = !_gameFlags.KnockBack;
+					}
+					break;
+				}
+				}
+				num4++;
+			}
+			num4++;
+			if (BlueBoxSupport(_mapSelected.Id))
+			{
+				int num8 = 1;
+				float left2 = 8f + (float)(num8 - 1) * 165f;
+				double num9 = 200.0 + 20.0 * Math.Ceiling((float)num4 / 2f);
+				bool flag4 = GUI.Toggle(new Rect(left2, (float)num9, 160f, 16f), BlueBoxSupportedMap, "Bluebox", BlueStonez.toggle);
+				if (BlueBoxSupportedMap != flag4)
+				{
+					BlueBoxSupportedMap = !BlueBoxSupportedMap;
+				}
+			}
+			else
+			{
+				BlueBoxSupportedMap = false;
+			}
 			GUI.EndGroup();
 		}
 		else
 		{
 			GUI.Label(rect, "Unsupported Game Mode!", BlueStonez.label_interparkbold_18pt);
-		}
-	}
-
-	private void ToggleGameFlag(GameFlags.GAME_FLAGS flag, int y, string content)
-	{
-		if (GUI.Toggle(new Rect(6f, y, 160f, 16f), _gameFlags == flag, content, BlueStonez.toggle))
-		{
-			_gameFlags = flag;
-		}
-		else if (_gameFlags == flag)
-		{
-			_gameFlags = GameFlags.GAME_FLAGS.None;
 		}
 	}
 
@@ -475,7 +606,7 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 		{
 			tooltip = "Game name not valid: " + _gameName;
 		}
-		GUI.enabled = IsModeSupported && Singleton<GameServerController>.Instance.SelectedServer.IsValid && LocalizationHelper.ValidateMemberName(_gameName, ApplicationDataManager.CurrentLocale) && (string.IsNullOrEmpty(_password) || ValidateGamePassword(_password));
+		GUI.enabled = isValidBundle && IsModeSupported && Singleton<GameServerController>.Instance.SelectedServer.IsValid && LocalizationHelper.ValidateMemberName(_gameName, ApplicationDataManager.CurrentLocale) && (string.IsNullOrEmpty(_password) || ValidateGamePassword(_password));
 		if (GUITools.Button(new Rect(rect.width - 138f - 125f, rect.height - 40f, 120f, 32f), new GUIContent(LocalizedStrings.CreateCaps, tooltip), BlueStonez.button_green))
 		{
 			PanelManager.Instance.ClosePanel(PanelType.CreateGame);
@@ -483,7 +614,7 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 			MapSettings mapSettings = _mapSelected.View.Settings[_modeSelection.Current];
 			int timeMinutes = Mathf.RoundToInt(mapSettings.TimeCurrent / 60) * 60;
 			string connectionString = Singleton<GameServerController>.Instance.SelectedServer.ConnectionString;
-			Singleton<GameStateController>.Instance.CreateNetworkGame(connectionString, _mapSelected.Id, _modeSelection.Current, _gameName, _password, timeMinutes, mapSettings.KillsCurrent, mapSettings.PlayersCurrent, _minLevelCurrent, _maxLevelCurrent, _gameFlags);
+			Singleton<GameStateController>.Instance.CreateNetworkGame(connectionString, _mapSelected.Id, _modeSelection.Current, _mapSelected.View.BoxType, _gameName, _password, timeMinutes, mapSettings.KillsCurrent, mapSettings.PlayersCurrent, _minLevelCurrent, _maxLevelCurrent, (GameFlags.GAME_FLAGS)_gameFlags.ToInt());
 		}
 		GUITools.PopGUIState();
 		GUI.EndGroup();
@@ -558,7 +689,7 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 			PanelManager.Instance.ClosePanel(PanelType.CreateGame);
 			MapSettings mapSettings = _mapSelected.View.Settings[_modeSelection.Current];
 			string connectionString = Singleton<GameServerController>.Instance.SelectedServer.ConnectionString;
-			Singleton<GameStateController>.Instance.CreateNetworkGame(connectionString, _mapSelected.Id, _modeSelection.Current, _gameName, _password, mapSettings.TimeCurrent, mapSettings.KillsCurrent, mapSettings.PlayersCurrent, _minLevelCurrent, _maxLevelCurrent, _gameFlags);
+			Singleton<GameStateController>.Instance.CreateNetworkGame(connectionString, _mapSelected.Id, _modeSelection.Current, _mapSelected.View.BoxType, _gameName, _password, mapSettings.TimeCurrent, mapSettings.KillsCurrent, mapSettings.PlayersCurrent, _minLevelCurrent, _maxLevelCurrent, (GameFlags.GAME_FLAGS)_gameFlags.ToInt());
 		}
 		GUITools.PopGUIState();
 		GUI.EndGroup();

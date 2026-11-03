@@ -71,7 +71,11 @@ public class CharacterConfig : MonoBehaviour, IShootable
 	{
 		get
 		{
-			return (State != null) ? State.Player.TeamID : TeamID.NONE;
+			if (State == null)
+			{
+				return TeamID.NONE;
+			}
+			return State.Player.TeamID;
 		}
 	}
 
@@ -158,7 +162,7 @@ public class CharacterConfig : MonoBehaviour, IShootable
 		_transform.position = State.Position;
 		if (!State.Player.IsAlive)
 		{
-			Debug.Log("Initialize as dead player at " + State.Position);
+			Debug.Log("Initialize as dead player at " + State.Position.ToString());
 		}
 		base.gameObject.name = string.Format("Player{0}_{1}", State.Player.Cmid, State.Player.PlayerName);
 		SetAvatar(avatar);
@@ -269,7 +273,9 @@ public class CharacterConfig : MonoBehaviour, IShootable
 			Avatar.Decorator.HudInformation.SetHealthBarValue((float)State.Player.Health / 100f);
 			Avatar.Decorator.CurrentFootStep = ((!(GameState.Current.Map != null)) ? FootStepSoundType.Rock : GameState.Current.Map.DefaultFootStep);
 			CharacterHitArea[] hitAreas = Avatar.Decorator.HitAreas;
-			foreach (CharacterHitArea characterHitArea in hitAreas)
+			CharacterHitArea[] array = hitAreas;
+			CharacterHitArea[] array2 = array;
+			foreach (CharacterHitArea characterHitArea in array2)
 			{
 				if ((bool)characterHitArea)
 				{
@@ -322,15 +328,15 @@ public class CharacterConfig : MonoBehaviour, IShootable
 		{
 			if (State.Player.ArmorPoints > 0)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitArmorRemaining);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitArmorRemaining, 0uL);
 			}
 			else if (State.Player.Health < 25)
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitNoArmorLowHealth);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitNoArmorLowHealth, 0uL);
 			}
 			else
 			{
-				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitNoArmor);
+				AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(GameAudio.LocalPlayerHitNoArmor, 0uL);
 			}
 		}
 	}

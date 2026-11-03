@@ -106,7 +106,9 @@ public class WeaponSimulator : IWeaponController
 	private void BeginShooting()
 	{
 		CharacterHitArea[] hitAreas = character.Avatar.Decorator.HitAreas;
-		foreach (CharacterHitArea characterHitArea in hitAreas)
+		CharacterHitArea[] array = hitAreas;
+		CharacterHitArea[] array2 = array;
+		foreach (CharacterHitArea characterHitArea in array2)
 		{
 			characterHitArea.gameObject.layer = 2;
 		}
@@ -115,7 +117,9 @@ public class WeaponSimulator : IWeaponController
 	private void EndShooting()
 	{
 		CharacterHitArea[] hitAreas = character.Avatar.Decorator.HitAreas;
-		foreach (CharacterHitArea characterHitArea in hitAreas)
+		CharacterHitArea[] array = hitAreas;
+		CharacterHitArea[] array2 = array;
+		foreach (CharacterHitArea characterHitArea in array2)
 		{
 			characterHitArea.gameObject.layer = character.Avatar.Decorator.gameObject.layer;
 		}
@@ -242,6 +246,7 @@ public class WeaponSimulator : IWeaponController
 
 	public Vector3 ShootingDirection(ICharacterState state)
 	{
-		return Quaternion.Euler(state.VerticalRotation, state.HorizontalRotation.eulerAngles.y, 0f) * Vector3.forward;
+		float verticalRotation = state.VerticalRotation;
+		return Quaternion.Euler(verticalRotation, state.HorizontalRotation.eulerAngles.y, 0f) * Vector3.forward;
 	}
 }

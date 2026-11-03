@@ -23,7 +23,9 @@ public class BulletTrail : BaseWeaponEffect
 		}
 		_renderers = GetComponentsInChildren<Renderer>();
 		Renderer[] renderers = _renderers;
-		foreach (Renderer renderer in renderers)
+		Renderer[] array = renderers;
+		Renderer[] array2 = array;
+		foreach (Renderer renderer in array2)
 		{
 			renderer.enabled = false;
 		}
@@ -32,7 +34,9 @@ public class BulletTrail : BaseWeaponEffect
 	public override void OnShoot()
 	{
 		Renderer[] renderers = _renderers;
-		foreach (Renderer renderer in renderers)
+		Renderer[] array = renderers;
+		Renderer[] array2 = array;
+		foreach (Renderer renderer in array2)
 		{
 			renderer.enabled = true;
 		}
@@ -61,9 +65,11 @@ public class BulletTrail : BaseWeaponEffect
 	{
 		yield return new WaitForSeconds(time);
 		Renderer[] renderers = _renderers;
-		foreach (Renderer r in renderers)
+		Renderer[] array = renderers;
+		Renderer[] array2 = array;
+		foreach (Renderer renderer in array2)
 		{
-			r.enabled = false;
+			renderer.enabled = false;
 		}
 	}
 }

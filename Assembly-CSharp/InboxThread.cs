@@ -111,8 +111,7 @@ public class InboxThread
 		{
 			if (value2.Content.ToLower().Contains(value))
 			{
-				result = true;
-				break;
+				return true;
 			}
 		}
 		return result;

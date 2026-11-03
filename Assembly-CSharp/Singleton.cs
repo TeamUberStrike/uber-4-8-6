@@ -20,7 +20,7 @@ public class Singleton<T> : IDisposable where T : Singleton<T>
 						ConstructorInfo constructor = typeof(T).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[0], null);
 						if (constructor == null || constructor.IsAssembly)
 						{
-							throw new Exception(string.Format("A private or protected constructor is missing for '{0}'.", typeof(T).Name));
+							throw new Exception("A private or protected constructor is missing for '" + typeof(T).Name + "'.");
 						}
 						_instance = (T)constructor.Invoke(null);
 					}
@@ -33,7 +33,7 @@ public class Singleton<T> : IDisposable where T : Singleton<T>
 	public void Dispose()
 	{
 		OnDispose();
-		_instance = (T)null;
+		_instance = null;
 	}
 
 	protected virtual void OnDispose()

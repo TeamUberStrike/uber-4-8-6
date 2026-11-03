@@ -20,7 +20,7 @@ namespace UberStrike.Realtime.Client
 
 		protected BaseLobbyRoom()
 		{
-			Operations = new LobbyRoomOperations();
+			Operations = new LobbyRoomOperations(0);
 		}
 
 		public void OnEvent(byte id, byte[] data)

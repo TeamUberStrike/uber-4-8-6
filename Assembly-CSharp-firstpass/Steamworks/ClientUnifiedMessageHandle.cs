@@ -20,7 +20,11 @@ namespace Steamworks
 
 		public override bool Equals(object other)
 		{
-			return other is ClientUnifiedMessageHandle && this == (ClientUnifiedMessageHandle)other;
+			if (other is ClientUnifiedMessageHandle)
+			{
+				return this == (ClientUnifiedMessageHandle)other;
+			}
+			return false;
 		}
 
 		public override int GetHashCode()

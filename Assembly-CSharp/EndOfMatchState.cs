@@ -8,7 +8,7 @@ internal class EndOfMatchState : IState
 
 	public void OnEnter()
 	{
-		AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.EndOfRound, 0uL, 1f, 1f);
+		AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.EndOfRound, 0uL);
 		Singleton<QuickItemController>.Instance.Restriction.RenewGameUses();
 		EventHandler.Global.AddListener<GameEvents.MatchCountdown>(OnMatchCountdown);
 		EventHandler.Global.AddListener<GameEvents.PlayerRespawn>(OnPlayerRespawn);
@@ -47,7 +47,7 @@ internal class EndOfMatchState : IState
 	{
 		if (ev.Countdown <= 3 && ev.Countdown > 0)
 		{
-			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CountdownTonal1, 0uL, 1f, 1f);
+			AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CountdownTonal1, 0uL);
 		}
 	}
 

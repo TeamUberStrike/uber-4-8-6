@@ -80,12 +80,16 @@ public class SkinnedMeshCombiner
 		List<Transform> list3 = new List<Transform>();
 		Dictionary<string, Transform> dictionary = new Dictionary<string, Transform>();
 		Transform[] componentsInChildren = sourceGameObject.GetComponentsInChildren<Transform>(true);
-		foreach (Transform transform in componentsInChildren)
+		Transform[] array = componentsInChildren;
+		Transform[] array2 = array;
+		foreach (Transform transform in array2)
 		{
 			dictionary[transform.name] = transform.transform;
 		}
 		SkinnedMeshRenderer[] componentsInChildren2 = sourceGameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true);
-		foreach (SkinnedMeshRenderer skinnedMeshRenderer in componentsInChildren2)
+		SkinnedMeshRenderer[] array3 = componentsInChildren2;
+		SkinnedMeshRenderer[] array4 = array3;
+		foreach (SkinnedMeshRenderer skinnedMeshRenderer in array4)
 		{
 			list2.AddRange(skinnedMeshRenderer.sharedMaterials);
 			for (int k = 0; k < skinnedMeshRenderer.sharedMesh.subMeshCount; k++)
@@ -116,7 +120,9 @@ public class SkinnedMeshCombiner
 						subMeshIndex = l
 					});
 					Transform[] bones = item2.bones;
-					foreach (Transform transform2 in bones)
+					Transform[] array5 = bones;
+					Transform[] array6 = array5;
+					foreach (Transform transform2 in array6)
 					{
 						if (dictionary.ContainsKey(transform2.name))
 						{
@@ -140,7 +146,9 @@ public class SkinnedMeshCombiner
 		skinnedMeshRenderer2.sharedMesh.CombineMeshes(list.ToArray(), false, false);
 		skinnedMeshRenderer2.bones = list3.ToArray();
 		Material[] materials = skinnedMeshRenderer2.materials;
-		foreach (Material obj in materials)
+		Material[] array7 = materials;
+		Material[] array8 = array7;
+		foreach (Material obj in array8)
 		{
 			UnityEngine.Object.Destroy(obj);
 		}
@@ -160,7 +168,9 @@ public class SkinnedMeshCombiner
 		List<Transform> list3 = new List<Transform>();
 		Dictionary<string, Transform> dictionary = new Dictionary<string, Transform>();
 		Transform[] componentsInChildren = sourceGameObject.GetComponentsInChildren<Transform>(true);
-		foreach (Transform transform in componentsInChildren)
+		Transform[] array = componentsInChildren;
+		Transform[] array2 = array;
+		foreach (Transform transform in array2)
 		{
 			dictionary[transform.name] = transform.transform;
 		}
@@ -182,7 +192,9 @@ public class SkinnedMeshCombiner
 						subMeshIndex = j
 					});
 					Transform[] bones = item.bones;
-					foreach (Transform transform2 in bones)
+					Transform[] array3 = bones;
+					Transform[] array4 = array3;
+					foreach (Transform transform2 in array4)
 					{
 						if (dictionary.ContainsKey(transform2.name))
 						{
@@ -214,7 +226,9 @@ public class SkinnedMeshCombiner
 			component.sharedMesh.CombineMeshes(list.ToArray(), false, false);
 			component.bones = list3.ToArray();
 			Material[] materials = component.materials;
-			foreach (Material obj in materials)
+			Material[] array5 = materials;
+			Material[] array6 = array5;
+			foreach (Material obj in array6)
 			{
 				UnityEngine.Object.Destroy(obj);
 			}

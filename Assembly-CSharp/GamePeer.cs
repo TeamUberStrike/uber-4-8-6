@@ -6,6 +6,7 @@ using ExitGames.Client.Photon;
 using UberStrike.Core.Models;
 using UberStrike.Core.Types;
 using UberStrike.Realtime.Client;
+using UberStrike.Realtime.UnitySdk;
 using UnityEngine;
 
 public class GamePeer : BaseGamePeer
@@ -30,7 +31,11 @@ public class GamePeer : BaseGamePeer
 	{
 		get
 		{
-			return base.IsConnected && lastRoomJoined != 0;
+			if (base.IsConnected)
+			{
+				return lastRoomJoined != 0;
+			}
+			return false;
 		}
 	}
 
@@ -55,6 +60,7 @@ public class GamePeer : BaseGamePeer
 	protected override void OnHeartbeatChallenge(string challengeHash)
 	{
 		string responseHash = Heartbeat.Instance.CheckHeartbeat(challengeHash);
+		UberBeat.ChildThreadWait.Set();
 		base.Operations.SendSendHeartbeatResponse(PlayerDataManager.AuthToken, responseHash);
 	}
 
@@ -68,13 +74,19 @@ public class GamePeer : BaseGamePeer
 			PopupSystem.ClearAll();
 			PopupSystem.ShowMessage("Server Disconnection", "You were disconnected from the game.\n Do you want to try to reconnect?", PopupSystem.AlertType.OKCancel, delegate
 			{
-				ReconnectToCurrentGame();
+				UnityRuntime.StartRoutine(BeginReconnection());
 			}, delegate
 			{
 				lastRoomJoined = 0;
 				Singleton<GameStateController>.Instance.LeaveGame();
 			});
 		}
+	}
+
+	private IEnumerator BeginReconnection()
+	{
+		yield return AutoMonoBehaviour<UnityRuntime>.Instance.StartCoroutine(Singleton<PlayerDataManager>.Instance.StartSetLoadout());
+		ReconnectToCurrentGame();
 	}
 
 	protected override void OnError(string message)
@@ -100,6 +112,7 @@ public class GamePeer : BaseGamePeer
 
 	protected override void OnGameListUpdate(List<GameRoomData> updatedGames, List<int> removedGames)
 	{
+		Debug.LogError("GameListUpdate");
 		IsConnectedToLobby = true;
 		foreach (GameRoomData updatedGame in updatedGames)
 		{
@@ -150,10 +163,10 @@ public class GamePeer : BaseGamePeer
 	{
 		Debug.Log("OnRoomJoined " + lastRoomJoined);
 		GameState.Current.Reset();
-		PopupSystem.ClearAll();
 		lastRoomJoined = data.Number;
 		GameState.Current.ResetRoundStartTime();
 		base.Peer.FetchServerTimestamp();
+		UberKill.KnockBack = GameFlags.IsFlagSet(GameFlags.GAME_FLAGS.KnockBack, data.GameFlags);
 		switch (data.GameMode)
 		{
 		case GameModeType.DeathMatch:
@@ -182,13 +195,18 @@ public class GamePeer : BaseGamePeer
 		}
 		AddRoomLogic(currentRoom, currentRoom.Operations);
 		UberstrikeMap mapWithId = Singleton<MapManager>.Instance.GetMapWithId(data.MapID);
+		if (mapWithId.Id == 1)
+		{
+			UberKill.BoxLoader(data.BoxType);
+		}
 		if (mapWithId != null)
 		{
 			Singleton<MapManager>.Instance.LoadMap(mapWithId, delegate
 			{
 				GameStateHelper.EnterGameMode();
 				GameState.Current.MatchState.SetState(GameStateId.PregameLoadout);
-				foreach (GameActorInfo value in GameState.Current.Players.Values)
+				Dictionary<int, GameActorInfo> dictionary = new Dictionary<int, GameActorInfo>(GameState.Current.Players);
+				foreach (GameActorInfo value in dictionary.Values)
 				{
 					if (!value.IsSpectator)
 					{
@@ -196,6 +214,7 @@ public class GamePeer : BaseGamePeer
 					}
 				}
 				currentRoom.Operations.SendPowerUpRespawnTimes(PickupItem.GetRespawnDurations());
+				UberKill.Instance.Patch();
 				List<Vector3> positions;
 				List<byte> angles;
 				Singleton<SpawnPointManager>.Instance.GetAllSpawnPoints(data.GameMode, TeamID.NONE, out positions, out angles);
@@ -279,12 +298,12 @@ public class GamePeer : BaseGamePeer
 	{
 		if (base.IsConnected)
 		{
-			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendCreateRoom(data, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendCreateRoom(data, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendCreateRoom(data, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 		};
 		Connect(data.Server.ConnectionString);
 	}
@@ -294,12 +313,12 @@ public class GamePeer : BaseGamePeer
 		Debug.Log("JoinGame " + server + ":" + roomId + "[current:" + base.Peer.ServerAddress + "]");
 		if (base.IsConnected)
 		{
-			base.Operations.SendEnterRoom(roomId, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendEnterRoom(roomId, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 			return;
 		}
 		onConnectAction = delegate
 		{
-			base.Operations.SendEnterRoom(roomId, password, "4.7.1", PlayerDataManager.AuthToken, PlayerDataManager.MagicHash);
+			base.Operations.SendEnterRoom(roomId, password, ApplicationDataManager.Version, PlayerDataManager.AuthToken, PlayerDataManager.MagicHash, ApplicationDataManager.IsMac);
 		};
 		Connect(server);
 	}
@@ -333,12 +352,12 @@ public class GamePeer : BaseGamePeer
 		Connect(serverAddress);
 	}
 
-	private void ReconnectToCurrentGame()
+	private void ReconnectToCurrentGame(string password = null)
 	{
 		if (lastRoomJoined != 0)
 		{
 			Singleton<GameStateController>.Instance.UnloadGameMode();
-			JoinGame(base.Peer.ServerAddress, lastRoomJoined, string.Empty);
+			JoinGame(base.Peer.ServerAddress, lastRoomJoined, password);
 		}
 		else
 		{
@@ -357,5 +376,15 @@ public class GamePeer : BaseGamePeer
 		{
 			Debug.LogError("Failed to reconnect because GameRoom is null!");
 		}
+	}
+
+	protected override void OnWeekendChallengeAchivement()
+	{
+	}
+
+	protected override void OnRoomRejoin(GameRoomData data, string password)
+	{
+		ReconnectToCurrentGame(password);
+		PopupSystem.ShowMessage(null, "Room rejoin");
 	}
 }

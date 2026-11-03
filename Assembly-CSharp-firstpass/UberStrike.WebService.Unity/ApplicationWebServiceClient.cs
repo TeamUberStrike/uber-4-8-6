@@ -19,7 +19,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, clientVersion);
 				EnumProxy<ChannelType>.Serialize(memoryStream, channel);
 				StringProxy.Serialize(memoryStream, publicKey);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ApplicationWebServiceContract.svc", "AuthenticateApplication", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "ApplicationWebService", "AuthenticateApplication", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -29,13 +29,24 @@ namespace UberStrike.WebService.Unity
 			}
 		}
 
+		public static Coroutine CheckIpReputation(Action<IpReputationView> callback, Action<Exception> handler)
+		{
+			return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "ApplicationWebService", "CheckIpReputation", new byte[0], delegate(byte[] data)
+			{
+				if (callback != null)
+				{
+					callback(IpReputationProxy.Deserialize(new MemoryStream(data)));
+				}
+			}, handler));
+		}
+
 		public static Coroutine GetMaps(string clientVersion, DefinitionType clientType, Action<List<MapView>> callback, Action<Exception> handler)
 		{
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, clientVersion);
 				EnumProxy<DefinitionType>.Serialize(memoryStream, clientType);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ApplicationWebServiceContract.svc", "GetMaps", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "ApplicationWebService", "GetMaps", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -50,7 +61,7 @@ namespace UberStrike.WebService.Unity
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				StringProxy.Serialize(memoryStream, clientVersion);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ApplicationWebServiceContract.svc", "GetConfigurationData", memoryStream.ToArray(), delegate(byte[] data)
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "ApplicationWebService", "GetConfigurationData", memoryStream.ToArray(), delegate(byte[] data)
 				{
 					if (callback != null)
 					{
@@ -67,7 +78,7 @@ namespace UberStrike.WebService.Unity
 				StringProxy.Serialize(memoryStream, clientVersion);
 				MatchStatsProxy.Serialize(memoryStream, scoringView);
 				StringProxy.Serialize(memoryStream, serverAuthentication);
-				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "UberStrike.DataCenter.WebService.CWS.ApplicationWebServiceContract.svc", "SetMatchScore", memoryStream.ToArray(), delegate
+				return MonoInstance.Mono.StartCoroutine(SoapClient.MakeRequest("IApplicationWebServiceContract", "ApplicationWebService", "SetMatchScore", memoryStream.ToArray(), delegate
 				{
 					if (callback != null)
 					{

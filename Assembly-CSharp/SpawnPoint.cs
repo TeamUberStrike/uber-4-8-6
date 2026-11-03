@@ -46,7 +46,8 @@ public class SpawnPoint : MonoBehaviour
 	{
 		get
 		{
-			return new Vector2(base.transform.rotation.eulerAngles.y, base.transform.rotation.eulerAngles.x);
+			float y = base.transform.rotation.eulerAngles.y;
+			return new Vector2(y, base.transform.rotation.eulerAngles.x);
 		}
 	}
 

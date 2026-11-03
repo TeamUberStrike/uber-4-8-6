@@ -5,10 +5,6 @@ public class StreamedAudioPlayer : AutoMonoBehaviour<StreamedAudioPlayer>
 {
 	private static int _playCounter;
 
-	static StreamedAudioPlayer()
-	{
-	}
-
 	public void PlayMusic(AudioSource source, string clipName)
 	{
 		if (!string.IsNullOrEmpty(clipName))

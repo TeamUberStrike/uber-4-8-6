@@ -97,13 +97,14 @@ public class HUDAmmoBar : MonoBehaviour
 		while (true)
 		{
 			time = Mathf.Min(time + Time.deltaTime * PulseSpeed, (float)Math.PI);
-			float pulse = Mathf.Sin(time) * PulseScale;
-			text.transform.localScale = (Vector3.one * (baseScale + pulse * (float)(up ? 1 : (-1)))).SetZ(1f);
-			if (time >= (float)Math.PI)
+			float num = Mathf.Sin(time) * PulseScale;
+			text.transform.localScale = (Vector3.one * (baseScale + num * (float)(up ? 1 : (-1)))).SetZ(1f);
+			if (!(time >= (float)Math.PI))
 			{
-				break;
+				yield return 0;
+				continue;
 			}
-			yield return 0;
+			break;
 		}
 	}
 }

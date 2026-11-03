@@ -12,7 +12,11 @@ public class DynamicTexture
 	{
 		get
 		{
-			return (holder == null) ? 1f : ((float)holder.Texture.height / (float)holder.Texture.width);
+			if (holder != null)
+			{
+				return (float)holder.Texture.height / (float)holder.Texture.width;
+			}
+			return 1f;
 		}
 	}
 

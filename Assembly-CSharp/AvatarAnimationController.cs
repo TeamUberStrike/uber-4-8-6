@@ -152,7 +152,8 @@ public class AvatarAnimationController : MonoBehaviour
 		Animator.SetInteger(ControlFields.GearType, gearTrigger);
 		if (state != null)
 		{
-			float value = Vector3.Magnitude(new Vector3(state.Velocity.x, 0f, state.Velocity.z));
+			float x = state.Velocity.x;
+			float value = Vector3.Magnitude(new Vector3(x, 0f, state.Velocity.z));
 			bool value2 = false;
 			bool value3 = false;
 			if (Mathf.DeltaAngle(state.HorizontalRotation.eulerAngles.y, turnAround) > 45f)
@@ -304,7 +305,6 @@ public class AvatarAnimationController : MonoBehaviour
 
 	public void TriggerGearAnimation(UberstrikeItemClass itemClass)
 	{
-		ChangeWeaponType((UberstrikeItemClass)0);
 		switch (itemClass)
 		{
 		case UberstrikeItemClass.GearHead:

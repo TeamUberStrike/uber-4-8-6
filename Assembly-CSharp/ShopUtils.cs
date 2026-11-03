@@ -35,6 +35,7 @@ public static class ShopUtils
 					itemPrice = price;
 				}
 			}
+			return itemPrice;
 		}
 		return itemPrice;
 	}
@@ -84,7 +85,11 @@ public static class ShopUtils
 	{
 		if (view != null && view.View != null)
 		{
-			return view.View.ItemClass == UberstrikeItemClass.WeaponMachinegun || view.View.ItemClass == UberstrikeItemClass.WeaponShotgun || view.View.ItemClass == UberstrikeItemClass.WeaponSniperRifle;
+			if (view.View.ItemClass != UberstrikeItemClass.WeaponMachinegun && view.View.ItemClass != UberstrikeItemClass.WeaponShotgun)
+			{
+				return view.View.ItemClass == UberstrikeItemClass.WeaponSniperRifle;
+			}
+			return true;
 		}
 		return false;
 	}
@@ -93,7 +98,11 @@ public static class ShopUtils
 	{
 		if (view != null && view.View != null)
 		{
-			return view.View.ItemClass == UberstrikeItemClass.WeaponCannon || view.View.ItemClass == UberstrikeItemClass.WeaponLauncher || view.View.ItemClass == UberstrikeItemClass.WeaponSplattergun;
+			if (view.View.ItemClass != UberstrikeItemClass.WeaponCannon && view.View.ItemClass != UberstrikeItemClass.WeaponLauncher)
+			{
+				return view.View.ItemClass == UberstrikeItemClass.WeaponSplattergun;
+			}
+			return true;
 		}
 		return false;
 	}

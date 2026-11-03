@@ -81,15 +81,15 @@ public class WeaponFeedbackManager : MonoBehaviour
 			_bobData = new Dictionary<LevelCamera.BobMode, BobData>();
 			foreach (int value in Enum.GetValues(typeof(LevelCamera.BobMode)))
 			{
-				switch ((LevelCamera.BobMode)value)
+				switch (value)
 				{
-				case LevelCamera.BobMode.Walk:
+				case 2:
 					_bobData[(LevelCamera.BobMode)value] = new BobData(0.5f, 3f, 6f);
 					break;
-				case LevelCamera.BobMode.Run:
+				case 3:
 					_bobData[(LevelCamera.BobMode)value] = new BobData(1f, 3f, 8f);
 					break;
-				case LevelCamera.BobMode.Crouch:
+				case 6:
 					_bobData[(LevelCamera.BobMode)value] = new BobData(0.5f, 3f, 12f);
 					break;
 				default:
@@ -148,7 +148,11 @@ public class WeaponFeedbackManager : MonoBehaviour
 		{
 			get
 			{
-				return _weapon != null && _decorator != null;
+				if (_weapon != null)
+				{
+					return _decorator != null;
+				}
+				return false;
 			}
 		}
 
@@ -258,7 +262,10 @@ public class WeaponFeedbackManager : MonoBehaviour
 					else
 					{
 						_targetPosition = Quaternion.AngleAxis(_currentRotation, Vector3.right) * base.PivotVector;
-						_targetRotation = Quaternion.Euler(_currentRotation + base.Decorator.DefaultAngles.x, base.Decorator.DefaultAngles.y, base.Decorator.DefaultAngles.z);
+						float currentRotation = _currentRotation;
+						float x = currentRotation + base.Decorator.DefaultAngles.x;
+						float y = base.Decorator.DefaultAngles.y;
+						_targetRotation = Quaternion.Euler(x, y, base.Decorator.DefaultAngles.z);
 					}
 					if (!Instance._isIronSight)
 					{
@@ -349,12 +356,13 @@ public class WeaponFeedbackManager : MonoBehaviour
 				{
 					_targetRotation = Quaternion.Euler(0f, 0f, Instance.WeaponAnimation.PickUpAngles);
 					_targetPosition = base.Decorator.DefaultPosition;
+					return;
 				}
-				else
-				{
-					_targetRotation = Quaternion.Euler(Instance.WeaponAnimation.PickUpAngles + base.Decorator.DefaultAngles.x, base.Decorator.DefaultAngles.y, base.Decorator.DefaultAngles.z);
-					_targetPosition = Quaternion.AngleAxis(Instance.WeaponAnimation.PickUpAngles, Vector3.right) * base.PivotVector;
-				}
+				float pickUpAngles = Instance.WeaponAnimation.PickUpAngles;
+				float x = pickUpAngles + base.Decorator.DefaultAngles.x;
+				float y = base.Decorator.DefaultAngles.y;
+				_targetRotation = Quaternion.Euler(x, y, base.Decorator.DefaultAngles.z);
+				_targetPosition = Quaternion.AngleAxis(Instance.WeaponAnimation.PickUpAngles, Vector3.right) * base.PivotVector;
 			}
 		}
 
@@ -392,6 +400,10 @@ public class WeaponFeedbackManager : MonoBehaviour
 		{
 			if (base.IsRunning && base.IsValid && !(_time > _transitionTime))
 			{
+				if (LevelCamera.IsZoomedIn)
+				{
+					Finish();
+				}
 				if (base.Decorator.IsMelee)
 				{
 					_currentRotation = Mathf.Lerp(_currentRotation, -90f, _time / _transitionTime);
@@ -629,7 +641,11 @@ public class WeaponFeedbackManager : MonoBehaviour
 	{
 		get
 		{
-			return (bool)Instance && Instance._bobManager.Mode != LevelCamera.BobMode.None;
+			if ((bool)Instance)
+			{
+				return Instance._bobManager.Mode != LevelCamera.BobMode.None;
+			}
+			return false;
 		}
 	}
 
@@ -662,7 +678,11 @@ public class WeaponFeedbackManager : MonoBehaviour
 	{
 		get
 		{
-			return _isIronSight && _isIronSightPosDone;
+			if (_isIronSight)
+			{
+				return _isIronSightPosDone;
+			}
+			return false;
 		}
 	}
 

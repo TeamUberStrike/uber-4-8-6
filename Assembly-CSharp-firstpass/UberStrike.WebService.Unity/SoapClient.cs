@@ -11,10 +11,6 @@ namespace UberStrike.WebService.Unity
 	{
 		private static int _requestId;
 
-		static SoapClient()
-		{
-		}
-
 		private static void LogRequest(int id, float time, int sizeBytes, string interfaceName, string serviceName, string methodName)
 		{
 			if (Configuration.RequestLogger != null)
@@ -36,8 +32,8 @@ namespace UberStrike.WebService.Unity
 		public static IEnumerator MakeRequest(string interfaceName, string serviceName, string methodName, byte[] data, Action<byte[]> requestCallback, Action<Exception> exceptionHandler)
 		{
 			int requestId = _requestId++;
-			string postData = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><" + methodName + " xmlns=\"http://tempuri.org/\"><data>" + Convert.ToBase64String(data) + "</data></" + methodName + "></s:Body></s:Envelope>";
-			byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+			string s = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"><s:Body><" + methodName + " xmlns=\"http://tempuri.org/\"><data>" + Convert.ToBase64String(data) + "</data></" + methodName + "></s:Body></s:Envelope>";
+			byte[] byteArray = Encoding.UTF8.GetBytes(s);
 			Dictionary<string, string> headers = new Dictionary<string, string>
 			{
 				{
@@ -68,41 +64,40 @@ namespace UberStrike.WebService.Unity
 					{
 						throw new Exception("Simulated Webservice fail when calling " + interfaceName + "/" + methodName);
 					}
-					if (request.isDone && string.IsNullOrEmpty(request.error))
+					if (!request.isDone || !string.IsNullOrEmpty(request.error))
 					{
-						if (!string.IsNullOrEmpty(request.text))
-						{
-							try
-							{
-								doc.LoadXml(request.text);
-								XmlNodeList result = doc.GetElementsByTagName(methodName + "Result");
-								if (result.Count <= 0)
-								{
-									LogResponse(requestId, Time.realtimeSinceStartup, request.text, Time.time - startTime, 0);
-									throw new Exception("WWW Request to " + Configuration.WebserviceBaseUrl + serviceName + " failed with content" + request.text);
-								}
-								returnData = Convert.FromBase64String(result[0].InnerXml);
-								if (returnData.Length == 0)
-								{
-									LogResponse(requestId, Time.realtimeSinceStartup, request.text, Time.time - startTime, 0);
-									throw new Exception("WWW Request to " + Configuration.WebserviceBaseUrl + serviceName + " failed with content" + request.text);
-								}
-								LogResponse(requestId, Time.realtimeSinceStartup, "OK", Time.realtimeSinceStartup - startTime, request.bytes.Length);
-							}
-							catch
-							{
-								LogResponse(requestId, Time.time, request.text, Time.realtimeSinceStartup - startTime, 0);
-								throw new Exception("Error reading XML return for method call " + interfaceName + "/" + methodName + ":" + request.text);
-							}
-						}
-						if (requestCallback != null)
-						{
-							requestCallback(returnData);
-						}
-						yield break;
+						LogResponse(requestId, Time.realtimeSinceStartup, request.error, Time.time - startTime, 0);
+						throw new Exception(request.error + "\nWWW Url: " + Configuration.WebserviceBaseUrl + "\nService: " + serviceName + "\nMethod: " + methodName);
 					}
-					LogResponse(requestId, Time.realtimeSinceStartup, request.error, Time.time - startTime, 0);
-					throw new Exception(request.error + "\nWWW Url: " + Configuration.WebserviceBaseUrl + "\nService: " + serviceName + "\nMethod: " + methodName);
+					if (!string.IsNullOrEmpty(request.text))
+					{
+						try
+						{
+							doc.LoadXml(request.text);
+							XmlNodeList elementsByTagName = doc.GetElementsByTagName(methodName + "Result");
+							if (elementsByTagName.Count <= 0)
+							{
+								LogResponse(requestId, Time.realtimeSinceStartup, request.text, Time.time - startTime, 0);
+								throw new Exception("WWW Request to " + Configuration.WebserviceBaseUrl + serviceName + " failed with content" + request.text);
+							}
+							returnData = Convert.FromBase64String(elementsByTagName[0].InnerXml);
+							if (returnData.Length == 0)
+							{
+								LogResponse(requestId, Time.realtimeSinceStartup, request.text, Time.time - startTime, 0);
+								throw new Exception("WWW Request to " + Configuration.WebserviceBaseUrl + serviceName + " failed with content" + request.text);
+							}
+							LogResponse(requestId, Time.realtimeSinceStartup, "OK", Time.realtimeSinceStartup - startTime, request.bytes.Length);
+						}
+						catch
+						{
+							LogResponse(requestId, Time.time, request.text, Time.realtimeSinceStartup - startTime, 0);
+							throw new Exception("Error reading XML return for method call " + interfaceName + "/" + methodName + ":" + request.text);
+						}
+					}
+					if (requestCallback != null)
+					{
+						requestCallback(returnData);
+					}
 				}
 				catch (Exception ex)
 				{

@@ -92,7 +92,9 @@ public class PickupItem : MonoBehaviour
 		IsAvailable = true;
 		_pickupID = AddInstance(this);
 		MeshRenderer[] renderers = _renderers;
-		foreach (Renderer renderer in renderers)
+		MeshRenderer[] array = renderers;
+		MeshRenderer[] array2 = array;
+		foreach (Renderer renderer in array2)
 		{
 			renderer.enabled = true;
 		}
@@ -138,12 +140,12 @@ public class PickupItem : MonoBehaviour
 
 	protected void PlayLocalPickupSound(AudioClip audioClip)
 	{
-		AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(audioClip);
+		AutoMonoBehaviour<SfxManager>.Instance.PlayInGameAudioClip(audioClip, 0uL);
 	}
 
 	protected void PlayRemotePickupSound(AudioClip audioClip, Vector3 position)
 	{
-		AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(audioClip, position, 1f);
+		AutoMonoBehaviour<SfxManager>.Instance.Play3dAudioClip(audioClip, position);
 	}
 
 	protected IEnumerator StartHidingPickupForSeconds(int seconds)
@@ -151,11 +153,13 @@ public class PickupItem : MonoBehaviour
 		IsAvailable = false;
 		ParticleEffectController.ShowPickUpEffect(_pickupItem.position, 100);
 		MeshRenderer[] renderers = _renderers;
-		foreach (Renderer r in renderers)
+		MeshRenderer[] array = renderers;
+		MeshRenderer[] array2 = array;
+		foreach (Renderer renderer in array2)
 		{
-			if (r != null)
+			if (renderer != null)
 			{
-				r.enabled = false;
+				renderer.enabled = false;
 			}
 		}
 		if (seconds > 0)
@@ -164,9 +168,11 @@ public class PickupItem : MonoBehaviour
 			ParticleEffectController.ShowPickUpEffect(_pickupItem.position, 5);
 			yield return new WaitForSeconds(1f);
 			MeshRenderer[] renderers2 = _renderers;
-			foreach (Renderer r2 in renderers2)
+			MeshRenderer[] array3 = renderers2;
+			MeshRenderer[] array4 = array3;
+			foreach (Renderer renderer2 in array4)
 			{
-				r2.enabled = true;
+				renderer2.enabled = true;
 			}
 			IsAvailable = true;
 		}
@@ -189,7 +195,9 @@ public class PickupItem : MonoBehaviour
 			ParticleEffectController.ShowPickUpEffect(_pickupItem.position, 100);
 		}
 		MeshRenderer[] renderers = _renderers;
-		foreach (Renderer renderer in renderers)
+		MeshRenderer[] array = renderers;
+		MeshRenderer[] array2 = array;
+		foreach (Renderer renderer in array2)
 		{
 			if ((bool)renderer)
 			{

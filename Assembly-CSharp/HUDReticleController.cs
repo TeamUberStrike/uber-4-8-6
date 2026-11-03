@@ -57,7 +57,11 @@ public class HUDReticleController : MonoBehaviour
 	{
 		get
 		{
-			return (!reticles.ContainsKey(activeReticleId)) ? null : reticles[activeReticleId];
+			if (reticles.ContainsKey(activeReticleId))
+			{
+				return reticles[activeReticleId];
+			}
+			return null;
 		}
 	}
 

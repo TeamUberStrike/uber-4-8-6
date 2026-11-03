@@ -26,7 +26,9 @@ public class CrossbowWeaponDecorator : BaseWeaponDecorator
 			{
 				arrowProjectile.gameObject.transform.parent = GameState.Current.Avatar.Decorator.GetBone(BoneIndex.Hips);
 				Renderer[] componentsInChildren = arrowProjectile.GetComponentsInChildren<Renderer>(true);
-				foreach (Renderer renderer in componentsInChildren)
+				Renderer[] array = componentsInChildren;
+				Renderer[] array2 = array;
+				foreach (Renderer renderer in array2)
 				{
 					renderer.enabled = false;
 				}

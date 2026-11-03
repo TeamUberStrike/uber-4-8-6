@@ -30,7 +30,11 @@ public class ChatDialog
 	{
 		get
 		{
-			return UserCmid == 0 || AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.HasPlayer(UserCmid);
+			if (UserCmid != 0)
+			{
+				return AutoMonoBehaviour<CommConnectionManager>.Instance.Client.Lobby.HasPlayer(UserCmid);
+			}
+			return true;
 		}
 	}
 

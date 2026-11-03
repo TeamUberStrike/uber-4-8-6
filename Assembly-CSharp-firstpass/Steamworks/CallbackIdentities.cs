@@ -13,7 +13,7 @@ namespace Steamworks
 				CallbackIdentityAttribute callbackIdentityAttribute = (CallbackIdentityAttribute)customAttributes[num];
 				return callbackIdentityAttribute.Identity;
 			}
-			throw new Exception("Callback number not found for struct " + callbackStruct);
+			throw new Exception("Callback number not found for struct " + ((callbackStruct != null) ? callbackStruct.ToString() : null));
 		}
 	}
 }
