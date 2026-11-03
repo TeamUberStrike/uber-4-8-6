@@ -266,8 +266,7 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 	{
 		List<int> list = new List<int>();
 		list.Add(1);
-		list.Add(17);
-		list.Add(18);
+		list.Add(19);
 		if (list.Contains(mapid))
 		{
 			return true;
@@ -336,7 +335,7 @@ public class CreateGamePanelGUI : MonoBehaviour, IPanelGui
 			{
 				AutoMonoBehaviour<SfxManager>.Instance.Play2dAudioClip(GameAudio.CreateGame, 0uL);
 				SelectMap(allMap2);
-				if (allMap2.View.MapId == 1 || allMap2.View.MapId == 17 || allMap2.View.MapId == 18)
+				if (BlueBoxSupport(allMap2.View.MapId))
 				{
 					BlueBoxSupportedMap = true;
 				}
