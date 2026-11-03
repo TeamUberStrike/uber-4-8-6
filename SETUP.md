@@ -54,10 +54,14 @@ Run **`tools\setup-unity-4.6.5.bat`**. It:
 ## 3. Open the project
 
 ```
-git clone https://github.com/constripacity/UberSteam-client-4-7-1
-cd UberSteam-client-4-7-1
-git checkout uber471-unity465
+git clone https://github.com/TeamUberStrike/uber-4-8-6
+cd uber-4-8-6
+git checkout original        (or patcher-qa)
 ```
+
+The code lives at the repo root like xavgru12/UberClient v4.8.6 (`Assembly-CSharp/`, `Assembly-CSharp-firstpass/`).
+**`tools\setup-links.bat`** links both folders into `Assets/` so Unity compiles them; `open-project.bat` and
+`build-player.bat` run it first. Do not open the project in Unity before the links exist (a dialog warns you).
 
 Run **`tools\open-project.bat`**. The first import takes 20–60 minutes (it fills `Library/`). Then open
 **`Assets/Scenes/GlobalScene.unity`** and press **Play** to run in the editor — never start from a map scene; maps
